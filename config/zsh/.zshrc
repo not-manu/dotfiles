@@ -220,9 +220,3 @@ function taf() {
   local session
   session=$(tmux list-sessions -F '#{session_name}' 2>/dev/null | fzf --prompt='tmux session: ') && tmux attach-session -t "$session"
 }
-
-# Auto-attach when opening a new terminal (e.g. a new Ghostty window)
-# Skipped if already inside tmux, or in a non-interactive shell / SSH session, or no TTY
-if [[ -z "$TMUX" ]] && [[ $- == *i* ]] && [[ -t 0 ]] && command -v tmux &>/dev/null; then
-  ts
-fi
