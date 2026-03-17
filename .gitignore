@@ -1,0 +1,30 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets and auth — NEVER commit these
+*.local
+.zshrc.local
+.npmrc
+.ssh/
+.mcp-auth/
+
+# Plugin binaries and dependencies (installed by plugin managers)
+config/tmux/plugins/
+config/opencode/node_modules/
+config/opencode/bun.lock
+config/opencode/package.json
+config/opencode/.gitignore
+config/nvim/lazy-lock.json
+
+# Editor state and caches
+config/zed/conversations/
+config/zed/prompts/
+config/zed/copilot/
+config/btop/themes/
+
+# Downloaded/generated files
+*.zwc
+*.swp
+*.swo
+*~
