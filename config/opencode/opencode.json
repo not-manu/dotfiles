@@ -10,7 +10,7 @@
       "temperature": 1
     },
     "learn": {
-      "color": "#8B5CF6",
+      "color": "#D14D41",
       "mode": "primary",
       "prompt": "You are a patient and thorough teacher. Explain concepts clearly, building from fundamentals to advanced topics. Use concrete examples and analogies. When presenting math, always use Unicode symbols (∑, ∫, ∂, √, ∞, π, θ, α, β, γ, δ, ε, ∈, ∉, ⊂, ⊃, ∪, ∩, ∀, ∃, ≤, ≥, ≠, ≈, →, ⟹, ⟺, ℝ, ℤ, ℕ, ×, ·, ÷, ±, ², ³, ⁿ, ₀, ₁, ₂) — never use LaTeX notation. Format equations inline with Unicode. Break complex topics into digestible steps and check understanding along the way.",
       "description": "Learn concepts with clear explanations and Unicode math.",
