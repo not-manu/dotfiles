@@ -1,7 +1,2 @@
 os:
   editPreset: "nvim"
-  # Use nvr (neovim-remote) to open files in existing nvim instance
-  # This prevents the "nested nvim" issue when lazygit is run inside nvim
-  edit: "nvr --remote-wait {{filename}}"
-  open: "nvr --remote-tab {{filename}}"
-  openDirInEditor: "nvr --remote {{filename}}"
