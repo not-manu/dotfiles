@@ -1,0 +1,3 @@
+- [ ] nvim: clean up status bar
+- [ ] tmux: add tmux-plugins/tmux-continuum
+- [ ] tmux: add tmux-plugins/tmux-resurrect
