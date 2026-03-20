@@ -28,7 +28,7 @@ outer.top = 0
 # then h/j/k/l picks a direction and drops back to main mode.
 
 [mode.main.binding]
-ctrl-b = 'mode service'
+alt-b = 'mode service'
 
 [mode.service.binding]
 # Focus windows by direction
