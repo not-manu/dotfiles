@@ -40,6 +40,7 @@ config_dirs=(
   opencode
   vim
   zsh
+  aerospace
 )
 
 for dir in "${config_dirs[@]}"; do

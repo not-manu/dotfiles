@@ -1,0 +1,41 @@
+# Disable tiling — keep normal macOS window behavior
+after-login-command = []
+after-startup-command = []
+enable-normalization-flatten-containers = false
+enable-normalization-opposite-orientation-for-nested-containers = false
+
+# Don't auto-tile. Use "floating" layout by default (normal macOS behavior)
+default-root-container-layout = 'tiles'
+default-root-container-orientation = 'auto'
+
+# Make all windows float by default (disables tiling)
+[[on-window-detected]]
+run = 'layout floating'
+
+# No gaps needed in floating mode
+[gaps]
+inner.horizontal = 0
+inner.vertical = 0
+outer.left = 0
+outer.right = 0
+outer.bottom = 0
+outer.top = 0
+
+# -------------------------------------------------------------------
+# Keybindings: ctrl+b as leader (tmux-style), then direction to focus
+# -------------------------------------------------------------------
+# 'service' mode acts as the leader layer — ctrl+b enters it,
+# then h/j/k/l picks a direction and drops back to main mode.
+
+[mode.main.binding]
+ctrl-b = 'mode service'
+
+[mode.service.binding]
+# Focus windows by direction
+h = ['focus left', 'mode main']
+j = ['focus down', 'mode main']
+k = ['focus up', 'mode main']
+l = ['focus right', 'mode main']
+
+# Cancel leader with escape
+esc = 'mode main'
