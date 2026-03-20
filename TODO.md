@@ -1,6 +1,5 @@
 - [ ] nvim: clean up status bar
 - [ ] nvim: figure out how to handle "auto wrapping" beyond 80 characters
-- [ ] tmux: update styling for status bar when a process is done (e.g timer is finished)
 - [ ] raycast: add raycast shortcuts to dotfiles
 
 **done**
@@ -9,3 +8,4 @@
 - [x] tmux: add tmux-plugins/tmux-continuum
 - [x] tmux: add tmux-plugins/tmux-resurrect
 - [x] tmux: include preview when searching for processes with <C-b>f
+- [x] tmux: update styling for status bar when a process is done (e.g timer is finished)
