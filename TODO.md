@@ -14,3 +14,4 @@
 - [x] tmux: update styling for status bar when a process is done (e.g timer is finished)
 - [x] aerospace: install
 - [x] aerospace: add config to dotfiles
+- [x] opencode: make default ask model sonnet 4.6
