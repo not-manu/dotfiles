@@ -1,6 +1,9 @@
 - [ ] nvim: clean up status bar
 - [ ] nvim: figure out how to handle "auto wrapping" beyond 80 characters
 - [ ] raycast: add raycast shortcuts to dotfiles
+- [ ] nvim: add a more fully featured code folding setup that:
+       * remembers folds per file
+       * actually works with latex
 
 **done**
 - [x] opencode: add a learn mode (gpt-5.4, openrouter). use unicode for math, not latex.
