@@ -4,7 +4,6 @@
 - [ ] nvim: add a more fully featured code folding setup that:
        * remembers folds per file
        * actually works with latex
-- [ ] remove dotfiles with basic/non-essential config (zed, codex)
 
 **done**
 - [x] opencode: add a learn mode (gpt-5.4, openrouter). use unicode for math, not latex.
@@ -16,3 +15,4 @@
 - [x] aerospace: install
 - [x] aerospace: add config to dotfiles
 - [x] opencode: make default ask model sonnet 4.6
+- [x] remove dotfiles with basic/non-essential config (zed, codex)

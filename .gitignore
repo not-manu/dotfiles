@@ -18,9 +18,6 @@ config/opencode/.gitignore
 config/nvim/lazy-lock.json
 
 # Editor state and caches
-config/zed/conversations/
-config/zed/prompts/
-config/zed/copilot/
 config/btop/themes/
 
 # Downloaded/generated files

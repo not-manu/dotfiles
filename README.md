@@ -8,11 +8,9 @@
 - **ghostty** - flexoki dark, jetbrainsmono nerd font, some fun cursor shaders
 - **git** - delta pager, zdiff3 merge style
 - **lazygit** - nvim integration
-- **zed** - gruvbox dark, vim mode
 - **bat** - ansi theme
 - **btop** - system monitor config
 - **opencode** - ai config
-- **codex** - openrouter setup
 - **claude** - plugin settings
 - **vim** - 3 lines lol
 

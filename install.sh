@@ -35,7 +35,6 @@ config_dirs=(
   lazygit
   bat
   btop
-  zed
   git
   opencode
   vim
@@ -65,13 +64,11 @@ mkdir -p "$ghostty_dir"
 link "$CONFIG_DIR/ghostty/config"  "$ghostty_dir/config"
 link "$CONFIG_DIR/ghostty/shaders" "$ghostty_dir/shaders"
 
-# ---- Codex and Claude (live in ~/.<name>, not ~/.config/) ----
+# ---- Claude (lives in ~/.<name>, not ~/.config/) ----
 echo ""
-echo "[4/4] Linking codex and claude configs ..."
+echo "[4/4] Linking claude config ..."
 
-mkdir -p "$HOME/.codex"
 mkdir -p "$HOME/.claude"
-link "$DOTFILES_DIR/config/codex/config.toml"    "$HOME/.codex/config.toml"
 link "$DOTFILES_DIR/config/claude/settings.json"  "$HOME/.claude/settings.json"
 
 # ---- Create .zshrc.local if it doesn't exist ----
