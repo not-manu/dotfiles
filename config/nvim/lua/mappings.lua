@@ -9,6 +9,10 @@ map("i", "jk", "<ESC>")
 map("n", "<C-d>", "<C-d>zz", { desc = "Center cursor after moving down half-page" })
 map("n", "<C-u>", "<C-u>zz", { desc = "Center cursor after moving up half-page" })
 
+-- Move by visual lines (for soft-wrapped text)
+map({ "n", "v" }, "j", "gj", { noremap = true })
+map({ "n", "v" }, "k", "gk", { noremap = true })
+
 -- map({ "n", "i", "v" }, "<C-s>", "<cmd> w <cr>")
 
 -- TypeScript-specific keybindings (only active in TS/JS files)

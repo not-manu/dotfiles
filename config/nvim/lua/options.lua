@@ -7,6 +7,10 @@ vim.o.shadafile = "NONE"
 
 vim.opt.backupcopy = "yes" -- Enable hot reloading for file watchers
 
+-- Soft wrap at word boundaries
+vim.o.wrap = true
+vim.o.linebreak = true
+
 -- Treesitter-based code folding
 vim.o.foldenable = true
 vim.o.foldlevel = 99
