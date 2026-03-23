@@ -5,7 +5,6 @@
        * remembers folds per file
        * actually works with latex
 - [ ] nvim: autoformat astro on save
-- [ ] nvim: autotags don't work with astro
 
 **done**
 - [x] opencode: add a learn mode (gpt-5.4, openrouter). use unicode for math, not latex.
@@ -18,3 +17,4 @@
 - [x] aerospace: add config to dotfiles
 - [x] opencode: make default ask model sonnet 4.6
 - [x] remove dotfiles with basic/non-essential config (zed, codex)
+- [x] nvim: autotags don't work with astro

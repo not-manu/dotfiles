@@ -10,6 +10,8 @@ local options = {
     typescriptreact = { "prettier" },
     json = { "prettier" },
     jsonc = { "prettier" },
+    -- Astro
+    astro = { "prettier" },
     -- MDX
     mdx = { "prettier" },
     -- Additional web formats
