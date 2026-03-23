@@ -26,7 +26,7 @@ link() {
 }
 
 # ---- ~/.config/ directories ----
-echo "[1/5] Linking config directories into ~/.config/ ..."
+echo "[1/4] Linking config directories into ~/.config/ ..."
 
 config_dirs=(
   ghostty
@@ -48,7 +48,7 @@ done
 
 # ---- Home directory symlinks (apps that don't support XDG) ----
 echo ""
-echo "[2/5] Linking shell dotfiles into ~/ ..."
+echo "[2/4] Linking shell dotfiles into ~/ ..."
 
 link "$CONFIG_DIR/zsh/.zshrc"   "$HOME/.zshrc"
 link "$CONFIG_DIR/zsh/.zshenv"  "$HOME/.zshenv"
@@ -57,7 +57,7 @@ link "$CONFIG_DIR/vim/vimrc"    "$HOME/.vimrc"
 
 # ---- Ghostty (macOS Application Support) ----
 echo ""
-echo "[3/5] Linking Ghostty config into ~/Library/Application Support/ ..."
+echo "[3/4] Linking Ghostty config into ~/Library/Application Support/ ..."
 
 ghostty_dir="$HOME/Library/Application Support/com.mitchellh.ghostty"
 mkdir -p "$ghostty_dir"
@@ -66,16 +66,10 @@ link "$CONFIG_DIR/ghostty/shaders" "$ghostty_dir/shaders"
 
 # ---- Claude (lives in ~/.<name>, not ~/.config/) ----
 echo ""
-echo "[4/5] Linking claude config ..."
+echo "[4/4] Linking claude config ..."
 
 mkdir -p "$HOME/.claude"
 link "$DOTFILES_DIR/config/claude/settings.json"  "$HOME/.claude/settings.json"
-
-# ---- Agent skills (~/.agents) ----
-echo ""
-echo "[5/5] Linking agent skills into ~/.agents ..."
-
-link "$DOTFILES_DIR/agents"  "$HOME/.agents"
 
 # ---- Create .zshrc.local if it doesn't exist ----
 echo ""
