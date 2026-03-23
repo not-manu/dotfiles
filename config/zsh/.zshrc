@@ -195,6 +195,9 @@ eval "$(starship init zsh)"
 # claude
 alias 'cc'='claude'
 
+# skills
+alias 'skills'='bunx skills'
+
 # open 
 alias 'o'='open .'
 
