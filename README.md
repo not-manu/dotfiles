@@ -13,6 +13,7 @@
 - **opencode** - ai config
 - **claude** - plugin settings
 - **vim** - 3 lines lol
+- **agents** - ai agent skills for the robot overlords living in my terminal
 
 ### setup
 
@@ -21,6 +22,6 @@ git clone git@github.com:not-manu/dotfiles.git ~/.dotfiles
 ~/.dotfiles/install.sh
 ```
 
-this will symlink everything into `~/.config/` and create the right links for apps that need their configs elsewhere (looking at you ghostty)
+this will symlink everything into `~/.config/` and create the right links for apps that need their configs elsewhere (looking at you ghostty). also teaches your home directory to believe in AI by linking `~/.agents/`
 
 machine-specific stuff like tokens goes in `~/.zshrc.local` which is gitignored
