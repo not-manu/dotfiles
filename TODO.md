@@ -5,6 +5,7 @@
        * remembers folds per file
        * actually works with latex
 - [ ] nvim: autoformat astro on save
+- [ ] nvim: add mdx support
 
 **done**
 - [x] opencode: add a learn mode (gpt-5.4, openrouter). use unicode for math, not latex.
