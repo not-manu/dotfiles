@@ -74,4 +74,14 @@ vim.lsp.config("texlab", {
   },
 })
 
--- read :h vim.lsp.config for changing options of lsp servers 
+-- MDX analyzer configuration
+vim.lsp.config("mdx_analyzer", {
+  root_markers = { "package.json", "tsconfig.json", "jsconfig.json", ".git" },
+  init_options = {
+    typescript = {
+      tsdk = vim.fn.stdpath("data") .. "/mason/packages/typescript-language-server/node_modules/typescript/lib",
+    },
+  },
+})
+
+-- read :h vim.lsp.config for changing options of lsp servers
