@@ -20,3 +20,4 @@
 - [x] opencode: make default ask model sonnet 4.6
 - [x] remove dotfiles with basic/non-essential config (zed, codex)
 - [x] nvim: autotags don't work with astro
+- [x] zsh: python3 -> python

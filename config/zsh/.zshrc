@@ -167,6 +167,9 @@ alias 'lg'='lazygit'
 # neovim
 alias 'n'='nvim'
 
+# python
+alias 'python'='python3'
+
 # yazi
 alias 'y'='yazi'
 
