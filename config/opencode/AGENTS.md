@@ -1,0 +1,1 @@
+/Users/manu/.dotfiles/config/agents/AGENTS.md
