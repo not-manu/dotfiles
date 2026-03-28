@@ -7,7 +7,6 @@
 - [ ] nvim: autoformat astro on save
 - [ ] nvim: add mdx support
 - [ ] nvim: working in long lines (e.g. latex) is a nightmare and extremely laggy?
-- [ ] agents: add a global AGENTS.md with symlinks to CLAUDE.md
 
 **done**
 - [x] opencode: add a learn mode (gpt-5.4, openrouter). use unicode for math, not latex.
@@ -22,3 +21,4 @@
 - [x] remove dotfiles with basic/non-essential config (zed, codex)
 - [x] nvim: autotags don't work with astro
 - [x] zsh: python3 -> python
+- [x] agents: add a global AGENTS.md with symlinks to CLAUDE.md

@@ -66,10 +66,17 @@ link "$CONFIG_DIR/ghostty/shaders" "$ghostty_dir/shaders"
 
 # ---- Claude (lives in ~/.<name>, not ~/.config/) ----
 echo ""
-echo "[4/4] Linking claude config ..."
+echo "[4/5] Linking claude config ..."
 
 mkdir -p "$HOME/.claude"
 link "$DOTFILES_DIR/config/claude/settings.json"  "$HOME/.claude/settings.json"
+
+# ---- Global agent instructions (AGENTS.md → CLAUDE.md + OpenCode) ----
+echo ""
+echo "[5/5] Linking global agent instructions ..."
+
+link "$DOTFILES_DIR/config/agents/AGENTS.md"       "$HOME/.claude/CLAUDE.md"
+link "$DOTFILES_DIR/config/agents/AGENTS.md"       "$CONFIG_DIR/opencode/AGENTS.md"
 
 # ---- Create .zshrc.local if it doesn't exist ----
 echo ""
