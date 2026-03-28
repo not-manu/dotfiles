@@ -6,7 +6,8 @@
        * actually works with latex
 - [ ] nvim: autoformat astro on save
 - [ ] nvim: add mdx support
-0-[ ] nvim: working in long lines (e.g. latex) is a nightmare and extremely laggy?
+- [ ] nvim: working in long lines (e.g. latex) is a nightmare and extremely laggy?
+- [ ] agents: add a global AGENTS.md with symlinks to CLAUDE.md
 
 **done**
 - [x] opencode: add a learn mode (gpt-5.4, openrouter). use unicode for math, not latex.
