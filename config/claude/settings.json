@@ -10,5 +10,6 @@
       }
     }
   },
-  "voiceEnabled": false
+  "voiceEnabled": false,
+  "model": "opus"
 }

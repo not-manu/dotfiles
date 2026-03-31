@@ -7,6 +7,7 @@
 - [ ] nvim: autoformat astro on save
 - [ ] nvim: add mdx support
 - [ ] nvim: working in long lines (e.g. latex) is a nightmare and extremely laggy?
+- [ ] claude: remove settings from the dotfiles (it keeps updating for some reason)
 
 **done**
 - [x] opencode: add a learn mode (gpt-5.4, openrouter). use unicode for math, not latex.
