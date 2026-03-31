@@ -14,11 +14,18 @@ M.base46 = {
 	-- },
 }
 
--- M.nvdash = { load_on_startup = true }
--- M.ui = {
---       tabufline = {
---          lazyload = false
---      }
--- }
+M.ui = {
+	statusline = {
+		order = { "mode", "file", "git", "recording", "%=", "lsp_msg", "%=", "diagnostics", "lsp", "cwd", "cursor" },
+		modules = {
+			recording = function()
+				if vim.g.recording_mode then
+					return "%#St_InsertMode#  REC %#St_InsertModeSep#"
+				end
+				return ""
+			end,
+		},
+	},
+}
 
 return M

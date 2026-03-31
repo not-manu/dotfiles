@@ -75,16 +75,38 @@ map("v", "<leader>tt", function()
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
 end, { desc = "Toggle markdown checkboxes" })
 
--- Toggle diagnostics visibility (for screenshots)
-local diagnostics_visible = true
-map("n", "<leader>td", function()
-  diagnostics_visible = not diagnostics_visible
-  vim.diagnostic.config({
-    virtual_text = diagnostics_visible,
-    signs = diagnostics_visible,
-    underline = diagnostics_visible,
-  })
-end, { desc = "Toggle diagnostics visibility" })
+-- Recording mode: disables diagnostics, completion popups, and copilot for clean recordings
+vim.g.recording_mode = false
+
+map("n", "<leader>tr", function()
+  vim.g.recording_mode = not vim.g.recording_mode
+  local on = vim.g.recording_mode
+
+  -- Diagnostics
+  vim.diagnostic.config {
+    virtual_text = not on and { spacing = 4, prefix = "" } or false,
+    signs = not on,
+    underline = not on,
+  }
+
+  -- Completion (nvim-cmp)
+  local ok_cmp, cmp = pcall(require, "cmp")
+  if ok_cmp then
+    if on then
+      cmp.setup.buffer { enabled = false }
+    else
+      cmp.setup.buffer { enabled = true }
+    end
+  end
+
+  -- Copilot (may not be loaded yet since it's lazy)
+  if vim.fn.exists ":Copilot" == 2 then
+    vim.cmd(on and "Copilot disable" or "Copilot enable")
+  end
+
+  vim.notify(on and "Recording mode ON" or "Recording mode OFF", vim.log.levels.INFO)
+  vim.cmd "redrawstatus"
+end, { desc = "Toggle recording mode" })
 
 -- Lazygit
 map("n", "<leader>lg", "<cmd>LazyGit<CR>", { desc = "LazyGit" })
