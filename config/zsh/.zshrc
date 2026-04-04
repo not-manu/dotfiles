@@ -226,3 +226,9 @@ function taf() {
   local session
   session=$(tmux list-sessions -F '#{session_name}' 2>/dev/null | fzf --prompt='tmux session: ') && tmux attach-session -t "$session"
 }
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/manu/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/manu/Downloads/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/manu/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/manu/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
