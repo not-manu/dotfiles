@@ -18,6 +18,5 @@
     }
   },
   "voiceEnabled": false,
-  "skipDangerousModePermissionPrompt": true,
-  "model": "opus"
+  "skipDangerousModePermissionPrompt": true
 }

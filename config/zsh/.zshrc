@@ -197,6 +197,11 @@ eval "$(starship init zsh)"
 
 # claude
 alias 'cc'='claude'
+alias 'ccd'='claude --dangerously-skip-permissions'
+
+# bun
+alias 'bn'='bun'
+alias 'bnx'='bunx'
 
 # skills
 alias 'skills'='bunx skills'
