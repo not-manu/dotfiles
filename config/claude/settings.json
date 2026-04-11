@@ -1,6 +1,7 @@
 {
   "enabledPlugins": {
-    "pyright-lsp@claude-plugins-official": true
+    "pyright-lsp@claude-plugins-official": false,
+    "mempalace@mempalace": false
   },
   "extraKnownMarketplaces": {
     "claude-code-plugins": {
@@ -8,7 +9,15 @@
         "source": "github",
         "repo": "anthropics/claude-code"
       }
+    },
+    "mempalace": {
+      "source": {
+        "source": "github",
+        "repo": "milla-jovovich/mempalace"
+      }
     }
   },
-  "voiceEnabled": false
+  "voiceEnabled": false,
+  "skipDangerousModePermissionPrompt": true,
+  "model": "opus"
 }
