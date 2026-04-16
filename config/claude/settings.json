@@ -1,4 +1,5 @@
 {
+  "model": "opus",
   "enabledPlugins": {
     "pyright-lsp@claude-plugins-official": false,
     "mempalace@mempalace": false
@@ -17,7 +18,7 @@
       }
     }
   },
-  "voiceEnabled": false,
   "skipDangerousModePermissionPrompt": true,
-  "model": "opus"
+  "voiceEnabled": false,
+  "effortLevel": "medium"
 }
