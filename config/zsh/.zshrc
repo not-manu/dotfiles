@@ -167,6 +167,9 @@ alias 'lg'='lazygit'
 # neovim
 alias 'n'='nvim'
 
+# neofetch
+alias 'nf'='neofetch'
+
 # python
 alias 'python'='python3'
 
