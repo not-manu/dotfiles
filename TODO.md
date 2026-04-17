@@ -8,7 +8,7 @@
 - [ ] nvim: add mdx support
 - [ ] nvim: working in long lines (e.g. latex) is a nightmare and extremely laggy?
 - [ ] claude: remove settings from the dotfiles (it keeps updating for some reason)
-- [ ] tmux: remove the delay after ctrl b interrupting nvim commands
+- [ ] tmux: remove the delay after ctrl b interrupting nvim commands (resizing is fine, but next/previous is not really necessary)
 
 **done**
 - [x] opencode: add a learn mode (gpt-5.4, openrouter). use unicode for math, not latex.
