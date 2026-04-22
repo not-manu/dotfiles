@@ -25,3 +25,6 @@ config/btop/themes/
 *.swp
 *.swo
 *~
+
+# claude
+.claude

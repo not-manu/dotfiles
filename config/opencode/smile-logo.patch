@@ -1,0 +1,20 @@
+diff --git a/packages/opencode/src/cli/logo.ts b/packages/opencode/src/cli/logo.ts
+index a58a8cf..d42c11d 100644
+--- a/packages/opencode/src/cli/logo.ts
++++ b/packages/opencode/src/cli/logo.ts
+@@ -1,6 +1,13 @@
+ export const logo = {
+-  left: ["                   ", "█▀▀█ █▀▀█ █▀▀█ █▀▀▄", "█__█ █__█ █^^^ █__█", "▀▀▀▀ █▀▀▀ ▀▀▀▀ ▀~~▀"],
+-  right: ["             ▄     ", "█▀▀▀ █▀▀█ █▀▀█ █▀▀█", "█___ █__█ █__█ █^^^", "▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀"],
++  left: [
++    "    ██    ██    ",
++    "                ",
++    "   ▄▄      ▄▄   ",
++    "   ▀▀▄▄▄▄▄▄▀▀   ",
++    "     ▀▀▀▀▀▀     ",
++    "                ",
++  ],
++  right: ["", "", "", "", "", ""],
+ }
+ 
+ export const go = {
