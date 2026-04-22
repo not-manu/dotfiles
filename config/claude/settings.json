@@ -18,6 +18,7 @@
     }
   },
   "effortLevel": "medium",
+  "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "voiceEnabled": false,
   "model": "opus"
