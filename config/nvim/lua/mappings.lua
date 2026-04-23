@@ -108,6 +108,19 @@ map("n", "<leader>tr", function()
   vim.cmd "redrawstatus"
 end, { desc = "Toggle recording mode" })
 
+-- Buffer management
+map("n", "<leader>X", function()
+  require("nvchad.tabufline").closeAllBufs(false)
+end, { desc = "buffer close all except current" })
+
+map("n", "<leader>bL", function()
+  require("nvchad.tabufline").closeBufs_at_direction "left"
+end, { desc = "buffer close all to left" })
+
+map("n", "<leader>bR", function()
+  require("nvchad.tabufline").closeBufs_at_direction "right"
+end, { desc = "buffer close all to right" })
+
 -- Lazygit
 map("n", "<leader>lg", "<cmd>LazyGit<CR>", { desc = "LazyGit" })
 
