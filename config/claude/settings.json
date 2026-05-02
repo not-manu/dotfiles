@@ -21,6 +21,5 @@
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "editorMode": "vim",
-  "voiceEnabled": false,
-  "model": "opus"
+  "voiceEnabled": false
 }
