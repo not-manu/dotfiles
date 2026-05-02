@@ -1,5 +1,4 @@
 {
-  "model": "opus",
   "enabledPlugins": {
     "pyright-lsp@claude-plugins-official": false,
     "mempalace@mempalace": false
@@ -18,9 +17,10 @@
       }
     }
   },
-  "effortLevel": "medium",
+  "effortLevel": "low",
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
+  "editorMode": "vim",
   "voiceEnabled": false,
-  "editorMode": "vim"
+  "model": "opus"
 }
