@@ -8,11 +8,11 @@
 - [ ] nvim: add mdx support
 - [ ] nvim: working in long lines (e.g. latex) is a nightmare and extremely laggy?
 - [ ] claude: remove settings from the dotfiles (it keeps updating for some reason)
-- [ ] tmux: remove the delay after ctrl b interrupting nvim commands (resizing is fine, but next/previous is not really necessary)
 - [ ] starship: eventually switch to starship?
-- [ ] tmux: make the switching sessions fzf nicer and less in the way and minimal. kinda like telescope but for tmux sessions.
 
 **done**
+- [x] tmux: remove the delay after ctrl b interrupting nvim commands (resizing is fine, but next/previous is not really necessary)
+- [x] tmux: make the switching sessions fzf nicer and less in the way and minimal. kinda like telescope but for tmux sessions.
 - [x] opencode: add a learn mode (gpt-5.4, openrouter). use unicode for math, not latex.
 - [x] ghostty: remove unused shaders
 - [x] tmux: add tmux-plugins/tmux-continuum
