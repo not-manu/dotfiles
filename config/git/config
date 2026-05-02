@@ -1,5 +1,6 @@
 [core]
     pager = delta
+	hooksPath = /Users/manu/.config/git/hooks
 
 [interactive]
     diffFilter = delta --color-only
