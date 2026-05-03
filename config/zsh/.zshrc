@@ -124,8 +124,17 @@ ZLE_RPROMPT_INDENT=0  # remove padding from the right
 
 # opencode
 export PATH="$HOME/.opencode/bin:$PATH"
-alias 'oc'='opencode'
 alias 'ocd'='opencode --agent yolo'
+
+# `oc` wraps opencode so `oc patch` runs the smile-logo rebuild script
+function oc() {
+  if [[ "${1:-}" == "patch" ]]; then
+    shift
+    bash "$HOME/.dotfiles/config/opencode/rebuild-with-smile.sh" "$@"
+  else
+    opencode "$@"
+  fi
+}
 
 # zoxide
 eval "$(zoxide init zsh)"
