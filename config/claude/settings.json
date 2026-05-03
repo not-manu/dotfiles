@@ -1,4 +1,5 @@
 {
+  "model": "opus",
   "enabledPlugins": {
     "pyright-lsp@claude-plugins-official": false,
     "mempalace@mempalace": false
@@ -21,6 +22,5 @@
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "editorMode": "vim",
-  "voiceEnabled": false,
-  "model": "haiku"
+  "voiceEnabled": false
 }
