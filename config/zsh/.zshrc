@@ -125,6 +125,7 @@ ZLE_RPROMPT_INDENT=0  # remove padding from the right
 # opencode
 export PATH="$HOME/.opencode/bin:$PATH"
 alias 'oc'='opencode'
+alias 'ocd'='opencode --agent yolo'
 
 # zoxide
 eval "$(zoxide init zsh)"
