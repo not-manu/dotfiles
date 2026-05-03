@@ -9,6 +9,22 @@
       "model": "anthropic/claude-sonnet-4-6",
       "temperature": 1
     },
+    "yolo": {
+      "color": "#AF3029",
+      "mode": "primary",
+      "description": "Skip all permission prompts. Use with care.",
+      "model": "anthropic/claude-opus-4-7",
+      "temperature": 1,
+      "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "websearch": "allow",
+        "task": "allow",
+        "skill": "allow",
+        "external_directory": { "**": "allow" }
+      }
+    },
     "learn": {
       "color": "#D14D41",
       "mode": "primary",
