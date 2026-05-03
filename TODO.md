@@ -9,7 +9,8 @@
 - [ ] nvim: working in long lines (e.g. latex) is a nightmare and extremely laggy?
 - [ ] claude: remove settings from the dotfiles (it keeps updating for some reason)
 - [ ] starship: eventually switch to starship?
-- [ ] tmux: session switch ctrl b f should show numnber windows per session and maybe a preview as well?
+- [ ] tmux: session switch leader + f should show number windows per session and maybe a preview as well?
+- [ ] tmux: add a keybind to toggle right sidebar for agengs
 
 **done**
 - [x] tmux: remove the delay after ctrl b interrupting nvim commands (resizing is fine, but next/previous is not really necessary)
