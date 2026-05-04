@@ -69,6 +69,13 @@ return {
     lazy = true,
   },
 
+  -- Diffview: file/branch git history and diffs
+  {
+    "sindrets/diffview.nvim",
+    cmd = { "DiffviewOpen", "DiffviewFileHistory", "DiffviewClose", "DiffviewToggleFiles", "DiffviewFocusFiles" },
+    dependencies = { "nvim-lua/plenary.nvim" },
+  },
+
   -- Lazygit integration
   {
     "kdheepak/lazygit.nvim",
