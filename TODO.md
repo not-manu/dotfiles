@@ -10,7 +10,8 @@
 - [ ] claude: remove settings from the dotfiles (it keeps updating for some reason)
 - [ ] starship: eventually switch to starship?
 - [ ] tmux: session switch leader + f should show number windows per session and maybe a preview as well?
-- [ ] tmux: add a keybind to toggle right sidebar for agengs
+- [ ] tmux: add a keybind to toggle right sidebar for agents 
+- [ ] claude: add a hook to notify when a process is done (terminal bell / say [summary])
 
 **done**
 - [x] tmux: remove the delay after ctrl b interrupting nvim commands (resizing is fine, but next/previous is not really necessary)
