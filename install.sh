@@ -70,6 +70,7 @@ echo "[4/5] Linking claude config ..."
 
 mkdir -p "$HOME/.claude"
 link "$DOTFILES_DIR/config/claude/settings.json"  "$HOME/.claude/settings.json"
+link "$DOTFILES_DIR/config/claude/hooks"          "$HOME/.claude/hooks"
 
 # ---- Global agent instructions (AGENTS.md → CLAUDE.md + OpenCode) ----
 echo ""
