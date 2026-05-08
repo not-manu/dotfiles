@@ -3,4 +3,5 @@
 - Avoid using `npm` unless explicitly asked to do so, and prefer `bun`. You may
   use `pnpm` as well depending on the project, but I generally prefer `bun`.
 - Prefer `rg` (ripgrep) over `grep` for searching.
+- Be brief, unless explicitly asked to be more verbose.
 
