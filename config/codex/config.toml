@@ -2,3 +2,11 @@ model = "gpt-5.5"
 model_reasoning_effort = "low"
 [projects."/Users/manu/Documents/Projects/not-manu/vactu"]
 trust_level = "trusted"
+
+[marketplaces.openai-bundled]
+last_updated = "2026-05-08T14:18:19Z"
+source_type = "local"
+source = "/Users/manu/.codex/.tmp/bundled-marketplaces/openai-bundled"
+
+[plugins."browser-use@openai-bundled"]
+enabled = true
