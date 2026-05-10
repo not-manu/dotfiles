@@ -4,7 +4,7 @@ model_reasoning_effort = "low"
 trust_level = "trusted"
 
 [marketplaces.openai-bundled]
-last_updated = "2026-05-08T14:18:19Z"
+last_updated = "2026-05-09T10:09:45Z"
 source_type = "local"
 source = "/Users/manu/.codex/.tmp/bundled-marketplaces/openai-bundled"
 
