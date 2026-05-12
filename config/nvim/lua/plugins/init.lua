@@ -6,7 +6,23 @@ return {
       view = {
         adaptive_size = true,
       },
+      auto_reload_on_write = true,
+      filesystem_watchers = {
+        enable = true,
+        debounce_delay = 50,
+      },
     },
+    config = function(_, opts)
+      require("nvim-tree").setup(opts)
+      local api = require "nvim-tree.api"
+      vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "TermLeave" }, {
+        callback = function()
+          if package.loaded["nvim-tree"] then
+            pcall(api.tree.reload)
+          end
+        end,
+      })
+    end,
   },
 
   {
