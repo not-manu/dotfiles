@@ -150,6 +150,22 @@ return {
     end,
   },
 
+  -- Telescope: add <C-j>/<C-k> to navigate results like fzf
+  {
+    "nvim-telescope/telescope.nvim",
+    opts = function(_, conf)
+      local actions = require "telescope.actions"
+      conf.defaults = conf.defaults or {}
+      conf.defaults.mappings = vim.tbl_deep_extend("force", conf.defaults.mappings or {}, {
+        i = {
+          ["<C-j>"] = actions.move_selection_next,
+          ["<C-k>"] = actions.move_selection_previous,
+        },
+      })
+      return conf
+    end,
+  },
+
   -- Snacks.nvim - UI components
   {
     "folke/snacks.nvim",
