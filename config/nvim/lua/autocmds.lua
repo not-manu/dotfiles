@@ -25,3 +25,19 @@ vim.filetype.add {
 
 -- Use markdown treesitter parser for MDX files
 vim.treesitter.language.register("markdown", "mdx")
+
+-- Auto-reload buffers when files change on disk (e.g. agent edits)
+vim.o.autoread = true
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI", "TermLeave" }, {
+  callback = function()
+    if vim.fn.mode() ~= "c" and vim.fn.getcmdwintype() == "" then
+      vim.cmd "silent! checktime"
+    end
+  end,
+})
+
+vim.api.nvim_create_autocmd("FileChangedShellPost", {
+  callback = function()
+    vim.notify("File changed on disk — buffer reloaded", vim.log.levels.INFO)
+  end,
+})
