@@ -216,6 +216,10 @@ alias 'ccd'='claude --dangerously-skip-permissions'
 alias 'bn'='bun'
 alias 'bnx'='bunx'
 
+# @antfu/ni — auto-detects pm per project
+#   ni / nci / nr / nx / nlx / nu / nun / nup
+# install: bun add -g @antfu/ni
+
 # skills
 alias 'skills'='bunx skills'
 
