@@ -43,10 +43,10 @@
       }
     }
   },
-  "effortLevel": "low",
+  "effortLevel": "xhigh",
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
-  "theme": "dark",
+  "theme": "custom:flexoki",
   "editorMode": "vim",
   "skipAutoPermissionPrompt": true,
   "voiceEnabled": false
