@@ -1,4 +1,25 @@
 return {
+  -- filemention.nvim — @file mentions via completion
+  {
+    "not-manu/filemention.nvim",
+    event = "InsertEnter",
+    opts = {},
+    config = function(_, opts)
+      require("filemention").setup(opts)
+    end,
+  },
+
+  -- Add filemention as a cmp source
+  {
+    "hrsh7th/nvim-cmp",
+    dependencies = { "not-manu/filemention.nvim" },
+    opts = function(_, opts)
+      opts.sources = opts.sources or {}
+      table.insert(opts.sources, 1, { name = "filemention" })
+      return opts
+    end,
+  },
+
   -- Override NvChad's nvim-tree config to auto-resize sidebar width
   {
     "nvim-tree/nvim-tree.lua",
