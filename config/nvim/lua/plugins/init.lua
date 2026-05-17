@@ -328,6 +328,26 @@ return {
     },
   },
 
+  -- Persist editor state (buffers, layout) per project directory
+  {
+    "folke/persistence.nvim",
+    event = "BufReadPre",
+    opts = {
+      options = { "buffers", "curdir", "tabpages", "winsize", "help", "globals", "skiprtp", "folds" },
+    },
+    init = function()
+      -- Auto-restore session when nvim is opened with no arguments in a dir
+      vim.api.nvim_create_autocmd("VimEnter", {
+        nested = true,
+        callback = function()
+          if vim.fn.argc() == 0 and vim.fn.line2byte "$" == -1 then
+            require("persistence").load()
+          end
+        end,
+      })
+    end,
+  },
+
   -- Snippet engine for LaTeX snippets
   {
     "L3MON4D3/LuaSnip",

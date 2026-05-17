@@ -165,6 +165,11 @@ map("n", "<leader>bR", function()
   require("nvchad.tabufline").closeBufs_at_direction "right"
 end, { desc = "buffer close all to right" })
 
+-- Session (persistence.nvim)
+map("n", "<leader>qs", function() require("persistence").load() end, { desc = "Restore session for cwd" })
+map("n", "<leader>ql", function() require("persistence").load { last = true } end, { desc = "Restore last session" })
+map("n", "<leader>qd", function() require("persistence").stop() end, { desc = "Don't save session on exit" })
+
 -- Lazygit
 map("n", "<leader>lg", "<cmd>LazyGit<CR>", { desc = "LazyGit" })
 
