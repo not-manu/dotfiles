@@ -154,6 +154,8 @@ do
       end
       return out
     end
+    -- modules.lua caches style_buf as a local at load time; clear so it re-requires with our patched version
+    package.loaded["nvchad.tabufline.modules"] = nil
   end
 end
 
