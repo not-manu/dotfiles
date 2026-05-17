@@ -108,6 +108,9 @@ map("n", "<leader>tr", function()
   vim.cmd "redrawstatus"
 end, { desc = "Toggle recording mode" })
 
+-- Disable nvchad's <leader>b (new buffer) so it can be used as a prefix
+pcall(vim.keymap.del, "n", "<leader>b")
+
 -- Buffer management
 local function is_pinned(buf)
   return vim.b[buf or vim.api.nvim_get_current_buf()].pinned == true
