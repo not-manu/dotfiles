@@ -109,9 +109,50 @@ map("n", "<leader>tr", function()
 end, { desc = "Toggle recording mode" })
 
 -- Buffer management
+local function is_pinned(buf)
+  return vim.b[buf or vim.api.nvim_get_current_buf()].pinned == true
+end
+
+map("n", "<leader>bp", function()
+  local buf = vim.api.nvim_get_current_buf()
+  vim.b[buf].pinned = not is_pinned(buf)
+  vim.cmd "redrawtabline"
+  vim.notify(is_pinned(buf) and "Buffer pinned" or "Buffer unpinned", vim.log.levels.INFO)
+end, { desc = "Toggle pin buffer" })
+
+map("n", "<leader>x", function()
+  if is_pinned() then
+    vim.notify("Buffer is pinned (<leader>bp to unpin)", vim.log.levels.WARN)
+    return
+  end
+  require("nvchad.tabufline").close_buffer()
+end, { desc = "buffer close (skip pinned)" })
+
 map("n", "<leader>X", function()
-  require("nvchad.tabufline").closeAllBufs(false)
-end, { desc = "buffer close all except current" })
+  local tabuf = require "nvchad.tabufline"
+  local cur = vim.api.nvim_get_current_buf()
+  for _, buf in ipairs(vim.t.bufs or {}) do
+    if buf ~= cur and not is_pinned(buf) then
+      tabuf.close_buffer(buf)
+    end
+  end
+end, { desc = "buffer close all except current and pinned" })
+
+-- Pin indicator in tabufline
+do
+  local ok, utils = pcall(require, "nvchad.tabufline.utils")
+  if ok and not utils._pin_patched then
+    utils._pin_patched = true
+    local orig = utils.style_buf
+    utils.style_buf = function(nr, i, w)
+      local out = orig(nr, i, w)
+      if vim.b[nr].pinned then
+        out = out:gsub("(%%%d+@TbGoToBuf@)", "%1%%#TbBufOnModified#󰐃 ", 1)
+      end
+      return out
+    end
+  end
+end
 
 map("n", "<leader>bL", function()
   require("nvchad.tabufline").closeBufs_at_direction "left"
