@@ -147,7 +147,7 @@ do
     utils.style_buf = function(nr, i, w)
       local out = orig(nr, i, w)
       if vim.b[nr].pinned then
-        out = out:gsub("(%%%d+@TbGoToBuf@)", "%1%%#TbBufOnModified#󰐃 ", 1)
+        out = out:gsub("󰅖", "󰐃")
       end
       return out
     end
