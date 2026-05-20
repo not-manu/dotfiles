@@ -1,9 +1,20 @@
 return {
+  -- fff.nvim — frecency-ranked, typo-resistant file index (used by filemention)
+  {
+    "dmtrKovalenko/fff.nvim",
+    build = function()
+      require("fff.download").download_or_build_binary()
+    end,
+    lazy = false,
+    opts = {},
+  },
+
   -- filemention.nvim — @file mentions via completion
   {
     "not-manu/filemention.nvim",
     event = "InsertEnter",
-    opts = {},
+    dependencies = { "dmtrKovalenko/fff.nvim" },
+    opts = { finder = "fff" },
     config = function(_, opts)
       require("filemention").setup(opts)
     end,
