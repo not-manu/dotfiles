@@ -13,9 +13,8 @@ return {
   {
     "not-manu/filemention.nvim",
     event = "InsertEnter",
-    branch = "5-folders-should-show-up-in-search-with-priority",
+    branch = "dev",
     dependencies = { "dmtrKovalenko/fff.nvim" },
-    opts = { finder = "rg" },
     config = function(_, opts)
       require("filemention").setup(opts)
     end,
