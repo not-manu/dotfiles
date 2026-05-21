@@ -13,8 +13,9 @@ return {
   {
     "not-manu/filemention.nvim",
     event = "InsertEnter",
+    branch = "5-folders-should-show-up-in-search-with-priority",
     dependencies = { "dmtrKovalenko/fff.nvim" },
-    opts = { finder = "fff" },
+    opts = { finder = "rg" },
     config = function(_, opts)
       require("filemention").setup(opts)
     end,
@@ -25,8 +26,26 @@ return {
     "hrsh7th/nvim-cmp",
     dependencies = { "not-manu/filemention.nvim" },
     opts = function(_, opts)
+      local cmp = require "cmp"
       opts.sources = opts.sources or {}
       table.insert(opts.sources, 1, { name = "filemention" })
+
+      opts.mapping = opts.mapping or {}
+      opts.mapping["<C-j>"] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_next_item()
+        else
+          fallback()
+        end
+      end, { "i", "s" })
+      opts.mapping["<C-k>"] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_prev_item()
+        else
+          fallback()
+        end
+      end, { "i", "s" })
+
       return opts
     end,
   },
