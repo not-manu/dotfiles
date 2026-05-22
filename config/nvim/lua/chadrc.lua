@@ -14,6 +14,17 @@ M.base46 = {
 	-- },
 }
 
+M.term = {
+	float = {
+		relative = "editor",
+		row = 0.1,
+		col = 0.075,
+		width = 0.85,
+		height = 0.8,
+		border = "single",
+	},
+}
+
 M.ui = {
 	statusline = {
 		order = { "mode", "file", "git", "recording", "%=", "lsp_msg", "%=", "diagnostics", "lsp", "cwd", "cursor" },
