@@ -64,6 +64,10 @@ mkdir -p "$ghostty_dir"
 link "$CONFIG_DIR/ghostty/config"  "$ghostty_dir/config"
 link "$CONFIG_DIR/ghostty/shaders" "$ghostty_dir/shaders"
 
+# ---- Karabiner (symlink just the json — Karabiner writes other state into the dir) ----
+mkdir -p "$CONFIG_DIR/karabiner"
+link "$DOTFILES_DIR/config/karabiner/karabiner.json" "$CONFIG_DIR/karabiner/karabiner.json"
+
 # ---- Claude (lives in ~/.<name>, not ~/.config/) ----
 echo ""
 echo "[4/5] Linking claude config ..."
