@@ -13,6 +13,7 @@
 - **opencode** - ai config
 - **claude** - plugin settings
 - **vim** - 3 lines lol
+- **karabiner** - caps→esc, ctrl+j/k → ↓/↑
 
 ### setup
 

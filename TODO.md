@@ -29,3 +29,4 @@
 - [x] nvim: autotags don't work with astro
 - [x] zsh: python3 -> python
 - [x] agents: add a global AGENTS.md with symlinks to CLAUDE.md
+- [x] karabiner: install + config (caps→esc, ctrl+j/k → ↓/↑)
