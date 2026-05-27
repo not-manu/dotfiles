@@ -30,14 +30,15 @@ return {
       table.insert(opts.sources, 1, { name = "filemention" })
 
       opts.mapping = opts.mapping or {}
-      opts.mapping["<C-j>"] = cmp.mapping(function(fallback)
+      -- Ctrl+J/K are remapped to Down/Up by karabiner, so bind the arrows here.
+      opts.mapping["<Down>"] = cmp.mapping(function(fallback)
         if cmp.visible() then
           cmp.select_next_item()
         else
           fallback()
         end
       end, { "i", "s" })
-      opts.mapping["<C-k>"] = cmp.mapping(function(fallback)
+      opts.mapping["<Up>"] = cmp.mapping(function(fallback)
         if cmp.visible() then
           cmp.select_prev_item()
         else

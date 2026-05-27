@@ -9,12 +9,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
 })
 
--- LSP servers to enable
--- Note: typescript-tools.nvim handles TypeScript/JavaScript instead of tsserver
-local servers = { "html", "cssls", "tailwindcss", "jsonls", "texlab", "basedpyright", "astro", "mdx_analyzer" }
-vim.lsp.enable(servers)
-
--- Optional: Configure specific LSP servers
+-- Configure specific LSP servers (must run before vim.lsp.enable)
 -- Tailwind CSS configuration
 vim.lsp.config("tailwindcss", {
   -- Tailwind CSS will auto-detect project roots with tailwind.config.js/ts
@@ -47,7 +42,9 @@ vim.lsp.config("astro", {
   cmd = { "astro-ls", "--stdio" },
   filetypes = { "astro" },
   init_options = {
-    typescript = {},
+    typescript = {
+      tsdk = "/Users/manu/.bun/install/global/node_modules/typescript/lib",
+    },
   },
   root_markers = { "package.json", "tsconfig.json", "jsconfig.json", ".git" },
 })
@@ -83,5 +80,10 @@ vim.lsp.config("mdx_analyzer", {
     },
   },
 })
+
+-- Enable LSP servers (must run after vim.lsp.config calls)
+-- Note: typescript-tools.nvim handles TypeScript/JavaScript instead of tsserver
+local servers = { "html", "cssls", "tailwindcss", "jsonls", "texlab", "basedpyright", "astro", "mdx_analyzer" }
+vim.lsp.enable(servers)
 
 -- read :h vim.lsp.config for changing options of lsp servers
