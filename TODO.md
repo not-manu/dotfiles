@@ -4,7 +4,6 @@
 - [ ] nvim: add a more fully featured code folding setup that:
        * remembers folds per file
        * actually works with latex
-- [ ] nvim: autoformat astro on save
 - [ ] nvim: add mdx support
 - [ ] nvim: working in long lines (e.g. latex) is a nightmare and extremely laggy?
 - [ ] claude: remove settings from the dotfiles (it keeps updating for some reason)
@@ -30,3 +29,4 @@
 - [x] zsh: python3 -> python
 - [x] agents: add a global AGENTS.md with symlinks to CLAUDE.md
 - [x] karabiner: install + config (caps→esc, ctrl+j/k → ↓/↑)
+- [x] nvim: autoformat astro on save
