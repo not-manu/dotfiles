@@ -1,8 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Reload Karabiner-Elements config by re-selecting the active profile.
-karabiner_cli="/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_cli"
+# Sync the dotfiles karabiner.json into the live config and let Karabiner
+# auto-reload it.
+#
+# Why copy instead of symlink: Karabiner-Elements owns ~/.config/karabiner/
+# karabiner.json — it rewrites the file on profile changes and replaces any
+# symlink with a regular file, so a symlink from dotfiles does not survive.
+# Karabiner watches this file and re-reads it automatically on change, so a
+# plain copy is all that's needed — do NOT restart the daemon (that reloads
+# from stale state and drops un-synced edits).
 
-"$karabiner_cli" --select-profile "Default profile"
-echo "Karabiner reloaded."
+DOTFILES_JSON="$(cd "$(dirname "$0")" && pwd)/karabiner.json"
+LIVE_JSON="$HOME/.config/karabiner/karabiner.json"
+
+cp "$DOTFILES_JSON" "$LIVE_JSON"
+echo "Synced karabiner.json → $LIVE_JSON (Karabiner will auto-reload)."
