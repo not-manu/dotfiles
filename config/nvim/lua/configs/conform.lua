@@ -28,6 +28,11 @@ local biome_filetypes = {
 
 local fallback_biome_config = vim.fn.expand "~/Documents/projects/not-manu/vactu/biome.json"
 
+-- prettier needs prettier-plugin-astro explicitly loaded; bare prettier can't
+-- infer a parser for .astro files. Point at the bun-global install.
+local astro_prettier_plugin =
+  vim.fn.expand "~/.bun/install/global/node_modules/prettier-plugin-astro/dist/index.js"
+
 local function has_biome_config(bufnr)
   local dir = vim.fs.dirname(vim.api.nvim_buf_get_name(bufnr))
   if dir == "" then
@@ -52,6 +57,9 @@ for _, ft in ipairs(web_filetypes) do
         return { "biome_fallback" }
       end
     end
+    if ft == "astro" then
+      return { "prettier_astro" }
+    end
     return { "prettier" }
   end
 end
@@ -59,6 +67,18 @@ end
 return {
   formatters_by_ft = formatters_by_ft,
   formatters = {
+    prettier_astro = {
+      command = "prettier",
+      stdin = true,
+      args = function(_, ctx)
+        return {
+          "--stdin-filepath",
+          ctx.filename,
+          "--plugin",
+          astro_prettier_plugin,
+        }
+      end,
+    },
     biome_fallback = {
       command = "biome",
       stdin = true,

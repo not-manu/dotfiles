@@ -13,7 +13,6 @@ return {
   {
     "not-manu/filemention.nvim",
     event = "InsertEnter",
-    branch = "dev",
     dependencies = { "dmtrKovalenko/fff.nvim" },
     config = function(_, opts)
       require("filemention").setup(opts)
