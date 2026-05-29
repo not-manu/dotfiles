@@ -12,8 +12,19 @@
             "complex_modifications": {
                 "rules": [
                     {
-                        "description": "Ctrl+J/K to Down/Up arrow",
+                        "description": "Ctrl+H/J/K/L to Left/Down/Up/Right arrow",
                         "manipulators": [
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "h",
+                                    "modifiers": {
+                                        "mandatory": ["control"],
+                                        "optional": ["any"]
+                                    }
+                                },
+                                "to": [{ "key_code": "left_arrow" }]
+                            },
                             {
                                 "type": "basic",
                                 "from": {
@@ -35,6 +46,17 @@
                                     }
                                 },
                                 "to": [{ "key_code": "up_arrow" }]
+                            },
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "l",
+                                    "modifiers": {
+                                        "mandatory": ["control"],
+                                        "optional": ["any"]
+                                    }
+                                },
+                                "to": [{ "key_code": "right_arrow" }]
                             }
                         ]
                     }
