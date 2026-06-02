@@ -209,8 +209,8 @@ source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zs
 eval "$(starship init zsh)"
 
 # claude
-alias 'cc'='claude'
-alias 'ccd'='claude --dangerously-skip-permissions'
+alias 'cc'='claude --system-prompt "You are a helpful assistant."'
+alias 'ccd'='claude --dangerously-skip-permissions --system-prompt "You are a helpful assistant."'
 
 # bun
 alias 'bn'='bun'
