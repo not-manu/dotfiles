@@ -1,3 +1,54 @@
 #!/bin/sh
+#
+# Auto-sync: push the current branch to its upstream after each commit.
+#
+# Designed to NEVER interfere with normal git. It:
+#   - returns immediately; the push runs fully detached in the background
+#   - skips while a rebase / merge / cherry-pick / revert / bisect is running
+#     (post-commit fires for every replayed commit — we must not push then)
+#   - skips on detached HEAD or when the branch has no upstream
+#   - never prompts for credentials/passphrases (fails fast instead of hanging)
+#   - never force-pushes (plain push — an amended/rebased already-pushed commit
+#     is just rejected as non-fast-forward, harmlessly; remote history is safe)
+#
+# Concurrent pushes are fine: the remote serializes ref updates, so overlapping
+# fast-forward pushes simply win or no-op. No lock needed (a lock that fails to
+# release would strand every later commit — strictly worse). A commit skipped
+# above is picked up by the next normal commit's push, since it's an ancestor.
+#
+# Opt out per-repo:  git config hooks.autopush false
+# Opt out globally:  git config --global hooks.autopush false
+# Debug log:         <git-dir>/autopush.log
+
+# Respect opt-out.
+[ "$(git config --bool hooks.autopush 2>/dev/null)" = "false" ] && exit 0
+
+git_dir=$(git rev-parse --git-dir 2>/dev/null) || exit 0
+
+# Don't sync mid-operation. Each marker means git is in the middle of something
+# (rebase replays, merge, cherry-pick, revert, bisect); pushing now would
+# publish intermediate state or race the operation.
+for marker in rebase-merge rebase-apply MERGE_HEAD CHERRY_PICK_HEAD \
+	REVERT_HEAD BISECT_LOG sequencer; do
+	[ -e "$git_dir/$marker" ] && exit 0
+done
+
+# Only a real branch (not detached HEAD) with a configured upstream.
+git symbolic-ref --quiet HEAD >/dev/null 2>&1 || exit 0
 git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1 || exit 0
-nohup git push >/dev/null 2>&1 </dev/null &
+
+log="$(cd "$git_dir" && pwd)/autopush.log"
+
+# Detached, non-interactive, time-bounded push. Backgrounded so git never waits
+# on us — the commit returns instantly regardless of network state.
+{
+	# Never block on auth: fail fast rather than hang on a prompt/stall.
+	export GIT_TERMINAL_PROMPT=0
+	export GIT_SSH_COMMAND="ssh -o BatchMode=yes -o ConnectTimeout=10"
+	# Bound HTTPS stalls too (abort if throughput stays under ~1KB/s for 20s).
+	git -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=20 push --quiet
+} </dev/null >>"$log" 2>&1 &
+
+# Best-effort detach (no-op where unsupported); never let it affect the commit.
+disown 2>/dev/null || true
+exit 0
