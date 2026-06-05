@@ -51,5 +51,8 @@ macos-option-as-alt = true
 window-padding-x = 20
 window-padding-y = 20
 
+adjust-cell-width = 0
+adjust-cell-height = 5%
+
 custom-shader = shaders/cursor_warp.glsl
 custom-shader-animation = always
