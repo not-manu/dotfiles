@@ -43,11 +43,12 @@
       }
     }
   },
-  "effortLevel": "low",
+  "effortLevel": "xhigh",
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "theme": "custom:flexoki",
   "editorMode": "vim",
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": false
+  "voiceEnabled": false,
+  "model": "claude-opus-4-6"
 }
