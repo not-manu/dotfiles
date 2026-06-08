@@ -39,16 +39,27 @@ git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1 || exit 0
 
 log="$(cd "$git_dir" && pwd)/autopush.log"
 
-# Detached, non-interactive, time-bounded push. Backgrounded so git never waits
-# on us — the commit returns instantly regardless of network state.
-{
-	# Never block on auth: fail fast rather than hang on a prompt/stall.
+# Detached, non-interactive, time-bounded push. Fully detached so git never
+# waits on us AND the push survives `git commit` exiting — otherwise the child
+# can die between updating the remote ref and updating the local tracking ref,
+# leaving `git status` permanently "ahead" of an already-pushed branch.
+#
+# `nohup` ignores SIGHUP; `setsid` (when available) starts a new session so the
+# process group isn't torn down with the parent's controlling terminal.
+detach() {
+	if command -v setsid >/dev/null 2>&1; then
+		setsid "$@"
+	else
+		nohup "$@"
+	fi
+}
+
+detach sh -c '
 	export GIT_TERMINAL_PROMPT=0
 	export GIT_SSH_COMMAND="ssh -o BatchMode=yes -o ConnectTimeout=10"
 	# Bound HTTPS stalls too (abort if throughput stays under ~1KB/s for 20s).
 	git -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=20 push --quiet
-} </dev/null >>"$log" 2>&1 &
+' </dev/null >>"$log" 2>&1 &
 
-# Best-effort detach (no-op where unsupported); never let it affect the commit.
 disown 2>/dev/null || true
 exit 0
