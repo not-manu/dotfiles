@@ -2,6 +2,7 @@
   "permissions": {
     "defaultMode": "auto"
   },
+  "model": "claude-fable-5[1m]",
   "hooks": {
     "Stop": [
       {
@@ -26,20 +27,13 @@
     ]
   },
   "enabledPlugins": {
-    "pyright-lsp@claude-plugins-official": false,
-    "mempalace@mempalace": false
+    "pyright-lsp@claude-plugins-official": false
   },
   "extraKnownMarketplaces": {
     "claude-code-plugins": {
       "source": {
         "source": "github",
         "repo": "anthropics/claude-code"
-      }
-    },
-    "mempalace": {
-      "source": {
-        "source": "github",
-        "repo": "milla-jovovich/mempalace"
       }
     }
   },
@@ -49,6 +43,5 @@
   "theme": "custom:flexoki",
   "editorMode": "vim",
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": false,
-  "model": "claude-opus-4-6"
+  "voiceEnabled": false
 }
