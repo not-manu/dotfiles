@@ -186,6 +186,9 @@ alias 'python'='python3'
 # yazi
 alias 'y'='yazi'
 
+# mini tmux — nested tmux (own server/socket) for swapping agent instances in a pane
+alias 'mini'='~/.config/tmux/mini.sh'
+
 # Source local overrides (tokens, machine-specific config)
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
