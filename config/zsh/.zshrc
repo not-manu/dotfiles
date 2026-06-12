@@ -177,6 +177,9 @@ alias 'lg'='lazygit'
 # neovim
 alias 'n'='nvim'
 
+# nvim-lean — minimal scratch config (isolated config/data/state/cache)
+alias 'nl'='NVIM_APPNAME=nvim-lean nvim'
+
 # neofetch
 alias 'nf'='neofetch'
 
