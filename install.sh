@@ -32,6 +32,7 @@ config_dirs=(
   ghostty
   tmux
   nvim
+  nvim-lean
   lazygit
   bat
   btop
