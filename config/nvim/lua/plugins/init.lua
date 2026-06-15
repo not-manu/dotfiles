@@ -258,19 +258,6 @@ return {
     end,
   },
 
-  -- Spell checking with cspell (VSCode Code Spell Checker equivalent)
-  {
-    "nvimtools/none-ls.nvim",
-    event = { "BufReadPre", "BufNewFile" },
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "davidmh/cspell.nvim",
-    },
-    config = function()
-      require "configs.none-ls"
-    end,
-  },
-
   -- Surround selections (add/delete/change surrounding pairs)
   {
     "kylechui/nvim-surround",

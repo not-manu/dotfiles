@@ -182,9 +182,6 @@ map("n", "<leader>gH", "<cmd>DiffviewFileHistory<CR>", { desc = "Git history (wh
 map("n", "<leader>gd", "<cmd>DiffviewOpen<CR>", { desc = "Git diff (working tree)" })
 map("n", "<leader>gq", "<cmd>DiffviewClose<CR>", { desc = "Close diffview" })
 
--- Spell checking (cspell)
--- Note: Code actions for adding words are available via <leader>ca on spelling errors
-
 -- Open URL under cursor in Zen browser
 map("n", "gz", function()
   local url = vim.fn.expand "<cfile>"
