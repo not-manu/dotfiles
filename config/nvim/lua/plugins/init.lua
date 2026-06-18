@@ -340,4 +340,12 @@ return {
       end, { desc = "Jump backward in snippet", silent = true })
     end,
   },
+
+  -- Smooth scrolling
+  {
+    "karb94/neoscroll.nvim",
+    enabled = false,
+    event = "VeryLazy",
+    opts = {},
+  },
 }
