@@ -174,6 +174,16 @@ alias 'q'=exit
 # lazygit
 alias 'lg'='lazygit'
 
+# Run `git push` in the background and return immediately.
+function git() {
+  if [[ "${1:-}" == "push" ]]; then
+    shift
+    "$HOME/.config/zsh/push-bg.zsh" "$@"
+  else
+    command git "$@"
+  fi
+}
+
 # neovim
 alias 'n'='nvim'
 
