@@ -6,7 +6,7 @@ customCommands:
     context: "global"
     description: "Push in background"
     command: >-
-      zsh -lc '
+      nohup zsh -lc '
         repo="$(command git rev-parse --show-toplevel 2>/dev/null || pwd)"
         hash="$(printf "%s" "$repo" | shasum -a 256 | cut -d " " -f 1)"
         state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/git-push-bg"
@@ -19,5 +19,5 @@ customCommands:
         (
           trap '\''rmdir "$lock_dir" 2>/dev/null'\'' EXIT
           command git push >"$log_file" 2>&1
-        ) &!
-      '
+        )
+      ' >/dev/null 2>&1 &
