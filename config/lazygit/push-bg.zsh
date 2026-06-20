@@ -21,4 +21,6 @@ mkdir "$lock_dir" 2>/dev/null || exit 0
 
 trap 'rmdir "$lock_dir" 2>/dev/null' EXIT
 
+cd / || exit 0
+
 command git -C "$repo" push >>"$log_file" 2>&1
