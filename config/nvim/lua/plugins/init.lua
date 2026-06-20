@@ -90,6 +90,69 @@ return {
     end,
   },
 
+  -- Rust: rustaceanvim configures rust_analyzer itself (do NOT add
+  -- rust_analyzer to vim.lsp.enable — it would conflict). Provides extra
+  -- commands like :RustLsp, runnables, debugging, expand macro, etc.
+  {
+    "mrcjkb/rustaceanvim",
+    version = "^6",
+    lazy = false, -- plugin sets up its own ft handling
+    ft = { "rust" },
+    config = function()
+      vim.g.rustaceanvim = {
+        server = {
+          on_attach = function(_, bufnr)
+            local map = function(keys, fn, desc)
+              vim.keymap.set("n", keys, fn, { buffer = bufnr, desc = desc })
+            end
+            map("<leader>rr", function()
+              vim.cmd.RustLsp "runnables"
+            end, "Rust runnables")
+            map("<leader>rd", function()
+              vim.cmd.RustLsp "debuggables"
+            end, "Rust debuggables")
+            map("<leader>rm", function()
+              vim.cmd.RustLsp "expandMacro"
+            end, "Rust expand macro")
+            map("<leader>rc", function()
+              vim.cmd.RustLsp "openCargo"
+            end, "Open Cargo.toml")
+            -- Use rustaceanvim's richer hover actions
+            map("K", function()
+              vim.cmd.RustLsp { "hover", "actions" }
+            end, "Rust hover actions")
+          end,
+          default_settings = {
+            ["rust-analyzer"] = {
+              cargo = { allFeatures = true },
+              checkOnSave = true,
+              check = { command = "clippy" },
+              procMacro = { enable = true },
+            },
+          },
+        },
+      }
+    end,
+  },
+
+  -- crates.nvim: completion, versions and updates inside Cargo.toml
+  {
+    "saecki/crates.nvim",
+    tag = "stable",
+    event = { "BufRead Cargo.toml" },
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      require("crates").setup {
+        completion = {
+          cmp = { enabled = true },
+        },
+      }
+      require("cmp").setup.buffer {
+        sources = { { name = "crates" } },
+      }
+    end,
+  },
+
   -- TypeScript Tools (replaces typescript-language-server)
   {
     "pmizio/typescript-tools.nvim",
@@ -185,6 +248,9 @@ return {
         "markdown_inline",
         -- Python
         "python",
+        -- Rust
+        "rust",
+        "toml",
         -- LaTeX
         "latex",
         -- Additional useful parsers

@@ -45,6 +45,8 @@ end
 local formatters_by_ft = {
   lua = { "stylua" },
   python = { "ruff_format" },
+  rust = { "rustfmt" },
+  toml = { "taplo" },
 }
 
 for _, ft in ipairs(web_filetypes) do
