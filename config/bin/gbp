@@ -3,21 +3,21 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-gp: background git push with per-repo spam protection
+gbp: background git push with per-repo spam protection
 
 Usage:
-  gp              start git push in background and return immediately
-  gp --wait       run git push in the foreground, still using the lock
-  gp --status     show whether a push is already running
-  gp --log        print the last push log
-  gp -- <args>    pass args to git push
+  gbp              start git push in background and return immediately
+  gbp --wait       run git push in the foreground, still using the lock
+  gbp --status     show whether a push is already running
+  gbp --log        print the last push log
+  gbp -- <args>    pass args to git push
 
-Logs: .git/gp.log
+Logs: .git/gbp.log
 EOF
 }
 
 die() {
-  printf 'gp: %s\n' "$*" >&2
+  printf 'gbp: %s\n' "$*" >&2
   exit 1
 }
 
@@ -53,8 +53,8 @@ case "$git_dir" in
   *) git_dir="$repo_root/$git_dir" ;;
 esac
 
-lock_dir="$git_dir/gp.lock"
-log_file="$git_dir/gp.log"
+lock_dir="$git_dir/gbp.lock"
+log_file="$git_dir/gbp.log"
 pid_file="$lock_dir/pid"
 
 is_running() {
@@ -67,9 +67,9 @@ is_running() {
 case "$mode" in
   status)
     if is_running; then
-      printf 'gp: push already running in %s (pid %s)\n' "$repo_root" "$(<"$pid_file")"
+      printf 'gbp: push already running in %s (pid %s)\n' "$repo_root" "$(<"$pid_file")"
     else
-      printf 'gp: no push running in %s\n' "$repo_root"
+      printf 'gbp: no push running in %s\n' "$repo_root"
     fi
     exit 0
     ;;
@@ -81,7 +81,7 @@ esac
 
 if ! mkdir "$lock_dir" 2>/dev/null; then
   if is_running; then
-    printf 'gp: push already running in %s (pid %s)\n' "$repo_root" "$(<"$pid_file")"
+    printf 'gbp: push already running in %s (pid %s)\n' "$repo_root" "$(<"$pid_file")"
     exit 0
   fi
 
@@ -98,7 +98,7 @@ run_push() {
   trap cleanup EXIT INT TERM
 
   {
-    printf '== gp started: %s ==\n' "$(date)"
+    printf '== gbp started: %s ==\n' "$(date)"
     printf 'repo: %s\n' "$repo_root"
     printf 'cmd: git push'
     if (($#)); then
@@ -109,7 +109,7 @@ run_push() {
     git push "$@"
     status=$?
 
-    printf '\n== gp finished: %s, status %s ==\n' "$(date)" "$status"
+    printf '\n== gbp finished: %s, status %s ==\n' "$(date)" "$status"
     exit "$status"
   } > "$log_file" 2>&1
 }
@@ -124,5 +124,5 @@ fi
 
 printf '%s\n' "$!" > "$pid_file"
 disown 2>/dev/null || true
-printf 'gp: pushing in background: %s\n' "$repo_root"
-printf 'gp: log: %s\n' "$log_file"
+printf 'gbp: pushing in background: %s\n' "$repo_root"
+printf 'gbp: log: %s\n' "$log_file"

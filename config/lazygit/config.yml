@@ -1,12 +1,12 @@
 customCommands:
   - key: "<c-p>"
     context: "global"
-    command: "gp"
+    command: "$HOME/.config/bin/gbp"
     description: "Push in background"
     loadingText: "Starting background push"
     output: popup
   - key: "<c-l>"
     context: "global"
-    command: "gp --log"
+    command: "$HOME/.config/bin/gbp --log"
     description: "Show background push log"
     output: terminal
