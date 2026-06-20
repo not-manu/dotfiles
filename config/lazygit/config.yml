@@ -6,4 +6,4 @@ customCommands:
     context: "global"
     description: "Push in background"
     command: >-
-      zsh -lc 'launchctl submit -l "git-push-bg-$(date +%s)-$$" -- /bin/zsh "$HOME/.config/lazygit/push-bg.zsh" "$PWD" >/dev/null 2>&1'
+      zsh -lc 'mkdir -p "${XDG_STATE_HOME:-$HOME/.local/state}/git-push-bg" && launchctl submit -l "git-push-bg-$(date +%s)-$$" -- /bin/zsh "$HOME/.config/lazygit/push-bg.zsh" "{{.RepoPath}}" >"${XDG_STATE_HOME:-$HOME/.local/state}/git-push-bg/launch.log" 2>&1'

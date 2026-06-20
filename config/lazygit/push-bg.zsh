@@ -10,8 +10,15 @@ lock_dir="$state_dir/$hash.lock"
 log_file="$state_dir/$hash.log"
 
 mkdir -p "$state_dir" || exit 0
+
+{
+  printf 'started: %s\n' "$(date)"
+  printf 'start_dir: %s\n' "$start_dir"
+  printf 'repo: %s\n' "$repo"
+} >"$log_file"
+
 mkdir "$lock_dir" 2>/dev/null || exit 0
 
 trap 'rmdir "$lock_dir" 2>/dev/null' EXIT
 
-command git -C "$repo" push >"$log_file" 2>&1
+command git -C "$repo" push >>"$log_file" 2>&1
