@@ -35,6 +35,7 @@ config_dirs=(
   nvim-lean
   lazygit
   bat
+  bin
   btop
   git
   opencode

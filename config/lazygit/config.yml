@@ -1,2 +1,12 @@
-os:
-  editPreset: "nvim"
+customCommands:
+  - key: "<c-p>"
+    context: "global"
+    command: "gp"
+    description: "Push in background"
+    loadingText: "Starting background push"
+    output: popup
+  - key: "<c-l>"
+    context: "global"
+    command: "gp --log"
+    description: "Show background push log"
+    output: terminal
