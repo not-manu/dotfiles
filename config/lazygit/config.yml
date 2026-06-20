@@ -1,9 +1,2 @@
 os:
   editPreset: "nvim"
-
-customCommands:
-  - key: "P"
-    context: "global"
-    description: "Push in background"
-    command: >-
-      zsh -lc 'repo="$PWD"; cd / || exit 0; mkdir -p "${XDG_STATE_HOME:-$HOME/.local/state}/git-push-bg" && launchctl submit -l "git-push-bg-$(date +%s)-$$" -- /bin/zsh "$HOME/.config/lazygit/push-bg.zsh" "$repo" >"${XDG_STATE_HOME:-$HOME/.local/state}/git-push-bg/launch.log" 2>&1'
