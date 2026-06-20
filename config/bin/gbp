@@ -23,6 +23,10 @@ die() {
 
 mode="background"
 case "${1:-}" in
+  --run-internal)
+    mode="run-internal"
+    shift
+    ;;
   -h|--help)
     usage
     exit 0
@@ -65,6 +69,8 @@ is_running() {
 }
 
 case "$mode" in
+  run-internal)
+    ;;
   status)
     if is_running; then
       printf 'gbp: push already running in %s (pid %s)\n' "$repo_root" "$(<"$pid_file")"
@@ -79,6 +85,33 @@ case "$mode" in
     ;;
 esac
 
+cleanup() {
+  rm -rf "$lock_dir"
+}
+
+run_push() {
+  printf '%s\n' "$$" > "$pid_file"
+  trap cleanup EXIT INT TERM
+
+  printf '== gbp started: %s ==\n' "$(date)"
+  printf 'repo: %s\n' "$repo_root"
+  printf 'cmd: git push'
+  if (($#)); then
+    printf ' %q' "$@"
+  fi
+  printf '\n\n'
+
+  git push "$@"
+  status=$?
+
+  printf '\n== gbp finished: %s, status %s ==\n' "$(date)" "$status"
+  exit "$status"
+}
+
+if [[ "$mode" == "run-internal" ]]; then
+  run_push "$@" > "$log_file" 2>&1
+fi
+
 if ! mkdir "$lock_dir" 2>/dev/null; then
   if is_running; then
     printf 'gbp: push already running in %s (pid %s)\n' "$repo_root" "$(<"$pid_file")"
@@ -89,40 +122,12 @@ if ! mkdir "$lock_dir" 2>/dev/null; then
   mkdir "$lock_dir" || die "could not acquire push lock"
 fi
 
-cleanup() {
-  rm -rf "$lock_dir"
-}
-
-run_push() {
-  printf '%s\n' "$BASHPID" > "$pid_file"
-  trap cleanup EXIT INT TERM
-
-  {
-    printf '== gbp started: %s ==\n' "$(date)"
-    printf 'repo: %s\n' "$repo_root"
-    printf 'cmd: git push'
-    if (($#)); then
-      printf ' %q' "$@"
-    fi
-    printf '\n\n'
-
-    git push "$@"
-    status=$?
-
-    printf '\n== gbp finished: %s, status %s ==\n' "$(date)" "$status"
-    exit "$status"
-  } > "$log_file" 2>&1
-}
-
 if [[ "$mode" == "wait" ]]; then
-  run_push "$@"
+  run_push "$@" | tee "$log_file"
 fi
 
-(
-  run_push "$@"
-) >/dev/null 2>&1 &
+nohup "$0" --run-internal "$@" >/dev/null 2>&1 &
 
 printf '%s\n' "$!" > "$pid_file"
-disown 2>/dev/null || true
 printf 'gbp: pushing in background: %s\n' "$repo_root"
 printf 'gbp: log: %s\n' "$log_file"
