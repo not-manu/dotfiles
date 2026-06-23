@@ -31,7 +31,7 @@ faint = "#575653"
 style = "blue bold"
 truncation_length = 3
 truncate_to_repo = true
-truncation_symbol = "…/"
+truncation_symbol = ""
 read_only = " "
 read_only_style = "red"
 # no trailing space — the next module supplies the leading gap
@@ -72,9 +72,12 @@ style = "faint"
 format = "[ took $duration]($style)"
 
 [character]
-success_symbol = "[❯](green)"
-error_symbol = "[❯](red)"
-vimcmd_symbol = "[❮](yellow)"
-vimcmd_replace_one_symbol = "[❮](purple)"
-vimcmd_replace_symbol = "[❮](purple)"
-vimcmd_visual_symbol = "[❮](cyan)"
+# insert mode — λ, green on success, red on error
+success_symbol = "[●](green bold)"
+error_symbol = "[●](red bold)"
+# vim modes keep the same ● but recolor so the glyph never jumps, only its hue:
+# normal = yellow · replace = purple · visual = cyan
+vimcmd_symbol = "[●](yellow bold)"
+vimcmd_replace_one_symbol = "[●](purple bold)"
+vimcmd_replace_symbol = "[●](purple bold)"
+vimcmd_visual_symbol = "[●](cyan bold)"
