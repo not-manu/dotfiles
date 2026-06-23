@@ -4,13 +4,13 @@ git:
     - colorArg: always
       pager: delta --dark --paging=never
 gui:
-  border: hidden
+  border: single
   theme:
     activeBorderColor:
       - "#4385BE" # blue
       - bold
     inactiveBorderColor:
-      - "#575653" # base-700
+      - "#403E3C" # base-800
     searchingActiveBorderColor:
       - "#D0A215" # yellow
       - bold
