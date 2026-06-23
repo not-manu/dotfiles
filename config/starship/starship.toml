@@ -72,12 +72,12 @@ style = "faint"
 format = "[ took $duration]($style)"
 
 [character]
-# insert mode — λ, green on success, red on error
-success_symbol = "[●](green bold)"
-error_symbol = "[●](red bold)"
-# vim modes keep the same ● but recolor so the glyph never jumps, only its hue:
+# insert mode — filled square, green on success, red on error
+success_symbol = "[■](green bold)"
+error_symbol = "[■](red bold)"
+# vim modes use a hollow square: filled = inserting, hollow = command mode.
 # normal = yellow · replace = purple · visual = cyan
-vimcmd_symbol = "[●](yellow bold)"
-vimcmd_replace_one_symbol = "[●](purple bold)"
-vimcmd_replace_symbol = "[●](purple bold)"
-vimcmd_visual_symbol = "[●](cyan bold)"
+vimcmd_symbol = "[□](yellow bold)"
+vimcmd_replace_one_symbol = "[□](purple bold)"
+vimcmd_replace_symbol = "[□](purple bold)"
+vimcmd_visual_symbol = "[□](cyan bold)"
