@@ -4,10 +4,10 @@ git:
     - colorArg: always
       pager: delta --dark --paging=never
 gui:
-  border: hidden
+  border: sharp
   theme:
     activeBorderColor:
-      - "#4385BE" # blue
+      - "#3AA99F" # cyan
       - bold
     inactiveBorderColor:
       - "#403E3C" # base-800
@@ -15,11 +15,11 @@ gui:
       - "#D0A215" # yellow
       - bold
     optionsTextColor:
-      - "#4385BE" # blue
+      - "#3AA99F" # cyan
     selectedLineBgColor:
       - "#282726" # base-900
     cherryPickedCommitFgColor:
-      - "#4385BE" # blue
+      - "#3AA99F" # cyan
     cherryPickedCommitBgColor:
       - "#343331" # base-850
     markedBaseCommitFgColor:
