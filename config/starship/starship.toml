@@ -36,8 +36,8 @@ truncation_symbol = ""
 read_only = " "
 read_only_style = "red"
 # corner connector that drops into the │ prompt char on the line below;
-# fixed green (can't track the character's dynamic mode color)
-format = "[┌─ ](green bold)[$path]($style)[$read_only]($read_only_style)"
+# faint grey to stay quiet (can't track the character's dynamic mode color)
+format = "[┌─ ](faint)[$path]($style)[$read_only]($read_only_style)"
 
 [git_branch]
 symbol = " "
@@ -75,9 +75,9 @@ format = "[ took $duration]($style)"
 
 [character]
 # insert mode — vertical line continuing the ┌─ connector above,
-# green on success, red on error
-success_symbol = "[│](green bold)"
-error_symbol = "[│](red bold)"
+# faint grey to match the connector
+success_symbol = "[│](faint)"
+error_symbol = "[│](faint)"
 # vim modes reuse the vertical line.
 # normal = yellow · replace = purple · visual = cyan
 vimcmd_symbol = "[│](yellow bold)"
