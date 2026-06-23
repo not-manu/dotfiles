@@ -31,36 +31,43 @@ faint = "#575653"
 style = "blue bold"
 truncation_length = 3
 truncate_to_repo = true
+truncation_symbol = "…/"
 read_only = " "
 read_only_style = "red"
+# no trailing space — the next module supplies the leading gap
+format = "[$path]($style)[$read_only]($read_only_style)"
 
 [git_branch]
 symbol = " "
 style = "purple"
-format = "[$symbol$branch]($style) "
+# "on  branch" — connector in faint grey; no trailing space since the
+# branch symbol already carries a leading space, so the gap stays single
+format = "[ on](faint)[$symbol$branch]($style)"
 
 [git_status]
 style = "yellow"
-format = '([\[$all_status$ahead_behind\]]($style) )'
+# no brackets — dirty flags, then ahead/behind separated by a space
+format = "[ $all_status]($style)[$ahead_behind]($style)"
 conflicted = "="
-ahead = "⇡${count}"
-behind = "⇣${count}"
-diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+ahead = " +${count}"
+behind = " -${count}"
+diverged = " +${ahead_count}-${behind_count}"
 untracked = "?"
 stashed = "$"
-modified = "!"
-staged = "+"
+modified = ""
+staged = "●"
 renamed = "»"
 deleted = "✘"
 
 [git_state]
 style = "magenta"
-format = '\([$state( $progress_current/$progress_total)]($style)\) '
+format = "[ \\($state($progress_current/$progress_total)\\)]($style)"
 
 [cmd_duration]
 min_time = 2000
 style = "faint"
-format = "[ $duration]($style) "
+# "took 3s" reads like prose
+format = "[ took $duration]($style)"
 
 [character]
 success_symbol = "[❯](green)"
