@@ -186,6 +186,48 @@ M.polish_hl = {
     ["@markup.quote"] = { fg = c.yellow },
     ["@markup.list"] = { fg = c.yellow },
   },
+
+  nvimtree = {
+    -- structure
+    NvimTreeNormal = { bg = "#100F0F" }, -- match editor bg
+    NvimTreeNormalNC = { bg = "#100F0F" },
+    NvimTreeEndOfBuffer = { fg = "#100F0F" },
+    NvimTreeWinSeparator = { fg = "#282726", bg = "#100F0F" },
+    NvimTreeCursorLine = { bg = "#1C1B1A" },
+    NvimTreeIndentMarker = { fg = "#403E3C" },
+
+    -- folders / root
+    NvimTreeFolderIcon = { fg = c.blue },
+    NvimTreeFolderName = { fg = c.blue },
+    NvimTreeOpenedFolderName = { fg = c.blue, bold = true },
+    NvimTreeEmptyFolderName = { fg = c.comment },
+    NvimTreeFolderArrowOpen = { fg = c.blue },
+    NvimTreeFolderArrowClosed = { fg = "#6F6E69" },
+    NvimTreeRootFolder = { fg = c.magenta, bold = true },
+    NvimTreeSpecialFile = { fg = c.yellow, bold = true },
+    NvimTreeExecFile = { fg = c.green },
+    NvimTreeImageFile = { fg = c.purple },
+    NvimTreeSymlink = { fg = c.cyan },
+
+    -- git status (Flexoki: add=green, change=yellow, delete=red)
+    NvimTreeGitNew = { fg = c.green }, -- untracked
+    NvimTreeGitStaged = { fg = c.green },
+    NvimTreeGitRenamed = { fg = c.orange },
+    NvimTreeGitDirty = { fg = c.yellow }, -- modified
+    NvimTreeGitMerge = { fg = c.orange },
+    NvimTreeGitDeleted = { fg = c.red },
+    NvimTreeGitIgnored = { fg = "#6F6E69" },
+
+    -- file name git highlight (when renderer.highlight_git = "name")
+    NvimTreeFileDirty = { fg = c.yellow },
+    NvimTreeFileNew = { fg = c.green },
+    NvimTreeFileStaged = { fg = c.green },
+    NvimTreeFileDeleted = { fg = c.red },
+    NvimTreeFileRenamed = { fg = c.orange },
+    NvimTreeFileIgnored = { fg = "#6F6E69" },
+
+    NvimTreeWindowPicker = { fg = "#100F0F", bg = c.blue, bold = true },
+  },
 }
 
 M = require("base46").override_theme(M, "flexoki-alt")
