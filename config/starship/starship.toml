@@ -1,0 +1,71 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Flexoki Dark palette (https://stephango.com/flexoki)
+palette = "flexoki"
+
+format = """
+$directory\
+$git_branch\
+$git_status\
+$git_state\
+$cmd_duration\
+$line_break\
+$character"""
+
+add_newline = true
+
+[palettes.flexoki]
+red = "#D14D41"
+orange = "#DA702C"
+yellow = "#D0A215"
+green = "#879A39"
+cyan = "#3AA99F"
+blue = "#4385BE"
+purple = "#8B7EC8"
+magenta = "#CE5D97"
+fg = "#CECDC3"
+muted = "#878580"
+faint = "#575653"
+
+[directory]
+style = "blue bold"
+truncation_length = 3
+truncate_to_repo = true
+read_only = " "
+read_only_style = "red"
+
+[git_branch]
+symbol = " "
+style = "purple"
+format = "[$symbol$branch]($style) "
+
+[git_status]
+style = "yellow"
+format = '([\[$all_status$ahead_behind\]]($style) )'
+conflicted = "="
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+untracked = "?"
+stashed = "$"
+modified = "!"
+staged = "+"
+renamed = "»"
+deleted = "✘"
+
+[git_state]
+style = "magenta"
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+
+[cmd_duration]
+min_time = 2000
+style = "faint"
+format = "[ $duration]($style) "
+
+[character]
+success_symbol = "[❯](green)"
+error_symbol = "[❯](red)"
+vimcmd_symbol = "[❮](yellow)"
+vimcmd_replace_one_symbol = "[❮](purple)"
+vimcmd_replace_symbol = "[❮](purple)"
+vimcmd_visual_symbol = "[❮](cyan)"
