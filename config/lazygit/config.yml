@@ -1,4 +1,8 @@
 # Flexoki Dark theme (https://stephango.com/flexoki)
+git:
+  pagers:
+    - colorArg: always
+      pager: delta --dark --paging=never
 gui:
   border: hidden
   theme:
@@ -31,7 +35,6 @@ gui:
   branchColors:
     main: "#D14D41" # red
     master: "#D14D41"
-
 customCommands:
   - key: "P"
     context: "global"

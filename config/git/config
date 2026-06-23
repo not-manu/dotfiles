@@ -8,7 +8,28 @@
 [delta]
     navigate = true  # use n and N to move between diff sections
     dark = true      # or light = true, or omit for auto-detection
-	syntax-theme = ansi
+    syntax-theme = ansi  # code colored by terminal's Flexoki palette
+
+    # --- Flexoki diff colors (green-600 / red-600 blended onto base-950) ---
+    minus-style = syntax "#40201D"        # removed line bg
+    minus-emph-style = syntax "#742723"   # removed word highlight
+    plus-style = syntax "#2E3416"         # added line bg
+    plus-emph-style = syntax "#485811"    # added word highlight
+
+    line-numbers = true
+    line-numbers-minus-style = "#D14D41"  # red
+    line-numbers-plus-style = "#879A39"   # green
+    line-numbers-zero-style = "#6F6E69"   # base-600
+    line-numbers-left-style = "#403E3C"   # base-800
+    line-numbers-right-style = "#403E3C"
+
+    file-style = "#4385BE" bold           # blue, just the filename
+    file-decoration-style = none           # no underline/box
+    hunk-header-style = line-number         # only the line number, no box
+    hunk-header-decoration-style = none
+    hunk-header-line-number-style = "#6F6E69"  # base-600, subtle
+
+    zero-style = syntax
 
 [merge]
     conflictStyle = zdiff3
