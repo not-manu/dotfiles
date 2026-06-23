@@ -46,18 +46,20 @@ format = "[ on](faint)[$symbol$branch]($style)"
 
 [git_status]
 style = "yellow"
-# conditional groups so each space only appears when its part is present
-format = "([ $all_status]($style))([$ahead_behind]($style))"
-conflicted = "="
-ahead = " ↑${count}"
-behind = " ↓${count}"
-diverged = " ↑${ahead_count}↓${behind_count}"
-untracked = "?"
-stashed = "$"
-modified = ""
-staged = "●"
-renamed = "»"
-deleted = "✘"
+# each part is its own conditional group: a leading space appears only when
+# that part is present, so flags read "!2 +2 ?3 ↑1" with single spaces.
+# yellow = worktree dirty · green = staged · blue = push/pull
+format = "([ $conflicted]($style))([ $stashed]($style))([ $modified]($style))([ $untracked]($style))([ $deleted]($style))([ $renamed]($style))([ $staged](green bold))([ $ahead_behind](blue bold))"
+conflicted = "=${count}"       # merge conflict
+stashed = "*${count}"          # stashed entries
+modified = "!${count}"         # unstaged edits
+untracked = "?${count}"        # new files
+deleted = "✘${count}"
+renamed = "»${count}"
+staged = "+${count}"           # staged for commit
+ahead = "↑${count}"            # commits to push
+behind = "↓${count}"           # commits to pull
+diverged = "↑${ahead_count}↓${behind_count}"
 
 [git_state]
 style = "magenta"
