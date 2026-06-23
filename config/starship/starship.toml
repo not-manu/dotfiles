@@ -35,8 +35,9 @@ truncate_to_repo = true
 truncation_symbol = ""
 read_only = " "
 read_only_style = "red"
-# corner connector that drops into the ▌ prompt char on the line below
-format = "[┌─ ](dim)[$path]($style)[$read_only]($read_only_style)"
+# corner connector that drops into the │ prompt char on the line below;
+# fixed green (can't track the character's dynamic mode color)
+format = "[┌─ ](green bold)[$path]($style)[$read_only]($read_only_style)"
 
 [git_branch]
 symbol = " "
