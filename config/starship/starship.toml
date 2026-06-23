@@ -26,6 +26,7 @@ magenta = "#CE5D97"
 fg = "#CECDC3"
 muted = "#878580"
 faint = "#575653"
+dim = "#6F6E69"   # base-600 — a touch brighter than faint
 
 [directory]
 style = "blue bold"
@@ -34,15 +35,15 @@ truncate_to_repo = true
 truncation_symbol = ""
 read_only = " "
 read_only_style = "red"
-# no trailing space — the next module supplies the leading gap
-format = "[$path]($style)[$read_only]($read_only_style)"
+# corner connector that drops into the ▌ prompt char on the line below
+format = "[┌─ ](dim)[$path]($style)[$read_only]($read_only_style)"
 
 [git_branch]
 symbol = " "
 style = "cyan"
 # "on  branch" — connector in faint grey; no trailing space since the
 # branch symbol already carries a leading space, so the gap stays single
-format = "[ on](faint)[$symbol$branch]($style)"
+format = "[ on](dim)[$symbol$branch]($style)"
 
 [git_status]
 style = "yellow"
@@ -67,17 +68,18 @@ format = "[ \\($state($progress_current/$progress_total)\\)]($style)"
 
 [cmd_duration]
 min_time = 2000
-style = "faint"
+style = "dim"
 # "took 3s" reads like prose
 format = "[ took $duration]($style)"
 
 [character]
-# insert mode — filled square, green on success, red on error
-success_symbol = "[■](green bold)"
-error_symbol = "[■](red bold)"
-# vim modes use a hollow square: filled = inserting, hollow = command mode.
+# insert mode — vertical line continuing the ┌─ connector above,
+# green on success, red on error
+success_symbol = "[│](green bold)"
+error_symbol = "[│](red bold)"
+# vim modes reuse the vertical line.
 # normal = yellow · replace = purple · visual = cyan
-vimcmd_symbol = "[□](yellow bold)"
-vimcmd_replace_one_symbol = "[□](purple bold)"
-vimcmd_replace_symbol = "[□](purple bold)"
-vimcmd_visual_symbol = "[□](cyan bold)"
+vimcmd_symbol = "[│](yellow bold)"
+vimcmd_replace_one_symbol = "[│](purple bold)"
+vimcmd_replace_symbol = "[│](purple bold)"
+vimcmd_visual_symbol = "[│](cyan bold)"
