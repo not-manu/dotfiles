@@ -46,12 +46,12 @@ format = "[ on](faint)[$symbol$branch]($style)"
 
 [git_status]
 style = "yellow"
-# no brackets — dirty flags, then ahead/behind separated by a space
-format = "[ $all_status]($style)[$ahead_behind]($style)"
+# conditional groups so each space only appears when its part is present
+format = "([ $all_status]($style))([$ahead_behind]($style))"
 conflicted = "="
-ahead = " +${count}"
-behind = " -${count}"
-diverged = " +${ahead_count}-${behind_count}"
+ahead = " ↑${count}"
+behind = " ↓${count}"
+diverged = " ↑${ahead_count}↓${behind_count}"
 untracked = "?"
 stashed = "$"
 modified = ""
