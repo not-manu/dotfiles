@@ -39,7 +39,7 @@ format = "[$path]($style)[$read_only]($read_only_style)"
 
 [git_branch]
 symbol = " "
-style = "purple"
+style = "cyan"
 # "on  branch" — connector in faint grey; no trailing space since the
 # branch symbol already carries a leading space, so the gap stays single
 format = "[ on](faint)[$symbol$branch]($style)"
