@@ -1,4 +1,28 @@
 return {
+  -- treesitter: ensure parsers for the languages we actually edit.
+  -- glsl matters for the ghostty cursor shaders — without it, operators,
+  -- numbers and punctuation fall back to flat legacy highlighting.
+  {
+    "nvim-treesitter/nvim-treesitter",
+    opts = {
+      ensure_installed = {
+        "glsl",
+        "c",
+        "lua",
+        "vim",
+        "vimdoc",
+        "javascript",
+        "typescript",
+        "tsx",
+        "rust",
+        "astro",
+        "json",
+        "markdown",
+        "markdown_inline",
+      },
+    },
+  },
+
   -- fff.nvim — frecency-ranked, typo-resistant file index (used by filemention)
   {
     "dmtrKovalenko/fff.nvim",
