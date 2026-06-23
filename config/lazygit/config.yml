@@ -1,3 +1,37 @@
+# Flexoki Dark theme (https://stephango.com/flexoki)
+gui:
+  border: hidden
+  theme:
+    activeBorderColor:
+      - "#4385BE" # blue
+      - bold
+    inactiveBorderColor:
+      - "#575653" # base-700
+    searchingActiveBorderColor:
+      - "#D0A215" # yellow
+      - bold
+    optionsTextColor:
+      - "#4385BE" # blue
+    selectedLineBgColor:
+      - "#282726" # base-900
+    cherryPickedCommitFgColor:
+      - "#4385BE" # blue
+    cherryPickedCommitBgColor:
+      - "#343331" # base-850
+    markedBaseCommitFgColor:
+      - "#D0A215" # yellow
+    markedBaseCommitBgColor:
+      - "#343331" # base-850
+    unstagedChangesColor:
+      - "#D14D41" # red
+    defaultFgColor:
+      - "#CECDC3" # base-200
+  authorColors:
+    "*": "#8B7EC8" # purple
+  branchColors:
+    main: "#D14D41" # red
+    master: "#D14D41"
+
 customCommands:
   - key: "P"
     context: "global"
