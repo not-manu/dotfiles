@@ -192,9 +192,9 @@ M.polish_hl = {
     NvimTreeNormal = { bg = "#100F0F" }, -- match editor bg
     NvimTreeNormalNC = { bg = "#100F0F" },
     NvimTreeEndOfBuffer = { fg = "#100F0F" },
-    NvimTreeWinSeparator = { fg = "#282726", bg = "#100F0F" },
+    NvimTreeWinSeparator = { fg = "#100F0F", bg = "#100F0F" }, -- invisible
     NvimTreeCursorLine = { bg = "#1C1B1A" },
-    NvimTreeIndentMarker = { fg = "#403E3C" },
+    NvimTreeIndentMarker = { fg = "#282726" }, -- base-900, subtle
 
     -- folders / root
     NvimTreeFolderIcon = { fg = c.blue },
