@@ -4,7 +4,7 @@ git:
     - colorArg: always
       pager: delta --dark --paging=never
 gui:
-  border: single
+  border: hidden
   theme:
     activeBorderColor:
       - "#4385BE" # blue
