@@ -6,7 +6,7 @@ set -euo pipefail
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
 result=$("$DIR/sessions.sh" | fzf \
-  --prompt='  ' \
+  --prompt='    ' \
   --ghost='search sessions… (: for commands)' \
   --pointer='▌' \
   --layout=reverse \
@@ -22,7 +22,7 @@ result=$("$DIR/sessions.sh" | fzf \
   --color=gutter:#1C1B1A \
   --color=input-bg:#282726,query:#CECDC3 \
   --color=input-border:#282726 \
-  --color=pointer:#DA702C,prompt:#DA702C,marker:#DA702C
+  --color=pointer:#DA702C,prompt:#D14D41,marker:#DA702C
 ) || exit 0
 
 # Pull out the first ':'-prefixed token, if any → command mode.
