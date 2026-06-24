@@ -3,64 +3,58 @@
 # Pretty, ANSI-coloured rows (picker runs fzf with --ansi):
 #   <marker>  <name>      <rel>   <Nw>   <win1 · win2 · …>
 # Field layout for the picker's parser stays: $1=marker, $2=session name.
+#
+# Speed: exactly two tmux calls total (all sessions + all windows via -a),
+# assembled in a single awk pass — no per-session subprocess fan-out.
 
 set -euo pipefail
 
-# --- Flexoki truecolor helpers -------------------------------------------
-esc() { printf '\033[38;2;%d;%d;%dm' "$1" "$2" "$3"; }
-RESET=$'\033[0m'
-BOLD=$'\033[1m'
-TX=$(esc 206 205 195)     # base-200  — session name
-DIM=$(esc 135 133 128)    # base-500  — rel time / separators
-FAINT=$(esc 87 86 83)     # base-700  — inactive window names
-GREEN=$(esc 135 154 57)   # green-2   — attached marker
-ORANGE=$(esc 218 112 44)  # orange-2  — active window / count
-
-now=$(date +%s)
-rel() {
-  local d=$(( now - $1 ))
-  if   (( d < 60 ));      then echo "${d}s"
-  elif (( d < 3600 ));    then echo "$(( d / 60 ))m"
-  elif (( d < 86400 ));   then echo "$(( d / 3600 ))h"
-  elif (( d < 604800 ));  then echo "$(( d / 86400 ))d"
-  elif (( d < 2592000 )); then echo "$(( d / 86400 / 7 ))w"
-  else                        echo "$(( d / 86400 / 30 ))mo"; fi
-}
-
-# --- Gather sessions, newest activity first ------------------------------
-names=(); markers=(); rels=(); counts=(); winlists=()
-maxn=0
-while IFS='|' read -r act attached name; do
-  [[ -n $name ]] || continue
-  if [[ $attached == 1 ]]; then markers+=("${ORANGE}●${RESET}"); else markers+=("${FAINT}○${RESET}"); fi
-  rels+=("$(rel "$act")")
-
-  wn=()
-  while IFS= read -r line; do wn+=("$line"); done \
-    < <(tmux list-windows -t "$name" -F '#{?window_active,*,}#{window_name}')
-  counts+=("${#wn[@]}")
-
-  wl=""
-  for j in "${!wn[@]}"; do
-    w=${wn[j]}
-    (( j > 0 )) && wl+="${DIM} · ${RESET}"
-    if [[ $w == \** ]]; then wl+="${ORANGE}${w#\*}${RESET}"; else wl+="${FAINT}${w}${RESET}"; fi
-  done
-  winlists+=("$wl")
-
-  names+=("$name")
-  (( ${#name} > maxn )) && maxn=${#name}
-done < <(
-  tmux list-sessions -F '#{session_activity}|#{session_attached}|#{session_name}' \
-    | sort -rn -t'|' -k1,1
-)
-
-# --- Render --------------------------------------------------------------
-for i in "${!names[@]}"; do
-  printf '%s  %s%s%-*s%s   %s%3s%s   %s%2sw%s   %s\n' \
-    "${markers[i]}" \
-    "$TX$BOLD" '' "$maxn" "${names[i]}" "$RESET" \
-    "$DIM" "${rels[i]}" "$RESET" \
-    "$ORANGE" "${counts[i]}" "$RESET" \
-    "${winlists[i]}"
-done
+awk -v now="$(date +%s)" '
+  BEGIN {
+    RESET = "\033[0m"; BOLD = "\033[1m";
+    TX     = "\033[38;2;206;205;195m";   # base-200  — session name
+    DIM    = "\033[38;2;135;133;128m";   # base-500  — rel / separators
+    FAINT  = "\033[38;2;87;86;83m";      # base-700  — inactive windows
+    ORANGE = "\033[38;2;218;112;44m";    # orange-2  — marker / active / count
+    SEP    = DIM " · " RESET;
+  }
+  function rel(t,   d) {
+    d = now - t;
+    if (d < 60)      return d "s";
+    if (d < 3600)    return int(d / 60) "m";
+    if (d < 86400)   return int(d / 3600) "h";
+    if (d < 604800)  return int(d / 86400) "d";
+    if (d < 2592000) return int(d / 86400 / 7) "w";
+    return int(d / 86400 / 30) "mo";
+  }
+  # First input: windows — "session|*name" (active) or "session|name"
+  FNR == NR {
+    p = index($0, "|"); s = substr($0, 1, p - 1); w = substr($0, p + 1);
+    cnt[s]++;
+    if (substr(w, 1, 1) == "*") { col = ORANGE; w = substr(w, 2); } else col = FAINT;
+    wl[s] = wl[s] (wl[s] == "" ? "" : SEP) col w RESET;
+    next;
+  }
+  # Second input: sessions (pre-sorted) — "activity|attached|name"
+  {
+    p = index($0, "|"); act = substr($0, 1, p - 1); rest = substr($0, p + 1);
+    q = index(rest, "|"); att = substr(rest, 1, q - 1); name = substr(rest, q + 1);
+    order[++m] = name; A[name] = act; AT[name] = att;
+    if (length(name) > maxn) maxn = length(name);
+  }
+  END {
+    for (i = 1; i <= m; i++) {
+      name = order[i];
+      mark = (AT[name] == "1") ? ORANGE "●" RESET : FAINT "○" RESET;
+      pad = ""; n = maxn - length(name);
+      while (n-- > 0) pad = pad " ";
+      printf "%s  %s%s%s%s   %s%3s%s   %s%2sw%s   %s\n",
+        mark, TX BOLD, name, pad, RESET,
+        DIM, rel(A[name]), RESET,
+        ORANGE, cnt[name], RESET,
+        wl[name];
+    }
+  }
+' \
+  <(tmux list-windows -a -F '#{session_name}|#{?window_active,*,}#{window_name}') \
+  <(tmux list-sessions -F '#{session_activity}|#{session_attached}|#{session_name}' | sort -rn -t'|' -k1,1)
