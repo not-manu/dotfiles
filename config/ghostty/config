@@ -48,6 +48,7 @@ keybind = shift+enter=text:"\n"
 # resize-overlay-duration = 4s 200ms
 theme = Flexoki Dark
 macos-option-as-alt = true
+macos-titlebar-proxy-icon = hidden
 window-padding-x = 20
 window-padding-y = 20
 
