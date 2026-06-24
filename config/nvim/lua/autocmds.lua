@@ -23,8 +23,16 @@ vim.filetype.add {
   },
 }
 
--- Use markdown treesitter parser for MDX files
-vim.treesitter.language.register("markdown", "mdx")
+-- MDX has no dedicated treesitter parser; davidmh/mdx.nvim maps the `mdx`
+-- filetype onto the `markdown` parser (see lua/plugins/init.lua). NvChad's
+-- nvim-treesitter keeps its own ft->lang table and won't start highlighting
+-- automatically, so we explicitly start the markdown highlighter per buffer.
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "mdx",
+  callback = function(args)
+    pcall(vim.treesitter.start, args.buf, "markdown")
+  end,
+})
 
 -- Auto-reload buffers when files change on disk (e.g. agent edits)
 vim.o.autoread = true

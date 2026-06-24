@@ -39,6 +39,19 @@ return {
     },
   },
 
+  -- mdx.nvim — registers the `mdx` filetype and points it at the `markdown`
+  -- treesitter parser (via vim.treesitter.language.register), plus extra
+  -- queries for ESM imports/JSX. It has no Lua module or setup() — everything
+  -- runs automatically from the plugin's after/plugin script, so no `config`.
+  -- Needs the `markdown` parser in ensure_installed below.
+  {
+    "davidmh/mdx.nvim",
+    -- not lazy: must register the filetype/parser mapping before nvim-treesitter
+    -- starts highlighting mdx buffers.
+    lazy = false,
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+  },
+
   -- fff.nvim — frecency-ranked, typo-resistant file index (used by filemention)
   {
     "dmtrKovalenko/fff.nvim",
