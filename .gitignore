@@ -5,6 +5,8 @@ Thumbs.db
 # Secrets and auth — NEVER commit these
 *.local
 .zshrc.local
+.env
+!.env.example
 .npmrc
 .ssh/
 .mcp-auth/

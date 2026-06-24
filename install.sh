@@ -85,17 +85,22 @@ echo "[5/5] Linking global agent instructions ..."
 link "$DOTFILES_DIR/config/agents/AGENTS.md"       "$HOME/.claude/CLAUDE.md"
 link "$DOTFILES_DIR/config/agents/AGENTS.md"       "$CONFIG_DIR/opencode/AGENTS.md"
 
-# ---- Create .zshrc.local if it doesn't exist ----
+# ---- .zshrc.local: gitignored secrets file kept in-repo, symlinked to ~ ----
+# The source lives in config/zsh/.zshrc.local (gitignored, so a fresh clone
+# won't have it) — seed it from a template if missing, then symlink.
 echo ""
-if [ ! -f "$HOME/.zshrc.local" ]; then
-  cat > "$HOME/.zshrc.local" <<'EOF'
-# Machine-specific config — NOT tracked in dotfiles repo
+zshrc_local_src="$CONFIG_DIR/zsh/.zshrc.local"
+if [ ! -f "$zshrc_local_src" ]; then
+  cat > "$zshrc_local_src" <<'EOF'
+# Machine-specific config — NOT tracked in dotfiles repo (gitignored)
 # Add tokens, API keys, and local overrides here
+
+# Anthropic API key — used by `ccm` (config/bin/ccm) to list models.
+# export ANTHROPIC_API_KEY="sk-ant-..."
 EOF
-  echo "Created empty ~/.zshrc.local (add your tokens here)"
-else
-  echo "~/.zshrc.local already exists, skipping"
+  echo "Created template $zshrc_local_src (add your tokens here)"
 fi
+link "$zshrc_local_src" "$HOME/.zshrc.local"
 
 echo ""
 echo "=== Install complete! ==="
