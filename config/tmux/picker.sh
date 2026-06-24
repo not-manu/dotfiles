@@ -7,17 +7,21 @@ DIR="$(cd "$(dirname "$0")" && pwd)"
 
 result=$("$DIR/sessions.sh" | fzf \
   --prompt='  ' \
+  --ghost='search sessions… (: for commands)' \
   --pointer='▌' \
   --layout=reverse \
   --no-info \
   --no-scrollbar \
+  --no-separator \
   --border=none \
-  --margin=1,2 \
+  --input-border=horizontal \
   --highlight-line \
   --bind "change:transform:[[ {q} =~ ^: ]] && echo 'reload:$DIR/commands.sh' || echo 'reload:$DIR/sessions.sh'" \
-  --color=fg:#878580,bg:#100F0F,hl:#DA702C \
-  --color=fg+:#CECDC3,bg+:#1C1B1A,hl+:#DA702C \
-  --color=gutter:#100F0F \
+  --color=fg:#878580,bg:#1C1B1A,hl:#DA702C \
+  --color=fg+:#CECDC3,bg+:#343331,hl+:#DA702C \
+  --color=gutter:#1C1B1A \
+  --color=input-bg:#282726,query:#CECDC3 \
+  --color=input-border:#282726 \
   --color=pointer:#DA702C,prompt:#DA702C,marker:#DA702C
 ) || exit 0
 
