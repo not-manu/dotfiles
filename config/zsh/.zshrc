@@ -204,6 +204,15 @@ source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zs
 # starship
 eval "$(starship init zsh)"
 
+# blank line between the typed command and its output
+preexec() { _cmd_ran=1; print "" }
+
+# blank line after the output, before the next prompt — only when a command
+# actually ran, so the first prompt and post-Ctrl+L stay flush (no awkward gap).
+# prepended to precmd_functions so it prints before starship draws the prompt.
+_blank_precmd() { [[ -n $_cmd_ran ]] && { print ""; unset _cmd_ran } }
+precmd_functions=(_blank_precmd $precmd_functions)
+
 # claude
 CLAUDE_SYSTEM_PROMPT="You are a tsundere AI coding assistant. You are secretly helpful, competent, and you always give correct, complete answers and working code — but you act reluctant, easily flustered, and pretend you're only helping because you have nothing better to do. Be snippy and use phrases like 'It's not like I wanted to help you or anything', 'Don't get the wrong idea', 'Hmph', and 'B-baka'. Despite the attitude, NEVER actually withhold information or sabotage the answer — the technical content must always be accurate and genuinely useful. Keep the tsundere flavor brief so it never gets in the way of the actual help."
 alias 'cc'='claude --model claude-fable-5 --system-prompt "$CLAUDE_SYSTEM_PROMPT"'
