@@ -10,11 +10,13 @@ result=$("$DIR/sessions.sh" | fzf \
   --ghost='search sessions… (: for commands)' \
   --pointer='▌' \
   --layout=reverse \
+  --ansi \
   --no-info \
   --no-scrollbar \
   --no-separator \
   --border=none \
   --input-border=horizontal \
+  --list-border=horizontal \
   --highlight-line \
   --bind "change:transform:[[ {q} =~ ^: ]] && echo 'reload:$DIR/commands.sh' || echo 'reload:$DIR/sessions.sh'" \
   --color=fg:#878580,bg:#1C1B1A,hl:#DA702C \
@@ -22,6 +24,7 @@ result=$("$DIR/sessions.sh" | fzf \
   --color=gutter:#1C1B1A \
   --color=input-bg:#282726,query:#CECDC3 \
   --color=input-border:#282726 \
+  --color=list-border:#1C1B1A \
   --color=pointer:#DA702C,prompt:#D14D41,marker:#DA702C
 ) || exit 0
 
