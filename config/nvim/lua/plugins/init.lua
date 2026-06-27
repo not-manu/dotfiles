@@ -39,16 +39,21 @@ return {
     },
   },
 
-  -- mdx.nvim — registers the `mdx` filetype and points it at the `markdown`
-  -- treesitter parser (via vim.treesitter.language.register), plus extra
-  -- queries for ESM imports/JSX. It has no Lua module or setup() — everything
-  -- runs automatically from the plugin's after/plugin script, so no `config`.
-  -- Needs the `markdown` parser in ensure_installed below.
+  -- mdx.nvim — points the `mdx` filetype at the `markdown` treesitter parser
+  -- (via vim.treesitter.language.register), plus extra queries for ESM
+  -- imports/JSX. It has no Lua module or setup() — everything runs from the
+  -- plugin's after/plugin script. Needs the `markdown` parser (ensure_installed).
+  --
+  -- Lazy-loaded on `ft = "mdx"` so its `after/queries/markdown/*.scm` files are
+  -- only on the runtimepath in mdx sessions. If loaded globally, those queries
+  -- merge into ALL markdown buffers and their `#lua-match?` predicates crash
+  -- with "Index out of bounds" when a line is deleted (`dd`) in plain `.md`.
+  -- The mdx filetype itself is registered in options.lua (loaded eagerly) so
+  -- detection works before this plugin loads; lazy.nvim re-fires FileType after
+  -- load, so `vim.treesitter.start` still runs for the opened buffer.
   {
     "davidmh/mdx.nvim",
-    -- not lazy: must register the filetype/parser mapping before nvim-treesitter
-    -- starts highlighting mdx buffers.
-    lazy = false,
+    ft = "mdx",
     dependencies = { "nvim-treesitter/nvim-treesitter" },
   },
 

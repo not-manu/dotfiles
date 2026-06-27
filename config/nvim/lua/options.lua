@@ -2,6 +2,12 @@ require "nvchad.options"
 
 -- add yours here!
 
+-- Register the mdx filetype here (not via mdx.nvim) so detection happens
+-- before the plugin loads, allowing mdx.nvim to be lazy-loaded on `ft = "mdx"`.
+-- This keeps mdx's markdown-parser queries out of plain `.md` buffers, which
+-- otherwise trigger a treesitter "Index out of bounds" crash on line deletion.
+vim.filetype.add({ extension = { mdx = "mdx" } })
+
 -- Disable global shada so we can load a per-project one in VimEnter
 vim.o.shadafile = "NONE"
 

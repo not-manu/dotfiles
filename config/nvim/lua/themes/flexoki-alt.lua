@@ -20,7 +20,7 @@ local M = {}
 
 M.base_30 = {
   white = "#CECDC3", -- base-200 (default fg)
-  darker_black = "#0C0B0B",
+  darker_black = "#100F0F", -- Flexoki has no shade below black; keep panels uniform
   black = "#100F0F", -- nvim bg (Flexoki black)
   black2 = "#1C1B1A", -- base-950
   one_bg = "#1C1B1A",
