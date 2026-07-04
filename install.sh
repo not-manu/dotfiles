@@ -70,10 +70,6 @@ link "$CONFIG_DIR/ghostty/shaders" "$ghostty_dir/shaders"
 mkdir -p "$CONFIG_DIR/karabiner"
 link "$DOTFILES_DIR/config/karabiner/karabiner.json" "$CONFIG_DIR/karabiner/karabiner.json"
 
-# ---- Herdr (symlink just the toml — herdr writes sockets/logs into the dir) ----
-mkdir -p "$CONFIG_DIR/herdr"
-link "$DOTFILES_DIR/config/herdr/config.toml" "$CONFIG_DIR/herdr/config.toml"
-
 # ---- Claude (lives in ~/.<name>, not ~/.config/) ----
 echo ""
 echo "[4/5] Linking claude config ..."
