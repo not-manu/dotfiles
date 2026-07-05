@@ -4,6 +4,7 @@ import { $ } from "bun";
 
 const SIDEBAR_OPT = "@sidebar_pane";
 const LAYOUT_OPT = "@sidebar_layout";
+const RETURN_OPT = "@sidebar_return";
 const WIDTH = 30;
 
 async function toggle() {
@@ -23,23 +24,32 @@ async function toggle() {
         await $`tmux show-options -wqv ${LAYOUT_OPT}`.text()
       ).trim();
       if (layout) await $`tmux select-layout ${layout}`.nothrow();
+      // Return focus to the pane that had it before the sidebar opened.
+      const ret = (
+        await $`tmux show-options -wqv ${RETURN_OPT}`.text()
+      ).trim();
+      if (ret) await $`tmux select-pane -t ${ret}`.nothrow();
       await $`tmux set-option -wu ${SIDEBAR_OPT}`;
       await $`tmux set-option -wu ${LAYOUT_OPT}`;
+      await $`tmux set-option -wu ${RETURN_OPT}`;
       return;
     }
   }
 
-  // Snapshot layout so closing the sidebar restores pane sizes exactly.
-  const layout = (
-    await $`tmux display-message -p '#{window_layout}'`.text()
-  ).trim();
+  // Snapshot layout + focused pane so closing restores both exactly.
+  const [layout, activePane] = (
+    await $`tmux display-message -p '#{window_layout} #{pane_id}'`.text()
+  )
+    .trim()
+    .split(" ");
 
-  // Open on the left, full height, without stealing focus.
+  // Open on the left, full height, taking focus (no -d).
   const paneId = (
-    await $`tmux split-window -hbf -d -l ${WIDTH} -P -F '#{pane_id}' bun ${import.meta.path} run`.text()
+    await $`tmux split-window -hbf -l ${WIDTH} -P -F '#{pane_id}' bun ${import.meta.path} run`.text()
   ).trim();
   await $`tmux set-option -w ${SIDEBAR_OPT} ${paneId}`;
   await $`tmux set-option -w ${LAYOUT_OPT} ${layout}`;
+  await $`tmux set-option -w ${RETURN_OPT} ${activePane}`;
 }
 
 async function run() {
