@@ -12,6 +12,9 @@
 - [ ] tmux: add a keybind to toggle right sidebar for agents 
 - [ ] claude: add a hook to notify when a process is done (terminal bell / say [summary])
 
+- [ ] need to standardize a spec so i can see folder descriptions in eza (cd)
+      (DESCRIPTION.md) or just yaml frontmatter in README.md?
+
 **done**
 - [x] tmux: remove the delay after ctrl b interrupting nvim commands (resizing is fine, but next/previous is not really necessary)
 - [x] tmux: make the switching sessions fzf nicer and less in the way and minimal. kinda like telescope but for tmux sessions.
