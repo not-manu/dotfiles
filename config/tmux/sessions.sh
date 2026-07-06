@@ -9,7 +9,11 @@
 
 set -euo pipefail
 
-awk -v now="$(date +%s)" '
+# Sessions starting with "_" (e.g. _scratch_*) are hidden unless --all is passed.
+hide=1
+[[ "${1:-}" == "--all" ]] && hide=0
+
+awk -v now="$(date +%s)" -v hide="$hide" '
   BEGIN {
     RESET = "\033[0m"; BOLD = "\033[1m";
     TX     = "\033[38;2;206;205;195m";   # base-200  — session name
@@ -39,6 +43,7 @@ awk -v now="$(date +%s)" '
   {
     p = index($0, "|"); act = substr($0, 1, p - 1); rest = substr($0, p + 1);
     q = index(rest, "|"); att = substr(rest, 1, q - 1); name = substr(rest, q + 1);
+    if (hide && substr(name, 1, 1) == "_") next;
     order[++m] = name; A[name] = act; AT[name] = att;
     if (length(name) > maxn) maxn = length(name);
   }

@@ -4,6 +4,9 @@ require "nvchad.mappings"
 
 local map = vim.keymap.set
 
+-- Alt-i scratch terminal now lives in tmux (per-window popup); drop nvchad's float
+pcall(vim.keymap.del, { "n", "t" }, "<A-i>")
+
 map("n", ";", ":", { desc = "CMD enter command mode" })
 map("i", "jk", "<ESC>")
 map("n", "<C-d>", "<C-d>zz", { desc = "Center cursor after moving down half-page" })

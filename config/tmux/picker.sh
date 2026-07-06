@@ -18,7 +18,7 @@ result=$("$DIR/sessions.sh" | fzf \
   --input-border=horizontal \
   --list-border=horizontal \
   --highlight-line \
-  --bind "change:transform:[[ {q} =~ ^: ]] && echo 'reload:$DIR/commands.sh' || echo 'reload:$DIR/sessions.sh'" \
+  --bind "change:transform:if [[ {q} =~ ^: ]]; then echo 'reload:$DIR/commands.sh'; elif [[ {q} =~ ^_ ]]; then echo 'reload:$DIR/sessions.sh --all'; else echo 'reload:$DIR/sessions.sh'; fi" \
   --color=fg:#878580,bg:#1C1B1A,hl:#DA702C \
   --color=fg+:#CECDC3,bg+:#343331,hl+:#DA702C \
   --color=gutter:#1C1B1A \
