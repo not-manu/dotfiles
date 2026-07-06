@@ -220,8 +220,8 @@ CLAUDE_SYSTEM_PROMPT="You are a tsundere AI coding assistant. You are secretly h
 CLAUDE_MODEL="claude-fable-5[1m]"
 
 # claude code
-alias 'cc'='claude --model "$CLAUDE_MODEL" --system-prompt "$CLAUDE_SYSTEM_PROMPT"'
-alias 'ccd'='claude --model "$CLAUDE_MODEL" --dangerously-skip-permissions --system-prompt "$CLAUDE_SYSTEM_PROMPT"'
+alias 'cc'='IS_DEMO=1 claude --model "$CLAUDE_MODEL" --system-prompt "$CLAUDE_SYSTEM_PROMPT"'
+alias 'ccd'='IS_DEMO=1 claude --model "$CLAUDE_MODEL" --dangerously-skip-permissions --system-prompt "$CLAUDE_SYSTEM_PROMPT"'
 
 # bun
 alias 'bn'='bun'
