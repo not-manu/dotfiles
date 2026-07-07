@@ -1,0 +1,207 @@
+#!/usr/bin/env -S uv run --script --quiet
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["rmc>=0.3", "pypdf>=5"]
+# ///
+"""rm2pdf — render reMarkable documents from a local mirror to PDFs.
+
+Usage:
+  rm2pdf [PATH] [-o OUT] [--root ROOT] [-f] [-j N]
+
+PATH is a human-readable path in the document tree (e.g. "Manu/Projects"
+or "Manu/Books/No Longer Human"), a document UUID, or omitted for everything.
+Renders recursively into OUT, mirroring the folder tree. Unchanged documents
+(output newer than all sources) are skipped, so re-runs are near-instant.
+"""
+
+import argparse
+import io
+import json
+import re
+import subprocess
+import sys
+import tempfile
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
+
+RSVG = "rsvg-convert"
+
+
+def load_tree(root: Path) -> dict[str, dict]:
+    docs = {}
+    for mf in root.glob("*.metadata"):
+        try:
+            m = json.loads(mf.read_text())
+        except Exception:
+            continue
+        if m.get("deleted"):
+            continue
+        docs[mf.stem] = m
+    return docs
+
+
+def visible_path(uid: str, docs: dict) -> str:
+    parts = []
+    cur = uid
+    while cur and cur in docs:
+        name = docs[cur].get("visibleName", cur)
+        parts.append(re.sub(r"[/\0]", "_", name))
+        cur = docs[cur].get("parent", "")
+        if cur == "trash":
+            return ""
+    return "/".join(reversed(parts))
+
+
+def page_ids(content: dict) -> list[dict]:
+    """Ordered page entries: {'id': str, 'redir': int|None}."""
+    out = []
+    cpages = content.get("cPages", {}).get("pages")
+    if cpages is not None:
+        for p in cpages:
+            if "deleted" in p:
+                continue
+            redir = p.get("redir", {}).get("value")
+            out.append({"id": p["id"], "redir": redir})
+        return out
+    redirmap = content.get("redirectionPageMap", [])
+    for i, pid in enumerate(content.get("pages", [])):
+        redir = redirmap[i] if i < len(redirmap) else None
+        out.append({"id": pid, "redir": None if redir in (None, -1) else redir})
+    return out
+
+
+def sources_mtime(root: Path, uid: str) -> float:
+    mt = 0.0
+    for p in [root / f"{uid}.content", root / f"{uid}.metadata", root / f"{uid}.pdf"]:
+        if p.exists():
+            mt = max(mt, p.stat().st_mtime)
+    d = root / uid
+    if d.is_dir():
+        for p in d.iterdir():
+            mt = max(mt, p.stat().st_mtime)
+    return mt
+
+
+def render_ink_pages(root: Path, uid: str, pages: list[dict], tmp: Path) -> dict[str, Path]:
+    """Render each page's .rm to a single-page PDF. Returns page_id -> pdf path."""
+    from rmc.exporters.svg import rm_to_svg
+
+    out: dict[str, Path] = {}
+    svgs: list[tuple[str, Path]] = []
+    for p in pages:
+        rm = root / uid / f"{p['id']}.rm"
+        if not rm.exists():
+            continue
+        svg = tmp / f"{p['id']}.svg"
+        try:
+            rm_to_svg(rm, svg)
+            svgs.append((p["id"], svg))
+        except Exception as e:
+            print(f"  warn: page {p['id']} failed to parse: {e}", file=sys.stderr)
+    for pid, svg in svgs:
+        pdf = tmp / f"{pid}.pdf"
+        r = subprocess.run([RSVG, "-f", "pdf", "-o", str(pdf), str(svg)],
+                           capture_output=True)
+        if r.returncode == 0 and pdf.exists():
+            out[pid] = pdf
+    return out
+
+
+def build_pdf(root: Path, uid: str, dest: Path) -> str:
+    from pypdf import PdfReader, PdfWriter, Transformation
+
+    content = json.loads((root / f"{uid}.content").read_text())
+    pages = page_ids(content)
+    base_pdf = root / f"{uid}.pdf"
+
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        ink = render_ink_pages(root, uid, pages, tmp)
+
+        writer = PdfWriter()
+        if base_pdf.exists():
+            base = PdfReader(str(base_pdf))
+            for p in pages:
+                overlay = ink.get(p["id"])
+                if p["redir"] is not None and p["redir"] < len(base.pages):
+                    page = base.pages[p["redir"]]
+                    if overlay:
+                        opage = PdfReader(str(overlay)).pages[0]
+                        sx = float(page.mediabox.width) / float(opage.mediabox.width)
+                        sy = float(page.mediabox.height) / float(opage.mediabox.height)
+                        page.merge_transformed_page(
+                            opage, Transformation().scale(min(sx, sy), min(sx, sy)))
+                    writer.add_page(page)
+                elif overlay:  # inserted notebook page inside a pdf doc
+                    writer.add_page(PdfReader(str(overlay)).pages[0])
+            if not pages:  # unannotated pdf: passthrough
+                for page in base.pages:
+                    writer.add_page(page)
+        else:
+            for p in pages:
+                overlay = ink.get(p["id"])
+                if overlay:
+                    writer.add_page(PdfReader(str(overlay)).pages[0])
+
+        if not writer.pages:
+            return "empty"
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        buf = io.BytesIO()
+        writer.write(buf)
+        dest.write_bytes(buf.getvalue())
+        return "ok"
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(prog="rm2pdf", description=__doc__)
+    ap.add_argument("path", nargs="?", default="", help="tree path or UUID (default: everything)")
+    ap.add_argument("-o", "--out", default="./pdfs", help="output dir (default ./pdfs)")
+    ap.add_argument("--root", default="~/reMarkable", help="mirror dir (default ~/reMarkable)")
+    ap.add_argument("-f", "--force", action="store_true", help="re-render even if fresh")
+    ap.add_argument("-j", "--jobs", type=int, default=8, help="parallel documents (default 8)")
+    args = ap.parse_args()
+
+    root = Path(args.root).expanduser()
+    out_root = Path(args.out).expanduser()
+    docs = load_tree(root)
+
+    # resolve targets
+    want = args.path.strip("/")
+    targets: list[tuple[str, str]] = []  # (uid, tree_path)
+    for uid, m in docs.items():
+        if m.get("type") != "DocumentType":
+            continue
+        vp = visible_path(uid, docs)
+        if not vp:
+            continue
+        if not want or vp == want or vp.startswith(want + "/") or uid == want:
+            targets.append((uid, vp))
+    if not targets:
+        print(f"no documents match '{args.path}'", file=sys.stderr)
+        return 1
+
+    def job(uid: str, vp: str) -> tuple[str, str]:
+        dest = out_root / f"{vp}.pdf"
+        if not args.force and dest.exists() and dest.stat().st_mtime >= sources_mtime(root, uid):
+            return vp, "fresh"
+        try:
+            return vp, build_pdf(root, uid, dest)
+        except Exception as e:
+            return vp, f"error: {e}"
+
+    counts: dict[str, int] = {}
+    with ThreadPoolExecutor(max_workers=args.jobs) as ex:
+        futs = [ex.submit(job, uid, vp) for uid, vp in targets]
+        for f in as_completed(futs):
+            vp, status = f.result()
+            counts[status.split(":")[0]] = counts.get(status.split(":")[0], 0) + 1
+            if status not in ("fresh",):
+                print(f"[{status}] {vp}")
+
+    total = len(targets)
+    print(f"done: {total} docs — " + ", ".join(f"{v} {k}" for k, v in sorted(counts.items())))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
