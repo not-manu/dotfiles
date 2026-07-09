@@ -135,6 +135,19 @@ return {
       },
     },
     config = function(_, opts)
+      opts.on_attach = function(bufnr)
+        local api = require "nvim-tree.api"
+        api.config.mappings.default_on_attach(bufnr)
+        -- open .excalidraw files in VS Code, everything else via system open
+        vim.keymap.set("n", "s", function()
+          local node = api.tree.get_node_under_cursor()
+          if node and node.absolute_path and node.absolute_path:match "%.excalidraw$" then
+            vim.fn.jobstart({ "code", node.absolute_path }, { detach = true })
+          else
+            api.node.run.system()
+          end
+        end, { buffer = bufnr, desc = "nvim-tree: Open (excalidraw → VS Code)" })
+      end
       require("nvim-tree").setup(opts)
       local api = require "nvim-tree.api"
       vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "TermLeave" }, {
