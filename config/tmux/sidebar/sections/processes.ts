@@ -376,6 +376,9 @@ export const hasQuery = () => query.length > 0;
 
 export const getPanes = () => panes;
 
+// True while any visible agent is working — drives the fast spinner repaint.
+export const hasWorkingAgents = () => panes.some((pane) => pane.status === "working");
+
 // Cursor column on the prompt line: after " / " (3 cols) + query, 1-indexed.
 export const queryCursorColumn = () => 4 + query.length;
 
@@ -441,7 +444,7 @@ const SPINNER = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", 
 
 const statusGlyph = (status: AgentStatus) => {
   if (status === "working")
-    return fg(palette.yellow, SPINNER[Math.floor(Date.now() / 250) % SPINNER.length]!);
+    return fg(palette.yellow, SPINNER[Math.floor(Date.now() / 80) % SPINNER.length]!);
   if (status === "blocked") return fg(palette.red, "●");
   return fg(palette.green, "✓");
 };

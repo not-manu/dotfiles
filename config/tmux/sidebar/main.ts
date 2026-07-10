@@ -7,15 +7,18 @@ import {
   backspace,
   clearQuery,
   hasQuery,
+  hasWorkingAgents,
   jumpToSelected,
   moveSelection,
   processLines,
   queryCursorColumn,
   refreshPanes,
+  setReservedRows,
   startProcesses,
   toggleAgentFilter,
   toggleProcFilter,
 } from "./sections/processes";
+import { refreshTasks, taskLines } from "./sections/tasks";
 
 let closed = false;
 const cleanup = () => {
@@ -27,12 +30,14 @@ const cleanup = () => {
 };
 
 const render = () => {
-  // JUMP up top, system stats pinned to the bottom of the popup.
+  // JUMP up top; TASKS pinned above the system stats at the bottom.
   const stats = topLines();
+  const tasks = taskLines();
+  setReservedRows(tasks.length); // shrink the process list to make room
   const jump = processLines();
-  const filler = Math.max(1, HEIGHT - jump.length - stats.length - 1);
+  const filler = Math.max(1, HEIGHT - jump.length - tasks.length - stats.length - 1);
   // Real terminal cursor sits on the prompt line (first row), after the query.
-  paint([...jump, ...Array(filler).fill(cell()), ...stats], {
+  paint([...jump, ...Array(filler).fill(cell()), ...tasks, ...stats], {
     row: 1,
     column: queryCursorColumn(),
   });
@@ -91,6 +96,14 @@ process.stdin.on("data", (data: Buffer) => {
 
 startTop(render);
 void startProcesses(render);
+void refreshTasks(render);
 setInterval(() => updateTop(render), 1000);
-setInterval(() => void refreshPanes(render), 3000);
+// Smooth spinner: repaint at animation rate, but only while something spins.
+setInterval(() => {
+  if (hasWorkingAgents()) render();
+}, 80);
+setInterval(() => {
+  void refreshPanes(render);
+  void refreshTasks(render);
+}, 3000);
 render();
