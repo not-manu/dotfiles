@@ -160,8 +160,6 @@ const render = () => {
     pair("NET", `total ${formatBytes(networkReceived + networkSent)}`, palette.blue),
     pair("down", `${formatBytes(networkDownRate)}/s`, palette.muted, palette.blue),
     pair("up", `${formatBytes(networkUpRate)}/s`, palette.muted, palette.cyan),
-    cell(),
-    pair("", "q / esc"),
   ]);
 };
 
