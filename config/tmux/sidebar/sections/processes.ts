@@ -1,5 +1,7 @@
 import { CONTENT_WIDTH, HEIGHT, bg, bold, cell, fg, fit, pair, palette, run } from "../core";
 
+export type AgentStatus = "working" | "blocked" | "idle";
+
 export type Pane = {
   session: string;
   windowIndex: string;
@@ -10,6 +12,8 @@ export type Pane = {
   pid: number;
   activity: number; // window_activity timestamp, for most-recently-used sorting
   processes: string[]; // every command in this pane's process tree, e.g. zsh, claude, bun, node
+  tool?: string; // agent process (claude/opencode/codex) if one runs here
+  status?: AgentStatus;
 };
 
 type Match = { pane: Pane; score: number };
@@ -25,6 +29,7 @@ export const setReservedRows = (rows: number) => {
 // stats block all accounted for).
 const visibleCount = () => Math.max(3, HEIGHT - 16 - reservedRows);
 const SHELLS = new Set(["zsh", "bash", "fish", "sh", "login", "-zsh", "-bash"]);
+const AGENT_TOOLS = new Set(["claude", "opencode", "codex"]);
 
 let panes: Pane[] = [];
 let query = "";
@@ -33,27 +38,32 @@ let scrollOffset = 0;
 let listRunning = false;
 
 // One ps pass → children map, so each pane's full process tree is a cheap BFS.
-const readProcessTree = (output: string) => {
+type ProcessTree = {
+  children: Map<number, number[]>;
+  names: Map<number, string>;
+  cpu: Map<number, number>;
+};
+
+const readProcessTree = (output: string): ProcessTree => {
   const children = new Map<number, number[]>();
   const names = new Map<number, string>();
+  const cpu = new Map<number, number>();
 
   for (const line of output.split("\n")) {
-    const match = line.match(/^\s*(\d+)\s+(\d+)\s+(.+)$/);
+    const match = line.match(/^\s*(\d+)\s+(\d+)\s+([\d.]+)\s+(.+)$/);
     if (!match) continue;
     const pid = Number(match[1]);
     const ppid = Number(match[2]);
-    names.set(pid, match[3]!.split("/").at(-1)!.trim());
+    names.set(pid, match[4]!.split("/").at(-1)!.trim());
+    cpu.set(pid, Number(match[3]));
     if (!children.has(ppid)) children.set(ppid, []);
     children.get(ppid)!.push(pid);
   }
 
-  return { children, names };
+  return { children, names, cpu };
 };
 
-const descendants = (
-  pid: number,
-  tree: { children: Map<number, number[]>; names: Map<number, string> },
-) => {
+const descendants = (pid: number, tree: ProcessTree) => {
   const commands: string[] = [];
   const queue = [pid];
   while (queue.length) {
@@ -63,6 +73,18 @@ const descendants = (
     queue.push(...(tree.children.get(current) ?? []));
   }
   return [...new Set(commands)];
+};
+
+// First agent process in the pane's tree, with its cpu usage.
+const findAgent = (pid: number, tree: ProcessTree) => {
+  const queue = [pid];
+  while (queue.length) {
+    const current = queue.shift()!;
+    const name = tree.names.get(current);
+    if (name && AGENT_TOOLS.has(name)) return { tool: name, cpu: tree.cpu.get(current) ?? 0 };
+    queue.push(...(tree.children.get(current) ?? []));
+  }
+  return undefined;
 };
 
 // Cache of absolute cwd → display path ("repo" or "repo/sub/dir"), resolved
@@ -77,6 +99,41 @@ const resolveDisplayPath = async (absolute: string, homeRelative: string) => {
   return rest ? `${repo}/${rest}` : repo;
 };
 
+// Agent status with hysteresis: tool-use pauses (reading files, edits)
+// briefly drop the "esc to interrupt" marker even though the agent is still
+// going, so "working" only decays to idle after a sustained quiet period.
+const WORKING_STICKY_MS = 12_000;
+const lastWorkingAt = new Map<string, number>();
+
+const detectStatus = async (target: string, cpu: number): Promise<AgentStatus> => {
+  const content = (await run(["tmux", "capture-pane", "-p", "-t", target])).toLowerCase();
+  const tail = content.split("\n").slice(-30).join("\n");
+
+  const blocked =
+    tail.includes("do you want") ||
+    tail.includes("waiting for approval") ||
+    tail.includes("permission required");
+  if (blocked) {
+    lastWorkingAt.delete(target);
+    return "blocked";
+  }
+
+  const working =
+    tail.includes("esc to interrupt") ||
+    tail.includes("ctrl+c to interrupt") ||
+    /[✻✽✶✳✢·⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏] \w+…/.test(tail) ||
+    cpu > 20;
+  if (working) {
+    lastWorkingAt.set(target, Date.now());
+    return "working";
+  }
+
+  // Recently working → still working (pause between tool calls, not done).
+  const last = lastWorkingAt.get(target);
+  if (last && Date.now() - last < WORKING_STICKY_MS) return "working";
+  return "idle";
+};
+
 const listPanes = async (): Promise<Pane[]> => {
   const [paneOutput, psOutput] = await Promise.all([
     run([
@@ -86,7 +143,7 @@ const listPanes = async (): Promise<Pane[]> => {
       "-F",
       "#{session_name}\t#{window_index}\t#{window_name}\t#{pane_index}\t#{pane_current_command}\t#{pane_current_path}\t#{pane_pid}\t#{window_activity}",
     ]),
-    run(["/bin/ps", "-axo", "pid=,ppid=,comm="]),
+    run(["/bin/ps", "-axo", "pid=,ppid=,pcpu=,comm="]),
   ]);
 
   const tree = readProcessTree(psOutput);
@@ -108,7 +165,7 @@ const listPanes = async (): Promise<Pane[]> => {
       }),
   );
 
-  return rows.map((line) => {
+  const result: Pane[] = rows.map((line) => {
     const [session, windowIndex, window, paneIndex, command, path, pid, activity] =
       line.split("\t");
     const panePid = Number(pid);
@@ -124,6 +181,21 @@ const listPanes = async (): Promise<Pane[]> => {
       processes: Number.isFinite(panePid) ? descendants(panePid, tree) : [],
     };
   });
+
+  // Resolve agent tool + live status for agent panes, in parallel.
+  await Promise.all(
+    result.map(async (pane) => {
+      const agent = Number.isFinite(pane.pid) ? findAgent(pane.pid, tree) : undefined;
+      if (!agent) return;
+      pane.tool = agent.tool;
+      pane.status = await detectStatus(
+        `${pane.session}:${pane.windowIndex}.${pane.paneIndex}`,
+        agent.cpu,
+      );
+    }),
+  );
+
+  return result;
 };
 
 // The headline process for a row: prefer a non-shell descendant (claude, nvim,
@@ -152,20 +224,28 @@ const fuzzyScore = (text: string, needle: string) => {
 };
 
 const haystack = (pane: Pane) =>
-  `${pane.processes.join(" ")} ${pane.command} ${pane.window} ${pane.session} ${pane.path}`;
+  `${pane.tool ? "agent " : ""}${pane.processes.join(" ")} ${pane.command} ${pane.window} ${pane.session} ${pane.path}`;
 
-// Priority tiers: agents (claude, opencode, codex) > other running processes
-// (node, bun, btop…) > bare shells. Within a tier, most recently used first.
-const AGENT_TOOLS = new Set(["claude", "opencode", "codex"]);
-
+// Priority tiers: blocked agents (need attention!) > working agents > idle
+// agents > other running processes (node, bun, btop…) > bare shells.
+// Within a tier, most recently used first.
 const tier = (pane: Pane) => {
-  if (pane.processes.some((name) => AGENT_TOOLS.has(name))) return 0;
-  if (pane.processes.some((name) => !SHELLS.has(name))) return 1;
-  return 2;
+  if (pane.status === "blocked") return 0;
+  if (pane.status === "working") return 1;
+  if (pane.tool) return 2;
+  if (pane.processes.some((name) => !SHELLS.has(name))) return 3;
+  return 4;
 };
 
 const byTierThenRecency = (a: Pane, b: Pane) =>
   tier(a) - tier(b) || b.activity - a.activity;
+
+// Up to +4 for panes used in the last few hours, decaying to 0 — so recently
+// touched panes float up even among equal fuzzy matches.
+const recencyBonus = (pane: Pane) => {
+  const hoursAgo = (Date.now() / 1000 - pane.activity) / 3600;
+  return Math.max(0, 4 - hoursAgo);
+};
 
 const matches = (): Match[] => {
   if (!query) {
@@ -174,7 +254,7 @@ const matches = (): Match[] => {
   return panes
     .map((pane) => ({
       pane,
-      score: fuzzyScore(haystack(pane), query) + (2 - tier(pane)) * 5,
+      score: fuzzyScore(haystack(pane), query) + (4 - tier(pane)) * 3 + recencyBonus(pane),
     }))
     .filter((match) => match.score > -Infinity)
     .sort((a, b) => b.score - a.score || byTierThenRecency(a.pane, b.pane));
@@ -294,17 +374,31 @@ const PROCESS_COLORS: Record<string, string> = {
   ssh: palette.blue,
 };
 
-// Compact single-line rows: "name   session:win"; the selection is just a
+// Agent status glyph after the name: spinner while working, ✓ when done,
+// ● when blocked on approval. Spinner frame keyed to wall clock so it
+// animates across renders.
+const SPINNER = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+
+const statusGlyph = (status: AgentStatus) => {
+  if (status === "working")
+    return fg(palette.yellow, SPINNER[Math.floor(Date.now() / 250) % SPINNER.length]!);
+  if (status === "blocked") return fg(palette.red, "●");
+  return fg(palette.green, "✓");
+};
+
+// Compact single-line rows: "name ⠸   session:win"; the selection is just a
 // background highlight, no expansion.
 const rowLines = (pane: Pane, isSelected: boolean, width: number) => {
   const name = headline(pane);
-  const nameWidth = Math.min(name.length, width - 12);
-  const meta = sessionLabel(pane, width - nameWidth - 5);
+  const glyphCols = pane.status ? 2 : 0; // " " + glyph
+  const nameWidth = Math.min(name.length, width - 12 - glyphCols);
+  const meta = sessionLabel(pane, width - nameWidth - glyphCols - 5);
 
   const color = isSelected ? palette.cyan : PROCESS_COLORS[name] ?? palette.text;
   const label = bold(fg(color, truncate(name, nameWidth)));
-  const gap = " ".repeat(Math.max(1, width - nameWidth - meta.length - 4));
-  const top = fit(`  ${label}${gap}${fg(palette.muted, meta)}`, width);
+  const suffix = pane.status ? ` ${statusGlyph(pane.status)}` : "";
+  const gap = " ".repeat(Math.max(1, width - nameWidth - glyphCols - meta.length - 4));
+  const top = fit(`  ${label}${suffix}${gap}${fg(palette.muted, meta)}`, width);
 
   return isSelected ? [bg(palette.empty, top)] : [top];
 };
