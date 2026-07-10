@@ -21,6 +21,8 @@ let reservedRows = 0;
 export const setReservedRows = (rows: number) => {
   reservedRows = rows;
 };
+// -16 leaves a guaranteed 2-row gap above the bottom stats (prompt + gap +
+// stats block all accounted for).
 const visibleCount = () => Math.max(3, HEIGHT - 16 - reservedRows);
 const SHELLS = new Set(["zsh", "bash", "fish", "sh", "login", "-zsh", "-bash"]);
 
@@ -272,15 +274,6 @@ export const jumpToSelected = (): boolean => {
 const truncate = (text: string, width: number) =>
   text.length > width ? `${text.slice(0, Math.max(0, width - 1))}…` : text;
 
-// "~/Documents/Projects/not-manu/localsim" → "…/not-manu/localsim"
-const shortPath = (path: string, width: number) => {
-  if (path.length <= width) return path;
-  const parts = path.split("/");
-  while (parts.length > 2 && `…/${parts.slice(1).join("/")}`.length > width) parts.shift();
-  const compact = `…/${parts.slice(1).join("/")}`;
-  return compact.length <= width ? compact : truncate(parts.at(-1) ?? path, width);
-};
-
 // Session label for the right column: drop the hidden-session underscore
 // prefix ("_scratch_dotfiles_w17" → "scratch_dotfiles_w17") and keep the tail,
 // which is the distinctive part.
@@ -301,8 +294,8 @@ const PROCESS_COLORS: Record<string, string> = {
   ssh: palette.blue,
 };
 
-// Compact single-line rows: "name   session:win". Only the selected entry
-// expands to a second line with its cwd, so the list stays scannable.
+// Compact single-line rows: "name   session:win"; the selection is just a
+// background highlight, no expansion.
 const rowLines = (pane: Pane, isSelected: boolean, width: number) => {
   const name = headline(pane);
   const nameWidth = Math.min(name.length, width - 12);
@@ -313,9 +306,7 @@ const rowLines = (pane: Pane, isSelected: boolean, width: number) => {
   const gap = " ".repeat(Math.max(1, width - nameWidth - meta.length - 4));
   const top = fit(`  ${label}${gap}${fg(palette.muted, meta)}`, width);
 
-  if (!isSelected) return [top];
-  const detail = fit(`   ${fg(palette.text, shortPath(pane.path, width - 4))}`, width);
-  return [bg(palette.empty, top), bg(palette.empty, detail)];
+  return isSelected ? [bg(palette.empty, top)] : [top];
 };
 
 export const processLines = (): string[] => {
@@ -347,17 +338,15 @@ export const processLines = (): string[] => {
     });
   }
 
-  // JUMP header with match count, then the prompt line: query, or a muted
-  // placeholder. The terminal's own cursor sits after the query (see paint).
-  const header = pair(
-    "JUMP",
-    `${list.length}/${panes.length}`,
-    palette.blue,
-    palette.muted,
+  // Single prompt line: "/ query" (muted placeholder when empty) with the
+  // match count on the right. The terminal cursor sits after the query.
+  const count = `${list.length}/${panes.length}`;
+  const text = query || "search…";
+  const gap = " ".repeat(Math.max(1, CONTENT_WIDTH - 3 - text.length - count.length - 1));
+  const input = fit(
+    ` ${fg(palette.muted, "/")} ${query ? fg(palette.text, query) : fg(palette.muted, text)}${gap}${fg(palette.muted, count)} `,
     CONTENT_WIDTH,
-    true,
   );
-  const input = fit(` ${fg(palette.muted, "/")} ${fg(palette.text, query)}`, CONTENT_WIDTH);
 
-  return [header, input, cell(), ...rows];
+  return [input, cell(), ...rows];
 };

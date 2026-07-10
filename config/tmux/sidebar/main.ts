@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 
-import { cell, paint, restoreTerminal } from "./core";
+import { HEIGHT, cell, paint, restoreTerminal } from "./core";
 import { startTop, topLines, updateTop } from "./sections/top";
 import {
   appendQuery,
@@ -25,10 +25,13 @@ const cleanup = () => {
 };
 
 const render = () => {
-  const top = topLines();
-  // Real terminal cursor sits on the prompt line (header + 1), after the query.
-  paint([...top, cell(), ...processLines()], {
-    row: top.length + 3,
+  // JUMP up top, system stats pinned to the bottom of the popup.
+  const stats = topLines();
+  const jump = processLines();
+  const filler = Math.max(1, HEIGHT - jump.length - stats.length - 1);
+  // Real terminal cursor sits on the prompt line (first row), after the query.
+  paint([...jump, ...Array(filler).fill(cell()), ...stats], {
+    row: 1,
     column: queryCursorColumn(),
   });
 };
