@@ -136,14 +136,6 @@ const formatBytes = (bytes: number) => {
   return `${value.toFixed(precision)}${units[unit]}`;
 };
 
-const formatUptime = () => {
-  const seconds = os.uptime();
-  const days = Math.floor(seconds / 86400);
-  const hours = Math.floor((seconds % 86400) / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  return `up ${days ? `${days}d ` : ""}${hours}h ${minutes}m`;
-};
-
 const usageColor = (value: number) =>
   value >= 80 ? palette.red : value >= 50 ? palette.yellow : palette.green;
 
@@ -169,7 +161,7 @@ const render = () => {
     pair("down", `${formatBytes(networkDownRate)}/s`, palette.muted, palette.blue),
     pair("up", `${formatBytes(networkUpRate)}/s`, palette.muted, palette.cyan),
     cell(),
-    pair(formatUptime(), "q / esc"),
+    pair("", "q / esc"),
   ]);
 };
 
