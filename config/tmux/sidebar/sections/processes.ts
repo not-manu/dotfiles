@@ -1,4 +1,4 @@
-import { CONTENT_WIDTH, HEIGHT, bg, bold, cell, fg, fit, palette } from "../core";
+import { CONTENT_WIDTH, HEIGHT, bg, bold, cell, fg, fit, pair, palette } from "../core";
 
 type Pane = {
   session: string;
@@ -13,9 +13,9 @@ type Pane = {
 
 type Match = { pane: Pane; score: number };
 
-// Items visible at once: rows left after the top section (12) and the
-// search header + gap (2), at 2 rows per item (name + path).
-const VISIBLE = Math.max(3, Math.floor((HEIGHT - 14) / 2));
+// Items visible at once: rows left after the top section (12) and the JUMP
+// header + prompt + gap (3), at 1 row per item (+1 for the selected detail).
+const VISIBLE = Math.max(3, HEIGHT - 16);
 const SHELLS = new Set(["zsh", "bash", "fish", "sh", "login", "-zsh", "-bash"]);
 
 let panes: Pane[] = [];
@@ -173,6 +173,10 @@ const matches = (): Match[] => {
     .sort((a, b) => b.score - a.score);
 };
 
+// Snapshot of the last pane list; painted instantly on startup while the
+// live refresh (ps + git resolution) runs behind it.
+const CACHE_FILE = `${process.env.HOME}/.cache/tmux-sidebar-panes.json`;
+
 export const refreshPanes = async (onChange: () => void) => {
   if (listRunning) return;
   listRunning = true;
@@ -180,10 +184,21 @@ export const refreshPanes = async (onChange: () => void) => {
   listRunning = false;
   selected = Math.min(selected, Math.max(0, matches().length - 1));
   onChange();
+  void Bun.write(CACHE_FILE, JSON.stringify(panes));
 };
 
-export const startProcesses = (onChange: () => void) => {
-  void refreshPanes(onChange);
+export const startProcesses = async (onChange: () => void) => {
+  const refresh = refreshPanes(onChange);
+  try {
+    const cached = (await Bun.file(CACHE_FILE).json()) as Pane[];
+    if (listRunning && Array.isArray(cached)) {
+      panes = cached;
+      onChange();
+    }
+  } catch {
+    // no cache yet — first run
+  }
+  await refresh;
 };
 
 export const appendQuery = (text: string) => {
@@ -197,6 +212,9 @@ export const backspace = () => {
 };
 
 export const hasQuery = () => query.length > 0;
+
+// Cursor column on the prompt line: after " / " (3 cols) + query, 1-indexed.
+export const queryCursorColumn = () => 4 + query.length;
 
 export const clearQuery = () => {
   query = "";
@@ -251,24 +269,35 @@ const sessionLabel = (pane: Pane, width: number) => {
   return label.length <= width ? label : `…${label.slice(-(width - 1))}`;
 };
 
-// Each result renders as two rows: "▌name   session:win" over a dimmed cwd,
-// plus a blank spacer so entries read as cards instead of a wall of text.
+// Accent color per process, so the list reads at a glance.
+const PROCESS_COLORS: Record<string, string> = {
+  claude: palette.purple,
+  nvim: palette.green,
+  bun: palette.yellow,
+  node: palette.yellow,
+  python: palette.yellow,
+  cargo: palette.yellow,
+  ssh: palette.blue,
+};
+
+// Compact single-line rows: "name   session:win". Only the selected entry
+// expands to a second line with its cwd, so the list stays scannable.
 const rowLines = (pane: Pane, isSelected: boolean) => {
   const name = headline(pane);
   const nameWidth = Math.min(name.length, CONTENT_WIDTH - 12);
   const meta = sessionLabel(pane, CONTENT_WIDTH - nameWidth - 5);
 
-  const label = isSelected
-    ? bold(fg(palette.cyan, truncate(name, nameWidth)))
-    : bold(fg(palette.text, truncate(name, nameWidth)));
+  const color = isSelected ? palette.cyan : PROCESS_COLORS[name] ?? palette.text;
+  const label = bold(fg(color, truncate(name, nameWidth)));
   const gap = " ".repeat(Math.max(1, CONTENT_WIDTH - nameWidth - meta.length - 4));
   const top = fit(`  ${label}${gap}${fg(palette.muted, meta)}`, CONTENT_WIDTH);
-  const bottom = fit(
-    `   ${fg(isSelected ? palette.text : palette.muted, shortPath(pane.path, CONTENT_WIDTH - 4))}`,
+
+  if (!isSelected) return [top];
+  const detail = fit(
+    `   ${fg(palette.text, shortPath(pane.path, CONTENT_WIDTH - 4))}`,
     CONTENT_WIDTH,
   );
-
-  return isSelected ? [bg(palette.empty, top), bg(palette.empty, bottom)] : [top, bottom];
+  return [bg(palette.empty, top), bg(palette.empty, detail)];
 };
 
 export const processLines = (): string[] => {
@@ -284,15 +313,17 @@ export const processLines = (): string[] => {
     ? view.flatMap(({ pane }, i) => rowLines(pane, scrollOffset + i === selected))
     : [fit(`  ${fg(palette.muted, query ? "no matches" : "no panes")}`, CONTENT_WIDTH)];
 
-  // Header doubles as the prompt: red search glyph ("⌕", U+2315 — no nerd
-  // font needed) + query (or muted placeholder) left, match count right.
-  const text = query || "search…";
-  const count = `${list.length}/${panes.length}`;
-  const gap = " ".repeat(Math.max(1, CONTENT_WIDTH - 4 - text.length - count.length - 1));
-  const header = fit(
-    ` ${bold(fg(palette.red, "⌕"))} ${query ? bold(fg(palette.red, text)) : fg(palette.muted, text)}${fg(palette.red, "▏")}${gap}${fg(palette.muted, count)} `,
+  // JUMP header with match count, then the prompt line: query, or a muted
+  // placeholder. The terminal's own cursor sits after the query (see paint).
+  const header = pair(
+    "JUMP",
+    `${list.length}/${panes.length}`,
+    palette.blue,
+    palette.muted,
     CONTENT_WIDTH,
+    true,
   );
+  const input = fit(` ${fg(palette.muted, "/")} ${fg(palette.text, query)}`, CONTENT_WIDTH);
 
-  return [header, cell(), ...rows];
+  return [header, input, cell(), ...rows];
 };

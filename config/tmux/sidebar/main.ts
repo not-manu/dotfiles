@@ -10,6 +10,7 @@ import {
   jumpToSelected,
   moveSelection,
   processLines,
+  queryCursorColumn,
   refreshPanes,
   startProcesses,
 } from "./sections/processes";
@@ -24,7 +25,12 @@ const cleanup = () => {
 };
 
 const render = () => {
-  paint([...topLines(), cell(), ...processLines()]);
+  const top = topLines();
+  // Real terminal cursor sits on the prompt line (header + 1), after the query.
+  paint([...top, cell(), ...processLines()], {
+    row: top.length + 3,
+    column: queryCursorColumn(),
+  });
 };
 
 process.on("SIGINT", cleanup);

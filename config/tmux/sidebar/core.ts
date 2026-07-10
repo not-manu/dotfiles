@@ -58,11 +58,13 @@ export const bar = (
   return fit(`${fg(color, filledGlyph.repeat(filled))}${fg(palette.empty, emptyGlyph.repeat(barWidth - filled))} `, width);
 };
 
-export const paint = (lines: string[]) => {
+export const paint = (lines: string[], cursor?: { row: number; column: number }) => {
   const background = `\x1b[48;2;${palette.background}m\x1b[38;2;${palette.text}m`;
   const canvas = [...lines, ...Array(Math.max(0, HEIGHT - lines.length)).fill(" ".repeat(WIDTH))];
   const frame = canvas.slice(0, HEIGHT).map((line, index) => `\x1b[${index + 1};1H${line}`).join("");
-  process.stdout.write(`\x1b[?25l\x1b[?7l${background}${frame}`);
+  // Park the real terminal cursor (if requested) instead of drawing one.
+  const tail = cursor ? `\x1b[${cursor.row};${cursor.column}H\x1b[?25h` : "\x1b[?25l";
+  process.stdout.write(`\x1b[?25l\x1b[?7l${background}${frame}${tail}`);
 };
 
 export const restoreTerminal = () => {
