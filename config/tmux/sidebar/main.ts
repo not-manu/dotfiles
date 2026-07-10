@@ -77,7 +77,7 @@ process.stdin.on("data", (data: Buffer) => {
 });
 
 startTop(render);
-startProcesses(render);
+void startProcesses(render);
 setInterval(() => updateTop(render), 1000);
 setInterval(() => void refreshPanes(render), 3000);
 render();

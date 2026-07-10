@@ -7,6 +7,7 @@ import {
   fit,
   pair,
   palette,
+  run,
 } from "../core";
 
 const COLUMN_GAP = 1;
@@ -46,16 +47,6 @@ const sampleCpu = () => {
   const idleDelta = next.idle - previousCpu.idle;
   cpuUsage = totalDelta > 0 ? ((totalDelta - idleDelta) / totalDelta) * 100 : 0;
   previousCpu = next;
-};
-
-const run = async (command: string[]) => {
-  try {
-    const child = Bun.spawn(command, { stdout: "pipe", stderr: "ignore" });
-    const output = await new Response(child.stdout).text();
-    return (await child.exited) === 0 ? output : "";
-  } catch {
-    return "";
-  }
 };
 
 const parseMemory = (output: string) => {

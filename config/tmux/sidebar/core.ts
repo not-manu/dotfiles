@@ -67,6 +67,16 @@ export const paint = (lines: string[], cursor?: { row: number; column: number })
   process.stdout.write(`\x1b[?25l\x1b[?7l${background}${frame}${tail}`);
 };
 
+export const run = async (command: string[]) => {
+  try {
+    const child = Bun.spawn(command, { stdout: "pipe", stderr: "ignore" });
+    const output = await new Response(child.stdout).text();
+    return (await child.exited) === 0 ? output : "";
+  } catch {
+    return "";
+  }
+};
+
 export const restoreTerminal = () => {
   process.stdout.write("\x1b[0m\x1b[?7h\x1b[?25h");
 };

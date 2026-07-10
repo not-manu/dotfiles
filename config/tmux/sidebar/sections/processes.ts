@@ -1,6 +1,6 @@
-import { CONTENT_WIDTH, HEIGHT, bg, bold, cell, fg, fit, pair, palette } from "../core";
+import { CONTENT_WIDTH, HEIGHT, bg, bold, cell, fg, fit, pair, palette, run } from "../core";
 
-type Pane = {
+export type Pane = {
   session: string;
   windowIndex: string;
   window: string;
@@ -8,14 +8,20 @@ type Pane = {
   command: string;
   path: string;
   pid: number;
+  activity: number; // window_activity timestamp, for most-recently-used sorting
   processes: string[]; // every command in this pane's process tree, e.g. zsh, claude, bun, node
 };
 
 type Match = { pane: Pane; score: number };
 
-// Items visible at once: rows left after the top section (12) and the JUMP
-// header + prompt + gap (3), at 1 row per item (+1 for the selected detail).
-const VISIBLE = Math.max(3, HEIGHT - 16);
+// Items visible at once: rows left after the top section (12), the JUMP
+// header + prompt + gap (3), and any rows other sections reserve (agents),
+// at 1 row per item (+1 for the selected detail).
+let reservedRows = 0;
+export const setReservedRows = (rows: number) => {
+  reservedRows = rows;
+};
+const visibleCount = () => Math.max(3, HEIGHT - 16 - reservedRows);
 const SHELLS = new Set(["zsh", "bash", "fish", "sh", "login", "-zsh", "-bash"]);
 
 let panes: Pane[] = [];
@@ -23,16 +29,6 @@ let query = "";
 let selected = 0;
 let scrollOffset = 0;
 let listRunning = false;
-
-const run = async (command: string[]) => {
-  try {
-    const child = Bun.spawn(command, { stdout: "pipe", stderr: "ignore" });
-    const output = await new Response(child.stdout).text();
-    return (await child.exited) === 0 ? output : "";
-  } catch {
-    return "";
-  }
-};
 
 // One ps pass → children map, so each pane's full process tree is a cheap BFS.
 const readProcessTree = (output: string) => {
@@ -86,7 +82,7 @@ const listPanes = async (): Promise<Pane[]> => {
       "list-panes",
       "-a",
       "-F",
-      "#{session_name}\t#{window_index}\t#{window_name}\t#{pane_index}\t#{pane_current_command}\t#{pane_current_path}\t#{pane_pid}",
+      "#{session_name}\t#{window_index}\t#{window_name}\t#{pane_index}\t#{pane_current_command}\t#{pane_current_path}\t#{pane_pid}\t#{window_activity}",
     ]),
     run(["/bin/ps", "-axo", "pid=,ppid=,comm="]),
   ]);
@@ -111,7 +107,8 @@ const listPanes = async (): Promise<Pane[]> => {
   );
 
   return rows.map((line) => {
-    const [session, windowIndex, window, paneIndex, command, path, pid] = line.split("\t");
+    const [session, windowIndex, window, paneIndex, command, path, pid, activity] =
+      line.split("\t");
     const panePid = Number(pid);
     return {
       session: session ?? "",
@@ -121,6 +118,7 @@ const listPanes = async (): Promise<Pane[]> => {
       command: command ?? "",
       path: displayPaths.get(path ?? "") ?? path ?? "",
       pid: panePid,
+      activity: Number(activity) || 0,
       processes: Number.isFinite(panePid) ? descendants(panePid, tree) : [],
     };
   });
@@ -154,28 +152,40 @@ const fuzzyScore = (text: string, needle: string) => {
 const haystack = (pane: Pane) =>
   `${pane.processes.join(" ")} ${pane.command} ${pane.window} ${pane.session} ${pane.path}`;
 
-// A pane is "active" when something beyond the login shell runs in it
-// (claude, nvim, a dev server…) — those rank above idle shells.
-const isActive = (pane: Pane) => pane.processes.some((name) => !SHELLS.has(name));
+// Priority tiers: agents (claude, opencode, codex) > other running processes
+// (node, bun, btop…) > bare shells. Within a tier, most recently used first.
+const AGENT_TOOLS = new Set(["claude", "opencode", "codex"]);
+
+const tier = (pane: Pane) => {
+  if (pane.processes.some((name) => AGENT_TOOLS.has(name))) return 0;
+  if (pane.processes.some((name) => !SHELLS.has(name))) return 1;
+  return 2;
+};
+
+const byTierThenRecency = (a: Pane, b: Pane) =>
+  tier(a) - tier(b) || b.activity - a.activity;
 
 const matches = (): Match[] => {
   if (!query) {
-    return panes
-      .map((pane) => ({ pane, score: isActive(pane) ? 1 : 0 }))
-      .sort((a, b) => b.score - a.score);
+    return [...panes].sort(byTierThenRecency).map((pane) => ({ pane, score: 0 }));
   }
   return panes
     .map((pane) => ({
       pane,
-      score: fuzzyScore(haystack(pane), query) + (isActive(pane) ? 5 : 0),
+      score: fuzzyScore(haystack(pane), query) + (2 - tier(pane)) * 5,
     }))
     .filter((match) => match.score > -Infinity)
-    .sort((a, b) => b.score - a.score);
+    .sort((a, b) => b.score - a.score || byTierThenRecency(a.pane, b.pane));
 };
 
 // Snapshot of the last pane list; painted instantly on startup while the
 // live refresh (ps + git resolution) runs behind it.
 const CACHE_FILE = `${process.env.HOME}/.cache/tmux-sidebar-panes.json`;
+const STATE_FILE = `${process.env.HOME}/.cache/tmux-sidebar-state.json`;
+
+const saveState = () => {
+  void Bun.write(STATE_FILE, JSON.stringify({ query }));
+};
 
 export const refreshPanes = async (onChange: () => void) => {
   if (listRunning) return;
@@ -189,6 +199,12 @@ export const refreshPanes = async (onChange: () => void) => {
 
 export const startProcesses = async (onChange: () => void) => {
   const refresh = refreshPanes(onChange);
+  try {
+    const state = (await Bun.file(STATE_FILE).json()) as { query?: string };
+    if (typeof state.query === "string") query = state.query;
+  } catch {
+    // no saved state yet
+  }
   try {
     const cached = (await Bun.file(CACHE_FILE).json()) as Pane[];
     if (listRunning && Array.isArray(cached)) {
@@ -204,14 +220,18 @@ export const startProcesses = async (onChange: () => void) => {
 export const appendQuery = (text: string) => {
   query += text;
   selected = 0;
+  saveState();
 };
 
 export const backspace = () => {
   query = query.slice(0, -1);
   selected = 0;
+  saveState();
 };
 
 export const hasQuery = () => query.length > 0;
+
+export const getPanes = () => panes;
 
 // Cursor column on the prompt line: after " / " (3 cols) + query, 1-indexed.
 export const queryCursorColumn = () => 4 + query.length;
@@ -219,6 +239,7 @@ export const queryCursorColumn = () => 4 + query.length;
 export const clearQuery = () => {
   query = "";
   selected = 0;
+  saveState();
 };
 
 export const moveSelection = (delta: number) => {
@@ -282,36 +303,49 @@ const PROCESS_COLORS: Record<string, string> = {
 
 // Compact single-line rows: "name   session:win". Only the selected entry
 // expands to a second line with its cwd, so the list stays scannable.
-const rowLines = (pane: Pane, isSelected: boolean) => {
+const rowLines = (pane: Pane, isSelected: boolean, width: number) => {
   const name = headline(pane);
-  const nameWidth = Math.min(name.length, CONTENT_WIDTH - 12);
-  const meta = sessionLabel(pane, CONTENT_WIDTH - nameWidth - 5);
+  const nameWidth = Math.min(name.length, width - 12);
+  const meta = sessionLabel(pane, width - nameWidth - 5);
 
   const color = isSelected ? palette.cyan : PROCESS_COLORS[name] ?? palette.text;
   const label = bold(fg(color, truncate(name, nameWidth)));
-  const gap = " ".repeat(Math.max(1, CONTENT_WIDTH - nameWidth - meta.length - 4));
-  const top = fit(`  ${label}${gap}${fg(palette.muted, meta)}`, CONTENT_WIDTH);
+  const gap = " ".repeat(Math.max(1, width - nameWidth - meta.length - 4));
+  const top = fit(`  ${label}${gap}${fg(palette.muted, meta)}`, width);
 
   if (!isSelected) return [top];
-  const detail = fit(
-    `   ${fg(palette.text, shortPath(pane.path, CONTENT_WIDTH - 4))}`,
-    CONTENT_WIDTH,
-  );
+  const detail = fit(`   ${fg(palette.text, shortPath(pane.path, width - 4))}`, width);
   return [bg(palette.empty, top), bg(palette.empty, detail)];
 };
 
 export const processLines = (): string[] => {
   const list = matches();
+  const visible = visibleCount();
   if (selected >= list.length) selected = Math.max(0, list.length - 1);
 
   if (selected < scrollOffset) scrollOffset = selected;
-  if (selected >= scrollOffset + VISIBLE) scrollOffset = selected - VISIBLE + 1;
-  scrollOffset = Math.max(0, Math.min(scrollOffset, Math.max(0, list.length - VISIBLE)));
+  if (selected >= scrollOffset + visible) scrollOffset = selected - visible + 1;
+  scrollOffset = Math.max(0, Math.min(scrollOffset, Math.max(0, list.length - visible)));
 
-  const view = list.slice(scrollOffset, scrollOffset + VISIBLE);
-  const rows = view.length
-    ? view.flatMap(({ pane }, i) => rowLines(pane, scrollOffset + i === selected))
+  const view = list.slice(scrollOffset, scrollOffset + visible);
+  const showBar = list.length > visible;
+  const rowWidth = showBar ? CONTENT_WIDTH - 1 : CONTENT_WIDTH;
+  let rows = view.length
+    ? view.flatMap(({ pane }, i) => rowLines(pane, scrollOffset + i === selected, rowWidth))
     : [fit(`  ${fg(palette.muted, query ? "no matches" : "no panes")}`, CONTENT_WIDTH)];
+
+  // Scrollbar down the right edge: thumb sized/positioned by viewport ratio.
+  if (showBar) {
+    const thumbLength = Math.max(1, Math.round((visible / list.length) * rows.length));
+    const thumbStart = Math.min(
+      rows.length - thumbLength,
+      Math.round((scrollOffset / list.length) * rows.length),
+    );
+    rows = rows.map((row, i) => {
+      const inThumb = i >= thumbStart && i < thumbStart + thumbLength;
+      return `${row}${fg(inThumb ? palette.muted : palette.empty, "▐")}`;
+    });
+  }
 
   // JUMP header with match count, then the prompt line: query, or a muted
   // placeholder. The terminal's own cursor sits after the query (see paint).
