@@ -53,6 +53,7 @@ process.stdin.on("data", (data: Buffer) => {
   const key = data.toString();
 
   if (key === "\x1c") return cleanup(); // ctrl-\
+  if (key === "\x03") return cleanup(); // ctrl-c
   if (key === "\x01") {
     toggleAgentFilter(); // ctrl-a
     return render();
