@@ -1,7 +1,18 @@
 #!/usr/bin/env bun
 
-import { restoreTerminal } from "./core";
-import { startTop, updateTop } from "./sections/top";
+import { cell, paint, restoreTerminal } from "./core";
+import { startTop, topLines, updateTop } from "./sections/top";
+import {
+  appendQuery,
+  backspace,
+  clearQuery,
+  hasQuery,
+  jumpToSelected,
+  moveSelection,
+  processLines,
+  refreshPanes,
+  startProcesses,
+} from "./sections/processes";
 
 let closed = false;
 const cleanup = () => {
@@ -12,6 +23,10 @@ const cleanup = () => {
   process.exit(0);
 };
 
+const render = () => {
+  paint([...topLines(), cell(), ...processLines()]);
+};
+
 process.on("SIGINT", cleanup);
 process.on("SIGTERM", cleanup);
 process.on("SIGHUP", cleanup);
@@ -20,8 +35,43 @@ process.stdin.setRawMode?.(true);
 process.stdin.resume();
 process.stdin.on("data", (data: Buffer) => {
   const key = data.toString();
-  if (key.includes("\x1c") || key.includes("q") || key.includes("\x1b")) cleanup();
+
+  if (key === "\x1c") return cleanup(); // ctrl-\
+  if (key === "\x1b[A") {
+    moveSelection(-1);
+    return render();
+  }
+  if (key === "\x1b[B") {
+    moveSelection(1);
+    return render();
+  }
+  if (key === "\x1b") {
+    // Esc clears an in-progress query first; only quits once it's empty.
+    if (hasQuery()) {
+      clearQuery();
+      return render();
+    }
+    return cleanup();
+  }
+  if (key === "\r" || key === "\n") {
+    if (jumpToSelected()) return cleanup();
+    return;
+  }
+  if (key === "\x7f" || key === "\b") {
+    backspace();
+    return render();
+  }
+  if (key.startsWith("\x1b")) return; // ignore other escape sequences (e.g. left/right arrows)
+
+  const printable = [...key].filter((char) => char >= " " && char !== "\x7f").join("");
+  if (printable) {
+    appendQuery(printable);
+    render();
+  }
 });
 
-startTop();
-setInterval(updateTop, 1000);
+startTop(render);
+startProcesses(render);
+setInterval(() => updateTop(render), 1000);
+setInterval(() => void refreshPanes(render), 3000);
+render();

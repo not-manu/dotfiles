@@ -5,7 +5,6 @@ import {
   bar,
   cell,
   fit,
-  paint,
   pair,
   palette,
 } from "../core";
@@ -107,7 +106,7 @@ const parseNetwork = (output: string) => {
   previousNetwork = { received: networkReceived, sent: networkSent, sampledAt };
 };
 
-const refreshSlowMetrics = async () => {
+const refreshSlowMetrics = async (onChange: () => void) => {
   if (refreshRunning) return;
   refreshRunning = true;
 
@@ -121,7 +120,7 @@ const refreshSlowMetrics = async () => {
   parseDisk(diskOutput);
   parseNetwork(networkOutput);
   refreshRunning = false;
-  render();
+  onChange();
 };
 
 const formatBytes = (bytes: number) => {
@@ -139,7 +138,7 @@ const formatBytes = (bytes: number) => {
 const usageColor = (value: number) =>
   value >= 80 ? palette.red : value >= 50 ? palette.yellow : palette.green;
 
-const render = () => {
+export const topLines = (): string[] => {
   const totalMemory = os.totalmem();
   const memoryRatio = memoryUsed / totalMemory;
   const load = os.loadavg();
@@ -148,7 +147,7 @@ const render = () => {
   const rightWidth = columnsWidth - leftWidth;
   const columnGap = " ".repeat(COLUMN_GAP);
 
-  paint([
+  return [
     pair("MEM", `${(memoryRatio * 100).toFixed(0)}%`, palette.yellow, palette.yellow, CONTENT_WIDTH, true),
     bar(memoryRatio, palette.yellow, CONTENT_WIDTH, "━", "━"),
     pair(`used ${formatBytes(memoryUsed)}`, `of ${formatBytes(totalMemory)}`),
@@ -160,16 +159,16 @@ const render = () => {
     pair("NET", `total ${formatBytes(networkReceived + networkSent)}`, palette.blue, palette.text, CONTENT_WIDTH, true),
     pair("down", `${formatBytes(networkDownRate)}/s`, palette.muted, palette.blue),
     pair("up", `${formatBytes(networkUpRate)}/s`, palette.muted, palette.cyan),
-  ]);
+  ];
 };
 
-export const startTop = () => {
-  render();
-  void refreshSlowMetrics();
+export const startTop = (onChange: () => void) => {
+  onChange();
+  void refreshSlowMetrics(onChange);
 };
 
-export const updateTop = () => {
+export const updateTop = (onChange: () => void) => {
   sampleCpu();
-  render();
-  if (++tick % 2 === 0) void refreshSlowMetrics();
+  onChange();
+  if (++tick % 2 === 0) void refreshSlowMetrics(onChange);
 };

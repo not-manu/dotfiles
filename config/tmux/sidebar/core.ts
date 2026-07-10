@@ -1,5 +1,5 @@
 export const WIDTH = Math.min(32, process.stdout.columns || 32);
-export const HEIGHT = Math.min(32, process.stdout.rows || 32);
+export const HEIGHT = process.stdout.rows || 32;
 export const CONTENT_WIDTH = WIDTH;
 
 export const palette = {
@@ -19,6 +19,10 @@ export const fg = (color: string, text: string) =>
   `\x1b[38;2;${color}m${text}\x1b[38;2;${palette.text}m`;
 
 export const bold = (text: string) => `\x1b[1m${text}\x1b[22m`;
+
+// Paints text on a highlight background, then restores the canvas background.
+export const bg = (color: string, text: string) =>
+  `\x1b[48;2;${color}m${text}\x1b[48;2;${palette.background}m`;
 
 const visibleLength = (text: string) => text.replace(/\x1b\[[0-9;?]*[ -/]*[@-~]/g, "").length;
 
