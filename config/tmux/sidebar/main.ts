@@ -1,35 +1,27 @@
 #!/usr/bin/env bun
-// tmux sidebar entrypoint — runs inside a borderless overlay popup (see tmux.conf).
-// Add a feature: create sections/<name>.ts exporting a Section, register it below.
 
-import { accent, dim, HR, type Section } from "./ui";
-import { clock } from "./sections/clock";
+import { restoreTerminal } from "./core";
+import { startTop, updateTop } from "./sections/top";
 
-const placeholder: Section = () => ["  placeholder"];
-
-const sections: Section[] = [placeholder, clock];
-
-process.stdout.write("\x1b[?25l"); // hide cursor
+let closed = false;
 const cleanup = () => {
-  process.stdout.write("\x1b[?25h");
+  if (closed) return;
+  closed = true;
+  process.stdin.setRawMode?.(false);
+  restoreTerminal();
   process.exit(0);
 };
+
 process.on("SIGINT", cleanup);
 process.on("SIGTERM", cleanup);
+process.on("SIGHUP", cleanup);
 
-// Popup owns the keyboard while open, so close keys are handled here.
 process.stdin.setRawMode?.(true);
 process.stdin.resume();
-process.stdin.on("data", (d: Buffer) => {
-  const s = d.toString();
-  if (s === "\x1c" /* C-\ */ || s === "q" || s === "\x1b" /* Esc */) cleanup();
+process.stdin.on("data", (data: Buffer) => {
+  const key = data.toString();
+  if (key.includes("\x1c") || key.includes("q") || key.includes("\x1b")) cleanup();
 });
 
-const render = () => {
-  const body = sections.flatMap((section) => [...section(), ""]);
-  console.clear();
-  console.log([accent("  ▌ sidebar"), HR, "", ...body, dim("  C-\\ / q / esc to close")].join("\n"));
-};
-
-render();
-setInterval(render, 1000);
+startTop();
+setInterval(updateTop, 1000);
