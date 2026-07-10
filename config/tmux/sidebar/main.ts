@@ -13,6 +13,8 @@ import {
   queryCursorColumn,
   refreshPanes,
   startProcesses,
+  toggleAgentFilter,
+  toggleProcFilter,
 } from "./sections/processes";
 
 let closed = false;
@@ -46,6 +48,14 @@ process.stdin.on("data", (data: Buffer) => {
   const key = data.toString();
 
   if (key === "\x1c") return cleanup(); // ctrl-\
+  if (key === "\x01") {
+    toggleAgentFilter(); // ctrl-a
+    return render();
+  }
+  if (key === "\x10") {
+    toggleProcFilter(); // ctrl-p
+    return render();
+  }
   if (key === "\x1b[A") {
     moveSelection(-1);
     return render();

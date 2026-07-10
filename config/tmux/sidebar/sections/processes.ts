@@ -37,6 +37,10 @@ let selected = 0;
 let scrollOffset = 0;
 let listRunning = false;
 
+// Toggleable filters (ctrl-a / ctrl-p): none active → everything shows.
+let filterAgents = false;
+let filterProcs = false;
+
 // One ps pass → children map, so each pane's full process tree is a cheap BFS.
 type ProcessTree = {
   children: Map<number, number[]>;
@@ -224,7 +228,17 @@ const fuzzyScore = (text: string, needle: string) => {
 };
 
 const haystack = (pane: Pane) =>
-  `${pane.tool ? "agent " : ""}${pane.processes.join(" ")} ${pane.command} ${pane.window} ${pane.session} ${pane.path}`;
+  `${pane.processes.join(" ")} ${pane.command} ${pane.window} ${pane.session} ${pane.path}`;
+
+const isRunningProc = (pane: Pane) =>
+  !pane.tool && pane.processes.some((name) => !SHELLS.has(name));
+
+const filtered = () => {
+  if (!filterAgents && !filterProcs) return panes;
+  return panes.filter(
+    (pane) => (filterAgents && pane.tool) || (filterProcs && isRunningProc(pane)),
+  );
+};
 
 // Priority tiers: blocked agents (need attention!) > working agents > idle
 // agents > other running processes (node, bun, btop…) > bare shells.
@@ -235,6 +249,38 @@ const tier = (pane: Pane) => {
   if (pane.tool) return 2;
   if (pane.processes.some((name) => !SHELLS.has(name))) return 3;
   return 4;
+};
+
+// Browse order: three solid blocks — agents, running processes, shells —
+// so types never interleave. Within a block, same-session panes sit
+// together; sessions rank by their most urgent pane (blocked > working >
+// idle), then by recency.
+const blockOf = (pane: Pane) => (pane.tool ? 0 : isRunningProc(pane) ? 1 : 2);
+
+const bySessionGroups = (list: Pane[]) => {
+  const rank = new Map<string, { tier: number; activity: number }>();
+  for (const pane of list) {
+    const key = `${blockOf(pane)}:${pane.session}`;
+    const current = rank.get(key);
+    rank.set(key, {
+      tier: Math.min(current?.tier ?? 9, tier(pane)),
+      activity: Math.max(current?.activity ?? 0, pane.activity),
+    });
+  }
+  return [...list].sort((a, b) => {
+    const blockA = blockOf(a);
+    const blockB = blockOf(b);
+    if (blockA !== blockB) return blockA - blockB;
+    const ra = rank.get(`${blockA}:${a.session}`)!;
+    const rb = rank.get(`${blockB}:${b.session}`)!;
+    return (
+      ra.tier - rb.tier ||
+      rb.activity - ra.activity ||
+      a.session.localeCompare(b.session) ||
+      Number(a.windowIndex) - Number(b.windowIndex) ||
+      Number(a.paneIndex) - Number(b.paneIndex)
+    );
+  });
 };
 
 const byTierThenRecency = (a: Pane, b: Pane) =>
@@ -249,9 +295,9 @@ const recencyBonus = (pane: Pane) => {
 
 const matches = (): Match[] => {
   if (!query) {
-    return [...panes].sort(byTierThenRecency).map((pane) => ({ pane, score: 0 }));
+    return bySessionGroups(filtered()).map((pane) => ({ pane, score: 0 }));
   }
-  return panes
+  return filtered()
     .map((pane) => ({
       pane,
       score: fuzzyScore(haystack(pane), query) + (4 - tier(pane)) * 3 + recencyBonus(pane),
@@ -265,8 +311,21 @@ const matches = (): Match[] => {
 const CACHE_FILE = `${process.env.HOME}/.cache/tmux-sidebar-panes.json`;
 const STATE_FILE = `${process.env.HOME}/.cache/tmux-sidebar-state.json`;
 
+// Only the filter toggles persist across opens; search always starts fresh.
 const saveState = () => {
-  void Bun.write(STATE_FILE, JSON.stringify({ query }));
+  void Bun.write(STATE_FILE, JSON.stringify({ filterAgents, filterProcs }));
+};
+
+export const toggleAgentFilter = () => {
+  filterAgents = !filterAgents;
+  selected = 0;
+  saveState();
+};
+
+export const toggleProcFilter = () => {
+  filterProcs = !filterProcs;
+  selected = 0;
+  saveState();
 };
 
 export const refreshPanes = async (onChange: () => void) => {
@@ -282,8 +341,12 @@ export const refreshPanes = async (onChange: () => void) => {
 export const startProcesses = async (onChange: () => void) => {
   const refresh = refreshPanes(onChange);
   try {
-    const state = (await Bun.file(STATE_FILE).json()) as { query?: string };
-    if (typeof state.query === "string") query = state.query;
+    const state = (await Bun.file(STATE_FILE).json()) as {
+      filterAgents?: boolean;
+      filterProcs?: boolean;
+    };
+    filterAgents = state.filterAgents ?? false;
+    filterProcs = state.filterProcs ?? false;
   } catch {
     // no saved state yet
   }
@@ -302,13 +365,11 @@ export const startProcesses = async (onChange: () => void) => {
 export const appendQuery = (text: string) => {
   query += text;
   selected = 0;
-  saveState();
 };
 
 export const backspace = () => {
   query = query.slice(0, -1);
   selected = 0;
-  saveState();
 };
 
 export const hasQuery = () => query.length > 0;
@@ -321,7 +382,6 @@ export const queryCursorColumn = () => 4 + query.length;
 export const clearQuery = () => {
   query = "";
   selected = 0;
-  saveState();
 };
 
 export const moveSelection = (delta: number) => {
@@ -432,13 +492,15 @@ export const processLines = (): string[] => {
     });
   }
 
-  // Single prompt line: "/ query" (muted placeholder when empty) with the
-  // match count on the right. The terminal cursor sits after the query.
+  // Single prompt line: "/ query" (muted placeholder when empty), filter
+  // chips (^a agents, ^p procs) and match count on the right. The terminal
+  // cursor sits after the query.
   const count = `${list.length}/${panes.length}`;
   const text = query || "search…";
-  const gap = " ".repeat(Math.max(1, CONTENT_WIDTH - 3 - text.length - count.length - 1));
+  const chips = `${fg(filterAgents ? palette.purple : palette.empty, "a")} ${fg(filterProcs ? palette.yellow : palette.empty, "p")}`;
+  const gap = " ".repeat(Math.max(1, CONTENT_WIDTH - 3 - text.length - 4 - count.length - 1));
   const input = fit(
-    ` ${fg(palette.muted, "/")} ${query ? fg(palette.text, query) : fg(palette.muted, text)}${gap}${fg(palette.muted, count)} `,
+    ` ${fg(palette.muted, "/")} ${query ? fg(palette.text, query) : fg(palette.muted, text)}${gap}${chips} ${fg(palette.muted, count)} `,
     CONTENT_WIDTH,
   );
 
