@@ -149,17 +149,19 @@ const render = () => {
   const columnGap = " ".repeat(COLUMN_GAP);
 
   paint([
-    pair("MEM", `${(memoryRatio * 100).toFixed(0)}%`, palette.yellow, palette.yellow),
+    pair("MEM", `${(memoryRatio * 100).toFixed(0)}%`, palette.yellow, palette.yellow, CONTENT_WIDTH, true),
     bar(memoryRatio, palette.yellow, CONTENT_WIDTH, "━", "━"),
     pair(`used ${formatBytes(memoryUsed)}`, `of ${formatBytes(totalMemory)}`),
     cell(),
-    `${pair("CPU", `${cpuUsage.toFixed(0)}%`, palette.cyan, usageColor(cpuUsage), leftWidth)}${columnGap}${pair("DISK", `${(diskRatio * 100).toFixed(0)}%`, palette.purple, palette.purple, rightWidth)}`,
+    `${pair("CPU", `${cpuUsage.toFixed(0)}%`, palette.cyan, usageColor(cpuUsage), leftWidth, true)}${columnGap}${pair("DISK", `${(diskRatio * 100).toFixed(0)}%`, palette.purple, palette.purple, rightWidth, true)}`,
     `${bar(cpuUsage / 100, usageColor(cpuUsage), leftWidth, "━", "━")}${columnGap}${bar(diskRatio, palette.purple, rightWidth, "━", "━")}`,
     `${fit(`${load[0]!.toFixed(1)} load ${os.cpus().length}c`, leftWidth)}${columnGap}${fit(`${formatBytes(diskUsed)} / ${formatBytes(diskFree)}`, rightWidth)}`,
     cell(),
-    pair("NET", `total ${formatBytes(networkReceived + networkSent)}`, palette.blue),
+    pair("NET", `total ${formatBytes(networkReceived + networkSent)}`, palette.blue, palette.text, CONTENT_WIDTH, true),
     pair("down", `${formatBytes(networkDownRate)}/s`, palette.muted, palette.blue),
     pair("up", `${formatBytes(networkUpRate)}/s`, palette.muted, palette.cyan),
+    cell(),
+    pair("", "q / esc"),
   ]);
 };
 

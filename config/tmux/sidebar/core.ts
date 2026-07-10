@@ -18,6 +18,8 @@ export const palette = {
 export const fg = (color: string, text: string) =>
   `\x1b[38;2;${color}m${text}\x1b[38;2;${palette.text}m`;
 
+export const bold = (text: string) => `\x1b[1m${text}\x1b[22m`;
+
 const visibleLength = (text: string) => text.replace(/\x1b\[[0-9;?]*[ -/]*[@-~]/g, "").length;
 
 export const fit = (content = "", width = CONTENT_WIDTH) => {
@@ -33,9 +35,11 @@ export const pair = (
   leftColor: string = palette.muted,
   rightColor: string = palette.text,
   width: number = CONTENT_WIDTH,
+  boldLeft = false,
 ) => {
   const gap = Math.max(1, width - left.length - right.length - 1);
-  return fit(`${fg(leftColor, left)}${" ".repeat(gap)}${fg(rightColor, right)} `, width);
+  const leftText = boldLeft ? bold(fg(leftColor, left)) : fg(leftColor, left);
+  return fit(`${leftText}${" ".repeat(gap)}${fg(rightColor, right)} `, width);
 };
 
 export const bar = (
