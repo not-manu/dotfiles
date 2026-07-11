@@ -236,6 +236,7 @@ alias 'bnx'='bunx'
 
 # skills
 alias 'skills'='bunx skills'
+alias 'pai'='pixelarticons'
 
 # open 
 alias 'o'='open .'
