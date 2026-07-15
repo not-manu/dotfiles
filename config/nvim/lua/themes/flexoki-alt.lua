@@ -143,28 +143,48 @@ M.polish_hl = {
     ["@keyword.exception"] = { fg = c.magenta }, -- try/catch/throw
     ["@keyword.import"] = { fg = c.red }, -- import / from
     ["@keyword.operator"] = { fg = c.red },
-    ["@keyword.storage"] = { fg = c.blue }, -- storage.modifier / type
+    ["@keyword.modifier"] = { fg = c.blue }, -- public/private/static/readonly (storage.modifier)
+    ["@keyword.type"] = { fg = c.blue }, -- class/interface/enum keywords (storage.type)
+    ["@keyword.storage"] = { fg = c.blue }, -- legacy name for the two above
+    ["@type.qualifier"] = { fg = c.blue }, -- legacy capture (older parsers)
     ["@keyword.directive"] = { fg = c.magenta },
     ["@keyword.directive.define"] = { fg = c.magenta },
     ["@operator"] = { fg = c.red },
 
-    -- functions
+    -- functions: methods are functions too (VS Code: entity.name.function = orange bold)
     ["@function"] = { fg = c.orange, bold = true },
     ["@function.call"] = { fg = c.orange, bold = true },
     ["@function.builtin"] = { fg = c.orange, bold = true },
-    ["@function.method"] = { fg = c.green },
-    ["@function.method.call"] = { fg = c.green },
+    ["@function.method"] = { fg = c.orange, bold = true },
+    ["@function.method.call"] = { fg = c.orange, bold = true },
     ["@function.macro"] = { fg = c.blue },
-    ["@constructor"] = { fg = c.orange },
+    ["@constructor"] = { fg = c.orange, bold = true },
 
     -- types
     ["@type"] = { fg = c.yellow },
     ["@type.builtin"] = { fg = c.yellow },
-    ["@type.definition"] = { fg = c.orange }, -- struct/enum/class names
+    ["@type.definition"] = { fg = c.yellow }, -- type aliases (entity.name.type)
     ["@attribute"] = { fg = c.yellow }, -- decorators / annotations
     ["@module"] = { fg = c.yellow }, -- namespaces
     ["@module.builtin"] = { fg = c.yellow },
     ["@label"] = { fg = c.magenta },
+
+    -- LSP semantic tokens (tsserver et al. override treesitter; pin them so the
+    -- theme stays deterministic instead of falling back to nvim's default links)
+    ["@lsp.type.class"] = { fg = c.orange }, -- entity.name.type.class
+    ["@lsp.type.enum"] = { fg = c.orange },
+    ["@lsp.type.interface"] = { fg = c.yellow },
+    ["@lsp.type.type"] = { fg = c.yellow },
+    ["@lsp.type.typeParameter"] = { fg = c.orange },
+    ["@lsp.type.namespace"] = { fg = c.yellow },
+    ["@lsp.type.function"] = { fg = c.orange, bold = true },
+    ["@lsp.type.method"] = { fg = c.orange, bold = true },
+    ["@lsp.type.member"] = { fg = c.orange, bold = true },
+    ["@lsp.type.decorator"] = { fg = c.yellow },
+    ["@lsp.type.property"] = { fg = c.blue },
+    ["@lsp.type.parameter"] = { fg = c.fg },
+    ["@lsp.type.variable"] = { fg = c.fg },
+    ["@lsp.type.enumMember"] = { fg = c.fg },
 
     -- tags (html/jsx)
     ["@tag"] = { fg = c.blue },
