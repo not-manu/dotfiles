@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 """Show Claude Code + Codex rate-limit usage (5h / weekly windows)."""
-import json, subprocess, sys, threading, time
-from datetime import datetime
+import json, re, subprocess, sys, threading, time
+from datetime import datetime, timedelta
 from pathlib import Path
 
-RED, YEL, GRN, DIM, RST, BOLD = "\033[31m", "\033[33m", "\033[32m", "\033[2m", "\033[0m", "\033[1m"
-BAR_W = 20
+RED, YEL, GRN, CYN = "\033[31m", "\033[33m", "\033[32m", "\033[36m"
+DIM, RST, BOLD = "\033[2m", "\033[0m", "\033[1m"
+BAR_W = 12
+# label, bar+pct, reset, in, out, cache, cost — negative width = right-aligned
+COLS = [7, BAR_W + 8, 10, -8, -9, -9, -9]
 CACHE = Path.home() / ".cache/cclimits.json"
+ANSI = re.compile(r"\033\[[0-9;]*m")
 
 
 def get(url, headers):
@@ -27,11 +31,29 @@ def get(url, headers):
     return json.loads(body)
 
 
-def bar(pct):
+def ccusage(*args):
+    out = subprocess.check_output(["bunx", "ccusage", *args, "--json"],
+                                  text=True, stderr=subprocess.DEVNULL, timeout=60)
+    return json.loads(out)
+
+
+def pad(s, w):
+    fill = " " * max(0, abs(w) - len(ANSI.sub("", s)))
+    return fill + s if w < 0 else s + fill
+
+
+def cells_to_line(cells):
+    return "  " + "".join(pad(c, w) for c, w in zip(cells, COLS)).rstrip()
+
+
+def bar(pct, gray=False):
     pct = max(0.0, min(100.0, pct))
     fill = round(pct / 100 * BAR_W)
+    blocks = f"{'█' * fill}{'░' * (BAR_W - fill)}"
+    if gray:
+        return f"{blocks} {pct:5.1f}%"
     color = GRN if pct < 60 else YEL if pct < 85 else RED
-    return f"{color}{'█' * fill}{DIM}{'░' * (BAR_W - fill)}{RST} {pct:5.1f}%"
+    return f"{color}{blocks[:fill]}{DIM}{blocks[fill:]}{RST} {pct:5.1f}%"
 
 
 def fmt_reset(seconds):
@@ -39,27 +61,41 @@ def fmt_reset(seconds):
         return ""
     d, rem = divmod(int(seconds), 86400)
     h, m = divmod(rem // 60, 60)
-    parts = [f"{d}d" if d else "", f"{h}h" if h or d else "", f"{m}m"]
-    return f"{DIM}resets in {' '.join(p for p in parts if p)}{RST}"
+    return f"{d}d {h}h" if d else f"{h}h {m}m"
 
 
-def render_row(r, now):
-    reset = (r["reset_at"] - now) if r.get("reset_at") else None
-    return f"  {r['label']:<8} {bar(r['pct'])}  {fmt_reset(reset)}"
+def fmt_tok(n):
+    if n >= 1e9:
+        return f"{n / 1e9:.1f}b"
+    if n >= 1e6:
+        return f"{n / 1e6:.1f}m"
+    if n >= 1e3:
+        return f"{n / 1e3:.1f}k"
+    return str(int(n))
 
 
-def loading_row(r, now):
-    """Cached row rendered in grayscale — color arrives with fresh data."""
-    if not r:
-        return f"{DIM}  {'░' * 6}   {'░' * BAR_W}     ░%  {'░' * 10}{RST}"
-    pct = max(0.0, min(100.0, r["pct"]))
-    fill = round(pct / 100 * BAR_W)
-    reset = (r["reset_at"] - now) if r.get("reset_at") else None
-    d, rem = divmod(int(reset or 0), 86400)
-    h, m = divmod(rem // 60, 60)
-    parts = [f"{d}d" if d else "", f"{h}h" if h or d else "", f"{m}m"]
-    tail = f"resets in {' '.join(p for p in parts if p)}" if reset else ""
-    return f"{DIM}  {r['label']:<8} {'█' * fill}{'░' * (BAR_W - fill)} {pct:5.1f}%  {tail}{RST}"
+def tok_cells(t, gray):
+    if not t:
+        return ["", "", "", ""]
+    cost = t.get("cost")
+    cost_s = f"${cost:.2f}" if cost is not None else ""
+    if gray:
+        return [fmt_tok(t["in"]), fmt_tok(t["out"]), fmt_tok(t["cache"]), cost_s]
+    return [f"{BOLD}{fmt_tok(t['in'])}{RST}",
+            f"{BOLD}{CYN}{fmt_tok(t['out'])}{RST}",
+            f"{DIM}{fmt_tok(t['cache'])}{RST}",
+            f"{BOLD}{cost_s}{RST}"]
+
+
+def render_row(r, t, now, gray):
+    if not r:  # skeleton
+        c = ["░" * 4, "░" * BAR_W + "     ░%", "░" * 6, "░" * 5, "░" * 6, "░" * 6, "░" * 6]
+        return f"{DIM}{cells_to_line(c)}{RST}"
+    reset = fmt_reset((r["reset_at"] - now) if r.get("reset_at") else None)
+    cells = [r["label"].upper(), bar(r["pct"], gray),
+             reset if gray else f"{DIM}{reset}{RST}"] + tok_cells(t, gray)
+    line = cells_to_line(cells)
+    return f"{DIM}{line}{RST}" if gray else line
 
 
 # --- providers ---------------------------------------------------------------
@@ -90,7 +126,7 @@ def claude():
 def codex():
     auth = json.loads((Path.home() / ".local/share/opencode/auth.json").read_text())["openai"]
     if auth.get("expires", 0) / 1000 < time.time():
-        raise RuntimeError("token expired — open opencode once to refresh it")
+        raise RuntimeError("token expired — open opencode once to refresh")
     data = get("https://chatgpt.com/backend-api/wham/usage", {
         "Authorization": f"Bearer {auth['access']}",
         "chatgpt-account-id": auth["accountId"],
@@ -108,16 +144,61 @@ def codex():
     return rows
 
 
+def tokens(cache):
+    """Token counts + API-equivalent cost per provider/window via ccusage."""
+    out = {}
+
+    def active_block():
+        blk = next((b for b in ccusage("blocks", "--active").get("blocks", [])
+                    if b.get("isActive")), None)
+        tc = (blk or {}).get("tokenCounts")
+        if tc:
+            out.setdefault("claude", {})["5h"] = {
+                "in": tc["inputTokens"], "out": tc["outputTokens"],
+                "cache": tc["cacheReadInputTokens"] + tc["cacheCreationInputTokens"],
+                "cost": blk.get("costUSD")}
+
+    def weekly():
+        # window start = weekly reset - 7d (from cached limits), else last 7 days
+        reset = next((r["reset_at"] for r in cache.get("claude", [])
+                      if r and r["label"] == "week" and r.get("reset_at")), None)
+        start = datetime.fromtimestamp(reset) - timedelta(days=7) if reset \
+            else datetime.now() - timedelta(days=6)
+        data = ccusage("daily", "--since", start.strftime("%Y%m%d"), "--by-agent")
+        sums, today = {}, datetime.now().strftime("%Y-%m-%d")
+        for day in data.get("daily", []):
+            for ab in day.get("agents") or day.get("agentBreakdowns") or []:
+                keys = ["week", "day"] if day.get("period") == today else ["week"]
+                for key in keys:
+                    s = sums.setdefault(ab["agent"], {}).setdefault(
+                        key, {"in": 0, "out": 0, "cache": 0, "cost": 0.0})
+                    s["in"] += ab.get("inputTokens", 0)
+                    s["out"] += ab.get("outputTokens", 0)
+                    s["cache"] += ab.get("cacheReadTokens", 0) + ab.get("cacheCreationTokens", 0)
+                    s["cost"] += ab.get("totalCost") or sum(
+                        m.get("cost", 0) for m in ab.get("modelBreakdowns") or [])
+        for agent, name in [("claude", "claude"), ("opencode", "codex")]:
+            for key, val in sums.get(agent, {}).items():
+                out.setdefault(name, {})[key] = val
+
+    # sequential: concurrent bunx runs can race each other's install cache
+    for f in (active_block, weekly):
+        try:
+            f()
+        except Exception:
+            pass  # cached token cells stay gray
+    return out
+
+
 # --- main --------------------------------------------------------------------
 
 def main():
     providers = [("claude", claude), ("codex", codex)]
-    icons = {"claude": "✳", "codex": "⌬"}
     try:
         cache = json.loads(CACHE.read_text())
     except Exception:
         cache = {}
-    results, errors = {}, {}
+    results, errors, toks = {}, {}, {}
 
     def run(name, fn):
         try:
@@ -127,34 +208,64 @@ def main():
             errors[name] = msg[:60] + ("…" if len(msg) > 60 else "")
             results[name] = None
 
+    def run_tokens():
+        try:
+            toks["data"] = tokens(cache)
+        except Exception:
+            toks["data"] = {}
+
     threads = [threading.Thread(target=run, args=p, daemon=True) for p in providers]
+    threads.append(threading.Thread(target=run_tokens, daemon=True))
     for t in threads:
         t.start()
 
+    def tok_for(name, r):
+        if not r:
+            return None
+        return (toks.get("data", {}).get(name, {}).get(r["label"])
+                or (cache.get("tokens") or {}).get(name, {}).get(r["label"]))
+
+    def header():
+        return f"{DIM}{cells_to_line(['', '', 'reset', 'in', 'out', 'cache', 'cost'])}{RST}"
+
     def section(name):
-        lines = [f"{DIM}{icons.get(name, '·')}{RST} {BOLD}{name}{RST}"]
+        lines = [f"{BOLD}{name.upper()}{RST}"]
+        now = time.time()
         if name in errors:
-            now = time.time()
-            lines += [loading_row(r, now) for r in cache.get(name) or []]
+            lines += [render_row(r, tok_for(name, r), now, gray=True)
+                      for r in cache.get(name) or []]
             lines.append(f"  {YEL}⚠{RST} {DIM}{errors[name]}"
                          f"{' — showing cached' if cache.get(name) else ''}{RST}")
         elif results.get(name) is not None:
-            now = time.time()
             rows = results[name] or [{"label": "?", "pct": 0, "reset_at": None}]
-            lines += [render_row(r, now) for r in rows]
+            lines += [render_row(r, tok_for(name, r), now, gray=False) for r in rows]
         else:  # loading: last known values in grayscale
-            now = time.time()
-            cached = cache.get(name) or [None, None]
-            lines += [loading_row(r, now) for r in cached]
+            lines += [render_row(r, tok_for(name, r), now, gray=True)
+                      for r in cache.get(name) or [None, None]]
         return lines
 
+    def total_row(key):
+        live = "data" in toks
+        src = toks.get("data") if live else (cache.get("tokens") or {})
+        vals = [v for v in (src.get(n, {}).get(key) for n, _ in providers) if v]
+        if not vals:
+            return None
+        tot = {k: sum(v.get(k) or 0 for v in vals) for k in ("in", "out", "cache", "cost")}
+        label = f"Σ {key.upper()}"
+        cells = [f"{BOLD}{label}{RST}" if live else label, "", ""] + tok_cells(tot, gray=not live)
+        line = cells_to_line(cells)
+        return line if live else f"{DIM}{line}{RST}"
+
     def frame():
-        out = []
+        out = [header()]
         for name, _ in providers:
-            if out:
-                out.append("")
             out += section(name)
-        return out
+            out.append("")
+        trs = [t for t in (total_row("day"), total_row("week")) if t]
+        return out + trs if trs else out[:-1]
+
+    def done():
+        return len(results) == len(providers) and "data" in toks
 
     if not sys.stdout.isatty():
         for t in threads:
@@ -170,16 +281,20 @@ def main():
                 out = frame()
                 print("\n".join(out))
                 drawn = len(out)
-                if len(results) == len(providers):
+                if done():
                     break
                 time.sleep(0.05)
         finally:
             print("\033[?25h", end="")
 
     good = {n: r for n, r in results.items() if r}
-    if good:
+    new_toks = toks.get("data") or {}
+    if good or new_toks:
         CACHE.parent.mkdir(parents=True, exist_ok=True)
-        CACHE.write_text(json.dumps({**cache, **good}))
+        merged_toks = {**(cache.get("tokens") or {})}
+        for name, wins in new_toks.items():
+            merged_toks[name] = {**merged_toks.get(name, {}), **wins}
+        CACHE.write_text(json.dumps({**cache, **good, "tokens": merged_toks}))
 
 
 if __name__ == "__main__":
