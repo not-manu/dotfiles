@@ -241,6 +241,9 @@ alias 'pai'='pixelarticons'
 # open 
 alias 'o'='open .'
 
+# server mode (keep awake with lid closed)
+alias sm='servermode'
+
 # tmux
 alias t='tmux'
 alias tn='tmux new-session -s'         # tn <name>  — new named session

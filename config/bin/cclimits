@@ -82,7 +82,7 @@ def tok_cells(t, gray):
     if gray:
         return [fmt_tok(t["in"]), fmt_tok(t["out"]), fmt_tok(t["cache"]), cost_s]
     return [f"{BOLD}{fmt_tok(t['in'])}{RST}",
-            f"{BOLD}{CYN}{fmt_tok(t['out'])}{RST}",
+            f"{BOLD}{GRN}{fmt_tok(t['out'])}{RST}",
             f"{DIM}{fmt_tok(t['cache'])}{RST}",
             f"{BOLD}{cost_s}{RST}"]
 
