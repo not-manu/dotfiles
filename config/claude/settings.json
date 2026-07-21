@@ -37,7 +37,7 @@
       }
     }
   },
-  "effortLevel": "high",
+  "effortLevel": "low",
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "theme": "custom:flexoki",
