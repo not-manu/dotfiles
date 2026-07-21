@@ -26,6 +26,12 @@ case "${1:-status}" in
     echo "server mode OFF — normal sleep restored."
     ;;
   status) status ;;
+  tmux)
+    # status-line segment: red power glyph when server mode is on, nothing when off
+    if pmset -g | grep -q 'SleepDisabled.*1'; then
+      printf '#[fg=#d14d41,bold]⏻ SRV #[default]'
+    fi
+    ;;
   *)
     echo "usage: servermode on|off|status" >&2
     exit 1
