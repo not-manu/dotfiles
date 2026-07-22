@@ -1,10 +1,24 @@
 #!/usr/bin/env bash
 # servermode — keep the Mac awake with the lid closed (mini-server mode).
-# Usage: servermode on|off|status
+# Usage: servermode on [--force] | off | status
 set -euo pipefail
 
+on_ac() { pmset -g batt | grep -q 'AC Power'; }
+srv_on() { pmset -g | grep -q 'SleepDisabled.*1'; }
+
+# Nag if the battery is allowed to sit at 100% — for a plugged-in-24/7
+# server, the Charge Limit slider (System Settings → Battery → Charging)
+# should be at 80%. There's no public CLI for it, so we can only check.
+charge_limit_nag() {
+  local pct
+  pct=$(pmset -g batt | grep -Eo '[0-9]+%' | head -1 | tr -d '%')
+  if [ "${pct:-0}" -gt 85 ]; then
+    echo "💡 battery at ${pct}% — set Charge Limit to 80% (System Settings → Battery → Charging ⓘ) for long-term health."
+  fi
+}
+
 status() {
-  if pmset -g | grep -q 'SleepDisabled.*1'; then
+  if srv_on; then
     echo "server mode: ON (lid close will NOT sleep)"
   else
     echo "server mode: OFF (normal sleep behavior)"
@@ -14,12 +28,15 @@ status() {
 
 case "${1:-status}" in
   on)
+    # A closed-lid server on battery just drains to zero — require AC.
+    if ! on_ac && [ "${2:-}" != "--force" ]; then
+      echo "✗ not on AC power — plug in first (or 'servermode on --force' if you really mean it)." >&2
+      exit 1
+    fi
     sudo pmset -a disablesleep 1
     echo "server mode ON — machine stays awake with lid closed."
-    # warn if on battery, since disablesleep will happily drain it
-    if pmset -g batt | grep -q 'Battery Power'; then
-      echo "⚠️  running on battery — plug in or this will drain fast."
-    fi
+    on_ac || echo "⚠️  on battery (--force) — this WILL drain fast."
+    charge_limit_nag
     ;;
   off)
     sudo pmset -a disablesleep 0
@@ -27,13 +44,18 @@ case "${1:-status}" in
     ;;
   status) status ;;
   tmux)
-    # status-line segment: red power glyph when server mode is on, nothing when off
-    if pmset -g | grep -q 'SleepDisabled.*1'; then
-      printf '#[fg=#d14d41,bold]⏻ SRV #[default]'
+    # status-line segment: red power glyph when server mode is on, nothing
+    # when off; the glyph goes orange if the power cable was yanked.
+    if srv_on; then
+      if on_ac; then
+        printf '#[fg=#d14d41,bold]⏻ SRV #[default]'
+      else
+        printf '#[fg=#da702c,bold]⏻ SRV ⚠ BATT #[default]'
+      fi
     fi
     ;;
   *)
-    echo "usage: servermode on|off|status" >&2
+    echo "usage: servermode on [--force] | off | status" >&2
     exit 1
     ;;
 esac
