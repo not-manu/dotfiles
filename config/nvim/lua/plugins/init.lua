@@ -147,6 +147,20 @@ return {
             api.node.run.system()
           end
         end, { buffer = bufnr, desc = "nvim-tree: Open (excalidraw → VS Code)" })
+        -- open images (and .aseprite) in Aseprite; `a` is taken by create-file
+        vim.keymap.set("n", "ga", function()
+          local node = api.tree.get_node_under_cursor()
+          if not (node and node.absolute_path) then
+            return
+          end
+          local ext = node.absolute_path:match "%.([%w]+)$"
+          local supported = { png = true, jpg = true, jpeg = true, gif = true, bmp = true, aseprite = true, ase = true }
+          if ext and supported[ext:lower()] then
+            vim.fn.jobstart({ "open", "-a", "Aseprite", node.absolute_path }, { detach = true })
+          else
+            vim.notify("Not an Aseprite-openable file", vim.log.levels.WARN)
+          end
+        end, { buffer = bufnr, desc = "nvim-tree: Open in Aseprite" })
       end
       require("nvim-tree").setup(opts)
       local api = require "nvim-tree.api"
