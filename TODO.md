@@ -14,6 +14,8 @@
 
 - [ ] need to standardize a spec so i can see folder descriptions in eza (cd)
       (DESCRIPTION.md) or just yaml frontmatter in README.md?
+- [ ] a tmux shortcut to open project specific todos would be pretty cool (and
+      the global todos as well)
 
 **done**
 - [x] tmux: remove the delay after ctrl b interrupting nvim commands (resizing is fine, but next/previous is not really necessary)
