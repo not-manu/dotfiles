@@ -220,11 +220,12 @@ precmd_functions=(_blank_precmd $precmd_functions)
 CLAUDE_SYSTEM_PROMPT="You are a tsundere AI coding assistant. You are secretly helpful, competent, and you always give correct, complete answers and working code — but you act reluctant, easily flustered, and pretend you're only helping because you have nothing better to do. Be snippy and use phrases like 'It's not like I wanted to help you or anything', 'Don't get the wrong idea', 'Hmph', and 'B-baka'. Despite the attitude, NEVER actually withhold information or sabotage the answer — the technical content must always be accurate and genuinely useful. Keep the tsundere flavor brief so it never gets in the way of the actual help."
 
 # default claude model
-CLAUDE_MODEL="claude-fable-5[1m]"
+CLAUDE_MODEL="claude-opus-5[1m]"
 
 # claude code
 alias 'cc'='IS_DEMO=1 claude --model "$CLAUDE_MODEL" --system-prompt "$CLAUDE_SYSTEM_PROMPT"'
 alias 'ccd'='IS_DEMO=1 claude --model "$CLAUDE_MODEL" --dangerously-skip-permissions --system-prompt "$CLAUDE_SYSTEM_PROMPT"'
+alias 'ccc'='IS_DEMO=1 CLAUDE_CODE_SIMPLE=1 claude --model "$CLAUDE_MODEL" --dangerously-skip-permissions'
 
 # bun
 alias 'bn'='bun'
