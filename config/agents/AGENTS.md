@@ -13,6 +13,23 @@
   `~/.dotfiles/config/agents/AGENTS.md`). Edit configs there, not the
   symlink targets' copies elsewhere.
 
+## Where My Stuff Lives
+- Code lives under `~/Documents/Projects/<scope>/<project>`. Scopes are
+  `not-manu` (personal, the default — assume this when I just name a project)
+  and another shared account.
+- `~/Documents/Projects/not-manu/Clones/` — upstream repos cloned for
+  **reading reference only** (e.g. `aseprite`, `flexoki`, `neru`). Never
+  commit, push, or "fix" anything here; treat as read-only source to grep.
+- `~/Documents/Projects/not-manu/Forks/` — my own GitHub forks that I *do*
+  push to (`git@github_not-manu:not-manu/…`). Branch and PR normally here.
+- `github_not-manu` is an SSH host alias for my personal GitHub account —
+  keep it in remote URLs; don't rewrite it to plain `github.com`.
+- Suffixes `-old` / `-cooked` mark abandoned or broken-on-purpose snapshots
+  (e.g. `scribble-old`). Don't edit them; prefer the unsuffixed project.
+- Other `~/Documents` folders are non-code: `Journal`, `Photos`, `YouTube`,
+  `Toronto`, `Image-Line`, `Codex`.
+- Dotfiles are `~/.dotfiles` (see the symlink note above), not a Projects dir.
+
 ## Shell Hygiene (avoid hangs)
 - Never create scripts via heredocs (`cat <<EOF`) in shell commands — a
   mangled delimiter leaves the shell waiting on stdin forever. Write files
