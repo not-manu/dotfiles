@@ -53,7 +53,8 @@ popup() {
 
 case "$action" in
 window)
-  tmux select-window -t "=$sess:$arg"
+  # =sess:=N — exact session name, exact window index (never a name match)
+  tmux select-window -t "=$sess:=$arg"
   ;;
 lazygit)
   popup -d "$arg" -w 85% -h 80% -S "fg=#282726" -E lazygit
