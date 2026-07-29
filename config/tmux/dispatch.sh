@@ -60,8 +60,14 @@ lazygit)
   popup -d "$arg" -w 85% -h 80% -S "fg=#282726" -E lazygit
   ;;
 todo)
-  # q / ctrl-c (normal mode only) saves & closes, like a transient pager
+  # q / ctrl-c (normal mode only) saves & closes, like a transient pager.
+  #
+  # g:fff_loaded short-circuits fff.nvim's plugin/fff.lua before it opens its
+  # LMDB envs. LMDB hands out reader slots per *thread*, capped at 126 per env
+  # for the whole machine, and fff never releases them while nvim lives — with
+  # a couple dozen editors open a throwaway popup is what tips it over into
+  # MDB_READERS_FULL. This popup never file-picks, so it doesn't need the index.
   popup -w 64 -h 70% -S "fg=#282726" \
-    -E "nvim -c 'nnoremap <buffer><silent> q :x<CR>|nnoremap <buffer><silent> <C-c> :x<CR>' ~/TODO.md"
+    -E "nvim --cmd 'let g:fff_loaded = 1' -c 'nnoremap <buffer><silent> q :x<CR>|nnoremap <buffer><silent> <C-c> :x<CR>' ~/TODO.md"
   ;;
 esac
