@@ -1,51 +1,41 @@
-- Use `uv` for python projects by default unless explicitly asked otherwise.
-- Always use `uvx` unless explicitly asked not to do so.
-- Avoid using `npm` unless explicitly asked to do so. Use `bun` or `pnpm`
-  depending on the project. If unsure, use `bun`.
-- Prefer `rg` (ripgrep) over `grep` for searching.
 - Be brief, unless explicitly asked to be more verbose.
-- IMPORTANT: Never manually edit dependency manifests (e.g. `package.json`,
-  `pyproject.toml`, `Cargo.toml`, `go.mod`, `Gemfile`) to add, remove, or
-  upgrade dependencies. Always use the package manager (`bun add`, `pnpm add`,
-  `uv add`, `cargo add`, `go get`, etc.) so lockfiles and resolution stay
-  consistent.
-- My dotfiles live in `~/.dotfiles` (`~/.claude/CLAUDE.md` symlinks to
-  `~/.dotfiles/config/agents/AGENTS.md`). Edit configs there, not the
-  symlink targets' copies elsewhere.
+- Python: `uv`, and always `uvx`. JS: `bun` (or `pnpm` if the project uses it),
+  never `npm`. Search: `rg`, not `grep`.
+- IMPORTANT: Never hand-edit dependency manifests (`package.json`,
+  `pyproject.toml`, `Cargo.toml`, `go.mod`, `Gemfile`). Use the package manager
+  (`bun add`, `uv add`, `cargo add`, `go get`) so lockfiles stay consistent.
 
 ## Where My Stuff Lives
-- Code lives under `~/Documents/Projects/<scope>/<project>`. Scopes are
-  `not-manu` (personal, the default — assume this when I just name a project)
-  and another shared account.
-- `~/Documents/Projects/not-manu/Clones/` — upstream repos cloned for
-  **reading reference only** (e.g. `aseprite`, `flexoki`, `neru`). Never
-  commit, push, or "fix" anything here; treat as read-only source to grep.
-- `~/Documents/Projects/not-manu/Forks/` — my own GitHub forks that I *do*
-  push to (`git@github_not-manu:not-manu/…`). Branch and PR normally here.
-- `github_not-manu` is an SSH host alias for my personal GitHub account —
-  keep it in remote URLs; don't rewrite it to plain `github.com`.
-- Suffixes `-old` / `-cooked` mark abandoned or broken-on-purpose snapshots
-  (e.g. `scribble-old`). Don't edit them; prefer the unsuffixed project.
-- Other `~/Documents` folders are non-code: `Journal`, `Photos`, `YouTube`,
-  `Toronto`, `Image-Line`, `Codex`.
-- Dotfiles are `~/.dotfiles` (see the symlink note above), not a Projects dir.
+- Dotfiles: `~/.dotfiles`. `~/.claude/CLAUDE.md` symlinks to
+  `~/.dotfiles/config/agents/AGENTS.md` — edit the source, not the symlink.
+- Code: `~/Documents/Projects/<scope>/<project>`. Scope `not-manu` is personal
+  and the default; the other is a shared account.
+- `.../not-manu/Clones/` — upstream repos for reading only. Never commit or
+  push there.
+- `.../not-manu/Forks/` — my forks; branch and PR normally. Keep the
+  `github_not-manu` SSH alias in remote URLs; don't rewrite it to `github.com`.
+- `-old` / `-cooked` suffixes are dead snapshots. Don't edit them.
+- Other `~/Documents` folders (`Journal`, `Photos`, `YouTube`, …) are non-code.
 
-## Shell Hygiene (avoid hangs)
-- Never create scripts via heredocs (`cat <<EOF`) in shell commands — a
-  mangled delimiter leaves the shell waiting on stdin forever. Write files
-  with the Write/Edit tool, then run them with a plain one-liner.
-- Set a short explicit `timeout` on experimental/unproven commands so a hang
-  costs seconds, not minutes.
-- Never `sleep`-and-poll in the foreground (it's blocked anyway); run long
-  commands with `run_in_background` and read their output file.
-- Prefer absolute paths over `cd` — the shell's cwd is sticky between calls
-  and leads to commands running in the wrong directory.
+## Shell Hygiene
+- One simple command per call. No `cd`, no env prefixes, no `&&`/`;` chains —
+  use absolute paths and the tool's own directory flag (`-C`, `--cwd`).
+- Never feed stdin. No heredocs — write the file, then run it. Redirect
+  `</dev/null` and pass the non-interactive flag (`-y`, `--batch`, `--yes`).
+- Set a short `timeout` on anything unproven, and run long work in the
+  background instead of sleeping in the foreground.
+- Assume a hang is a hidden prompt or a permission dialog before anything
+  exotic.
+- Never pattern-match processes by a string your own command contains. Kill by
+  exact name or PID.
+- Parse machine-readable output, not pretty output — shell aliases add colour
+  codes that corrupt captured paths.
+- Native media tools (`ffmpeg`, `magick`) stall on their thread pools. Pin them
+  to one thread, or do it in pure JS.
+- If a directory itself wedges, use its real path and move to a fresh one.
 
 ## Code Principles
-- Be concise and clear in your code. Avoid unnecessary complexity.
-- Be as DRY (Don't Repeat Yourself) as possible. If you find yourself writing
-  the same code multiple times, consider refactoring it into a function or
-  module.
+- Prefer the simplest thing that works. Keep it DRY.
 
 ## Comments
 - **Never write comments.** Not what, not why, no banners, no docstrings, no
