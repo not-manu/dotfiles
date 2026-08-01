@@ -57,39 +57,7 @@ return {
     dependencies = { "nvim-treesitter/nvim-treesitter" },
   },
 
-  -- fff.nvim — frecency-ranked, typo-resistant file index (used by filemention)
-  {
-    "dmtrKovalenko/fff.nvim",
-    init = function()
-      -- Clear stale LMDB reader locks (MDB_READERS_FULL after unclean
-      -- shutdowns), but only when no other nvim instance is running.
-      local pids = vim.fn.systemlist "pgrep -x nvim"
-      if #pids <= 1 then
-        for _, lock in ipairs {
-          vim.fn.stdpath "cache" .. "/fff_nvim/lock.mdb",
-          vim.fn.stdpath "data" .. "/fff_queries/lock.mdb",
-        } do
-          os.remove(lock)
-        end
-      end
-    end,
-    build = function()
-      require("fff.download").download_or_build_binary()
-    end,
-    lazy = false,
-    opts = {},
-  },
-
-  -- filemention.nvim — @file mentions via completion
-  {
-    "not-manu/filemention.nvim",
-    event = "InsertEnter",
-    branch = "dev",
-    dependencies = { "dmtrKovalenko/fff.nvim" },
-    config = function(_, opts)
-      require("filemention").setup(opts)
-    end,
-  },
+  { "not-manu/filemention.nvim", event = "InsertEnter", opts = {} },
 
   -- Add filemention as a cmp source
   {
