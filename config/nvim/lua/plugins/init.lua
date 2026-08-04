@@ -135,6 +135,13 @@ return {
       end
       require("nvim-tree").setup(opts)
       local api = require "nvim-tree.api"
+      local root_gap = vim.api.nvim_create_namespace "nvimtree_root_gap"
+      api.events.subscribe(api.events.Event.TreeRendered, function(data)
+        vim.api.nvim_buf_clear_namespace(data.bufnr, root_gap, 0, -1)
+        vim.api.nvim_buf_set_extmark(data.bufnr, root_gap, 0, 0, {
+          virt_lines = { { { " ", "NvimTreeNormal" } } },
+        })
+      end)
       vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "TermLeave" }, {
         callback = function()
           if package.loaded["nvim-tree"] then
