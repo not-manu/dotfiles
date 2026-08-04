@@ -208,12 +208,12 @@ M.polish_hl = {
   },
 
   nvimtree = {
-    NvimTreeNormal = { bg = "#000000" },
-    NvimTreeNormalNC = { bg = "#000000" },
-    NvimTreeEndOfBuffer = { fg = "#000000", bg = "#000000" },
-    NvimTreeWinSeparator = { fg = "#000000", bg = "#000000" },
+    NvimTreeNormal = { bg = "#100F0F" },
+    NvimTreeNormalNC = { bg = "#100F0F" },
+    NvimTreeEndOfBuffer = { fg = "#100F0F", bg = "#100F0F" },
+    NvimTreeWinSeparator = { fg = "#100F0F", bg = "#100F0F" },
     NvimTreeCursorLine = { bg = "#1C1B1A" },
-    NvimTreeIndentMarker = { fg = "#282726" }, -- base-900, subtle
+    NvimTreeIndentMarker = { fg = "#282726" },
 
     -- folders / root
     NvimTreeFolderIcon = { fg = c.blue },
