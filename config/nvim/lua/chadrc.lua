@@ -8,10 +8,12 @@ M.base46 = {
 		St_Lsp = { fg = "light_grey" },
 		Tabline = { bg = "black" },
 		TbFill = { bg = "black" },
-		TbBufOff = { bg = "#000000" },
-		TbBufOffModified = { bg = "#000000" },
-		TbBufOffClose = { bg = "#000000" },
-		TbTabOff = { bg = "#000000" },
+		TbBufOn = { bg = "#282726" },
+		TbBufOnModified = { bg = "#282726" },
+		TbBufOff = { bg = "black" },
+		TbBufOffModified = { bg = "black" },
+		TbBufOffClose = { bg = "black" },
+		TbTabOff = { bg = "black" },
 	},
 }
 
