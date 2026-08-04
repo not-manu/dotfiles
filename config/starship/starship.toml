@@ -6,6 +6,7 @@ palette = "flexoki"
 format = """
 $directory\
 $git_branch\
+${custom.worktree}\
 $git_status\
 $git_state\
 $cmd_duration\
@@ -45,6 +46,14 @@ style = "cyan"
 # "on  branch" — connector in faint grey; no trailing space since the
 # branch symbol already carries a leading space, so the gap stays single
 format = "[ on](dim)[$symbol$branch]($style)"
+
+[custom.worktree]
+# only in linked worktrees: git-dir diverges from the common dir there
+when = 'test "$(git rev-parse --git-dir 2>/dev/null)" != "$(git rev-parse --git-common-dir 2>/dev/null)"'
+style = "purple"
+# lone fork glyph: the name is always the directory basename, so printing it
+# would just duplicate $directory. plain unicode — nerd glyphs missing in font
+format = "[ ⎇]($style)"
 
 [git_status]
 style = "yellow"
