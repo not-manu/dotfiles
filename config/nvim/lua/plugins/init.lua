@@ -96,6 +96,9 @@ return {
       view = {
         adaptive_size = true,
       },
+      renderer = {
+        root_folder_label = ":t",
+      },
       auto_reload_on_write = true,
       filesystem_watchers = {
         enable = true,

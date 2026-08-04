@@ -208,11 +208,10 @@ M.polish_hl = {
   },
 
   nvimtree = {
-    -- structure
-    NvimTreeNormal = { bg = "#100F0F" }, -- match editor bg
-    NvimTreeNormalNC = { bg = "#100F0F" },
-    NvimTreeEndOfBuffer = { fg = "#100F0F" },
-    NvimTreeWinSeparator = { fg = "#100F0F", bg = "#100F0F" }, -- invisible
+    NvimTreeNormal = { bg = "#000000" },
+    NvimTreeNormalNC = { bg = "#000000" },
+    NvimTreeEndOfBuffer = { fg = "#000000", bg = "#000000" },
+    NvimTreeWinSeparator = { fg = "#000000", bg = "#000000" },
     NvimTreeCursorLine = { bg = "#1C1B1A" },
     NvimTreeIndentMarker = { fg = "#282726" }, -- base-900, subtle
 
@@ -223,7 +222,7 @@ M.polish_hl = {
     NvimTreeEmptyFolderName = { fg = c.comment },
     NvimTreeFolderArrowOpen = { fg = c.blue },
     NvimTreeFolderArrowClosed = { fg = "#6F6E69" },
-    NvimTreeRootFolder = { fg = c.magenta, bold = true },
+    NvimTreeRootFolder = { fg = c.fg, bold = true },
     NvimTreeSpecialFile = { fg = c.yellow, bold = true },
     NvimTreeExecFile = { fg = c.green },
     NvimTreeImageFile = { fg = c.purple },
