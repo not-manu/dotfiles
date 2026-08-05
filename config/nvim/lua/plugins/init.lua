@@ -129,6 +129,14 @@ return {
             vim.notify("Not an Aseprite-openable file", vim.log.levels.WARN)
           end
         end, { buffer = bufnr, desc = "nvim-tree: Open in Aseprite" })
+        vim.keymap.set("n", "gs", function()
+          local node = api.tree.get_node_under_cursor()
+          if node and node.absolute_path and node.absolute_path:lower():match "%.pdf$" then
+            vim.fn.jobstart({ "open", "-a", "Skim", node.absolute_path }, { detach = true })
+          else
+            vim.notify("Not a PDF", vim.log.levels.WARN)
+          end
+        end, { buffer = bufnr, desc = "nvim-tree: Open PDF in Skim" })
       end
       require("nvim-tree").setup(opts)
       local api = require "nvim-tree.api"
