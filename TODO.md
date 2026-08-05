@@ -33,6 +33,14 @@
          M-i and C-\ prefix-less, so this fits the existing style.
        * vim-tmux-navigator so C-h/j/k/l crosses vim splits ↔ tmux panes with
          no prefix at all
+- [ ] tmux: allow dots in displayed session names. real name stays sanitized
+      (`.`/`:` are target separators), pretty name lives in a per-session user
+      option: `set -t <sess> @display_name "copilot.vim"`. status-left renders
+      `#{?#{!=:#{@display_name},},#{@display_name},#S}` instead of `#S`;
+      picker.sh/windows.sh/sidebar emit `real<TAB>display`, fzf shows+matches
+      the display column, acts on the real one. add a `tn` wrapper that
+      sanitizes + sets the option on create. caveat: choose-tree (prefix s)
+      needs a custom -F to show pretty names.
 - [ ] lazygit: add a "revert TO this commit" custom command. `t` reverts a
       single commit and `g` resets (rewrites history) — neither restores the
       tree to an older commit as a new forward commit, which is the safe move
