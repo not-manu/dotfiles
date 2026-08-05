@@ -49,7 +49,7 @@ format = "[ on](dim)[$symbol$branch]($style)"
 
 [custom.worktree]
 # only in linked worktrees: git-dir diverges from the common dir there
-when = 'test "$(git rev-parse --git-dir 2>/dev/null)" != "$(git rev-parse --git-common-dir 2>/dev/null)"'
+when = 'test "$(git rev-parse --path-format=absolute --git-dir 2>/dev/null)" != "$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)"'
 style = "purple"
 # lone fork glyph: the name is always the directory basename, so printing it
 # would just duplicate $directory. plain unicode — nerd glyphs missing in font
