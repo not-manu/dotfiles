@@ -1,4 +1,6 @@
 # Flexoki Dark theme (https://stephango.com/flexoki)
+os:
+  editPreset: nvim
 git:
   pagers:
     - colorArg: always
