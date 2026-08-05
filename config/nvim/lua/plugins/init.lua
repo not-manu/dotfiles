@@ -202,6 +202,8 @@ return {
               checkOnSave = true,
               check = { command = "clippy" },
               procMacro = { enable = true },
+              lru = { capacity = 64 },
+              cachePriming = { enable = false },
             },
           },
         },
@@ -402,6 +404,13 @@ return {
   {
     "kylechui/nvim-surround",
     version = "^3.0.0",
+    event = "VeryLazy",
+    opts = {},
+  },
+
+  {
+    "zeioth/garbage-day.nvim",
+    dependencies = "neovim/nvim-lspconfig",
     event = "VeryLazy",
     opts = {},
   },

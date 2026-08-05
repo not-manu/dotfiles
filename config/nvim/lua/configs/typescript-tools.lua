@@ -4,8 +4,7 @@ local options = {
     -- Example: vim.keymap.set("n", "<leader>to", ":TSToolsOrganizeImports<CR>", { buffer = bufnr })
   end,
   settings = {
-    -- spawn additional tsserver instance to calculate diagnostics on it
-    separate_diagnostic_server = true,
+    separate_diagnostic_server = false,
     -- "change"|"insert_leave" determine when the client asks the server about diagnostic
     publish_diagnostic_on = "insert_leave",
     -- array of strings("fix_all"|"add_missing_imports"|"remove_unused"|
@@ -24,9 +23,7 @@ local options = {
     tsserver_path = vim.fn.stdpath("data") .. "/mason/packages/typescript-language-server/node_modules/typescript/lib/tsserver.js",
     -- specify a list of plugins to load by tsserver, e.g., for support `styled-components`
     tsserver_plugins = {},
-    -- this value is passed to: https://nodejs.org/api/cli.html#--max-old-space-sizesize-in-megabytes
-    -- memory limit in megabytes or "auto"(basically no limit)
-    tsserver_max_memory = 2048,
+    tsserver_max_memory = 1024,
     -- described below
     tsserver_format_options = {},
     tsserver_file_preferences = {
