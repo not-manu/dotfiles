@@ -193,6 +193,8 @@ alias ls='eza --icons --color=always --group-directories-first'
 alias ll='eza -l --icons --git --color=always --group-directories-first'
 alias la='eza -la --icons --git --color=always --group-directories-first'
 alias lt='eza --tree --icons --color=always --group-directories-first'
+alias llt='eza -l --icons --git --color=always --sort=modified --time-style=relative'
+function lr() { eza -l --icons --color=always --sort=modified --time-style=relative "$@" | tail -n ${LR_COUNT:-20} }
 
 # Replace cd with eza preview (optional)
 # eza doesn't replace cd directly since it's a navigation command,
