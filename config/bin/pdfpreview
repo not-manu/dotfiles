@@ -1,0 +1,159 @@
+#!/usr/bin/env bun
+import { watch, existsSync, mkdirSync } from "fs"
+import { homedir } from "os"
+import { join, dirname, basename, resolve } from "path"
+
+const PORT = 43110
+const CACHE = join(homedir(), ".cache", "pdfpreview")
+const PDFJS = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/"
+const ASSETS = ["pdf.min.mjs", "pdf.worker.min.mjs"]
+
+let assetsReady
+function ensureAssets() {
+  assetsReady ??= (async () => {
+    mkdirSync(CACHE, { recursive: true })
+    for (const name of ASSETS) {
+      const path = join(CACHE, name)
+      if (existsSync(path)) continue
+      const res = await fetch(PDFJS + name)
+      if (!res.ok) throw new Error("failed to fetch " + PDFJS + name)
+      await Bun.write(path, await res.arrayBuffer())
+    }
+  })()
+  return assetsReady
+}
+
+const HTML = [
+  "<!doctype html><html><head><meta charset=utf-8><title>pdfpreview</title><style>",
+  ":root{color-scheme:light}",
+  "body{margin:0;background:#fff;display:flex;flex-direction:column;align-items:center}",
+  ".page{position:relative;background:#fff}",
+  ".page + .page{border-top:1px solid #eee}",
+  ".page canvas{position:absolute;inset:0}",
+  ".page canvas.next{opacity:0;transition:opacity .25s ease}",
+  ".page canvas.next.in{opacity:1}",
+  "</style></head><body><div id=pages></div><script type=module>",
+  'import * as pdfjs from "/pdfjs/pdf.min.mjs"',
+  'pdfjs.GlobalWorkerOptions.workerSrc = "/pdfjs/pdf.worker.min.mjs"',
+  'const file = new URLSearchParams(location.search).get("file")',
+  'document.title = file.split("/").pop()',
+  'const pagesEl = document.getElementById("pages")',
+  "let rendering = false, queued = false, retries = 0",
+  "async function render() {",
+  "  if (rendering) { queued = true; return }",
+  "  rendering = true",
+  "  let ok = true",
+  "  try {",
+  '    const buf = await fetch("/pdf?file=" + encodeURIComponent(file) + "&t=" + Date.now()).then(r => r.arrayBuffer())',
+  "    const doc = await pdfjs.getDocument({ data: buf }).promise",
+  "    const W = innerWidth",
+  "    while (pagesEl.children.length > doc.numPages) pagesEl.lastChild.remove()",
+  "    for (let i = 1; i <= doc.numPages; i++) {",
+  "      const page = await doc.getPage(i)",
+  "      let holder = pagesEl.children[i - 1]",
+  '      if (!holder) { holder = document.createElement("div"); holder.className = "page"; pagesEl.append(holder) }',
+  "      const vp0 = page.getViewport({ scale: 1 })",
+  "      const vp = page.getViewport({ scale: (W / vp0.width) * devicePixelRatio })",
+  '      const canvas = document.createElement("canvas")',
+  "      canvas.width = vp.width; canvas.height = vp.height",
+  '      canvas.style.width = W + "px"; canvas.style.height = vp.height / devicePixelRatio + "px"',
+  '      await page.render({ canvasContext: canvas.getContext("2d"), viewport: vp }).promise',
+  "      holder.style.width = canvas.style.width; holder.style.height = canvas.style.height",
+  '      const old = [...holder.querySelectorAll("canvas")]',
+  "      if (!old.length) { holder.append(canvas); continue }",
+  '      canvas.className = "next"',
+  "      holder.append(canvas)",
+  '      requestAnimationFrame(() => requestAnimationFrame(() => canvas.classList.add("in")))',
+  '      setTimeout(() => { old.forEach(c => c.remove()); canvas.className = "" }, 300)',
+  "    }",
+  "    retries = 0",
+  "  } catch (e) { ok = false }",
+  "  rendering = false",
+  "  if (queued) { queued = false; render() }",
+  "  else if (!ok && retries++ < 10) setTimeout(render, 400)",
+  "}",
+  'new EventSource("/events?file=" + encodeURIComponent(file)).onmessage = () => render()',
+  "let rt",
+  'addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 200) })',
+  "render()",
+  "</script></body></html>",
+].join("\n")
+
+let clients = 0
+let shutdown
+function bump(delta) {
+  clients += delta
+  clearTimeout(shutdown)
+  if (clients === 0) shutdown = setTimeout(() => process.exit(0), 60000)
+}
+
+function sse(file) {
+  const dir = dirname(file)
+  const name = basename(file)
+  const enc = new TextEncoder()
+  let timer, watcher, ping
+  return new Response(
+    new ReadableStream({
+      start(controller) {
+        bump(1)
+        controller.enqueue(enc.encode("retry: 1000\n\n"))
+        watcher = watch(dir, (_, fn) => {
+          if (fn && fn !== name) return
+          clearTimeout(timer)
+          timer = setTimeout(() => controller.enqueue(enc.encode("data: reload\n\n")), 200)
+        })
+        ping = setInterval(() => controller.enqueue(enc.encode(": ping\n\n")), 15000)
+      },
+      cancel() {
+        bump(-1)
+        watcher?.close()
+        clearInterval(ping)
+        clearTimeout(timer)
+      },
+    }),
+    { headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-store" } }
+  )
+}
+
+const fileArg = process.argv[2] ? resolve(process.argv[2]) : null
+
+let server = null
+try {
+  server = Bun.serve({
+    port: PORT,
+    idleTimeout: 0,
+    async fetch(req) {
+      const url = new URL(req.url)
+      if (url.pathname === "/")
+        return new Response(HTML, {
+          headers: { "Content-Type": "text/html", "Cache-Control": "no-store" },
+        })
+      if (url.pathname.startsWith("/pdfjs/")) {
+        const name = url.pathname.slice(7)
+        if (!ASSETS.includes(name)) return new Response("not found", { status: 404 })
+        await ensureAssets()
+        return new Response(Bun.file(join(CACHE, name)), {
+          headers: { "Content-Type": "text/javascript" },
+        })
+      }
+      const f = url.searchParams.get("file")
+      if (!f || !f.endsWith(".pdf") || !existsSync(f))
+        return new Response("bad file", { status: 400 })
+      if (url.pathname === "/pdf")
+        return new Response(Bun.file(f), {
+          headers: { "Content-Type": "application/pdf", "Cache-Control": "no-store" },
+        })
+      if (url.pathname === "/events") return sse(f)
+      return new Response("not found", { status: 404 })
+    },
+  })
+} catch (e) {
+  if (e.code !== "EADDRINUSE") throw e
+}
+
+if (server) {
+  ensureAssets()
+  bump(0)
+}
+if (fileArg) Bun.spawn(["open", "http://localhost:" + PORT + "/?file=" + encodeURIComponent(fileArg)])
+if (!server) process.exit(0)
