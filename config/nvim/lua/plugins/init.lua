@@ -388,6 +388,7 @@ return {
   -- LaTeX support with VimTeX
   {
     "lervag/vimtex",
+    tag = "v2.18",
     ft = "tex",
     init = function()
       -- Must be set BEFORE plugin loads
