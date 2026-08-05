@@ -155,5 +155,13 @@ if (server) {
   ensureAssets()
   bump(0)
 }
-if (fileArg) Bun.spawn(["open", "http://localhost:" + PORT + "/?file=" + encodeURIComponent(fileArg)])
+if (fileArg)
+  Bun.spawn([
+    "open",
+    "-na",
+    "Helium",
+    "--args",
+    "--new-window",
+    "http://localhost:" + PORT + "/?file=" + encodeURIComponent(fileArg),
+  ])
 if (!server) process.exit(0)
