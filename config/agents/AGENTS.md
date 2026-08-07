@@ -14,6 +14,9 @@
   push there.
 - `.../not-manu/Forks/` — my forks; branch and PR normally. Keep the
   `github_not-manu` SSH alias in remote URLs; don't rewrite it to `github.com`.
+- `.../not-manu/resume` — my resume: `current/` (LaTeX/Tectonic source of the
+  live resume), `full/` (master experience/honors/LinkedIn notes), and
+  `applications/` (past application essays by year).
 - `-old` / `-cooked` suffixes are dead snapshots. Don't edit them.
 - Other `~/Documents` folders (`Journal`, `Photos`, `YouTube`, …) are non-code.
 
