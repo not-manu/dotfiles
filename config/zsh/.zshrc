@@ -164,8 +164,9 @@ alias ':q'=exit
 alias ':qa'=exit
 alias 'q'=exit
 
-# lazygit
+# lazygit — my fork (vim-style editing); ~/go/bin shadows homebrew's binary
 alias 'lg'='lazygit'
+alias 'lgup'='go -C ~/Documents/Projects/not-manu/Forks/lazygit install'
 
 # neovim
 alias 'n'='nvim'

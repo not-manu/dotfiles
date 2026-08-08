@@ -2,11 +2,12 @@
 os:
   editPreset: nvim
 git:
-  pagers:
+  diffRenderers:
     - colorArg: always
-      pager: delta --dark --paging=never
+      command: delta --dark --paging=never
 gui:
   border: sharp
+  vimStyleEditing: true
   theme:
     activeBorderColor:
       - "#3AA99F" # cyan
