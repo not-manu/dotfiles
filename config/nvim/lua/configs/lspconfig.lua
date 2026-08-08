@@ -83,7 +83,7 @@ vim.lsp.config("mdx_analyzer", {
 
 -- Enable LSP servers (must run after vim.lsp.config calls)
 -- Note: typescript-tools.nvim handles TypeScript/JavaScript instead of tsserver
-local servers = { "html", "cssls", "tailwindcss", "jsonls", "texlab", "basedpyright", "astro", "mdx_analyzer" }
+local servers = { "html", "cssls", "tailwindcss", "jsonls", "texlab", "basedpyright", "astro", "mdx_analyzer", "gopls" }
 vim.lsp.enable(servers)
 
 -- read :h vim.lsp.config for changing options of lsp servers

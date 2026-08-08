@@ -15,6 +15,9 @@ return {
         "typescript",
         "tsx",
         "rust",
+        "go",
+        "gomod",
+        "gosum",
         "astro",
         "json",
         "jsonc",
@@ -325,6 +328,10 @@ return {
         -- Rust
         "rust",
         "toml",
+        -- Go
+        "go",
+        "gomod",
+        "gosum",
         -- LaTeX
         "latex",
         -- Additional useful parsers
