@@ -38,7 +38,7 @@
     }
   },
   "effortLevel": "high",
-  "tui": "default",
+  "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "theme": "custom:flexoki",
   "editorMode": "vim",
