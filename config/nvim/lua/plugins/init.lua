@@ -140,6 +140,15 @@ return {
             vim.notify("Not a PDF", vim.log.levels.WARN)
           end
         end, { buffer = bufnr, desc = "nvim-tree: Open PDF live preview" })
+        vim.keymap.set("n", "go", function()
+          local node = api.tree.get_node_under_cursor()
+          if node and node.absolute_path and node.absolute_path:lower():match "%.md$" then
+            local uri = "obsidian://open?path=" .. vim.uri_encode(node.absolute_path, "rfc2396")
+            vim.fn.jobstart({ "open", uri }, { detach = true })
+          else
+            vim.notify("Not a markdown file", vim.log.levels.WARN)
+          end
+        end, { buffer = bufnr, desc = "nvim-tree: Open in Obsidian" })
       end
       require("nvim-tree").setup(opts)
       local api = require "nvim-tree.api"
