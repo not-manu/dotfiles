@@ -6,3 +6,5 @@ export PATH="$VOLTA_HOME/bin:$PATH"
 # Colima's docker socket (XDG path) — keeps docker clients working
 # regardless of context config
 export DOCKER_HOST="unix://$HOME/.config/colima/default/docker.sock"
+
+export CLAUDE_CODE_TMUX_TRUECOLOR=1
