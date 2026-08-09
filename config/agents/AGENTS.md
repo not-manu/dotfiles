@@ -39,6 +39,11 @@
 - Scratch/temp files go in `./.tmp/` at the project root (create it, keep it
   git-ignored), never in the global `/tmp`.
 
+## Git
+- Never stage, commit, or push unless I explicitly ask. I stage and review my
+  own changes — read-only git (`status`, `diff`, `log`) is fine, anything that
+  touches the index or history is not.
+
 ## Code Principles
 - Prefer the simplest thing that works. Keep it DRY.
 
