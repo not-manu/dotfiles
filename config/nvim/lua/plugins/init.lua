@@ -376,6 +376,14 @@ return {
           ["<C-k>"] = actions.move_selection_previous,
         },
       })
+      conf.pickers = vim.tbl_deep_extend("force", conf.pickers or {}, {
+        find_files = {
+          find_command = { "rg", "--files", "--hidden", "--glob", "!.git/*" },
+        },
+        live_grep = {
+          additional_args = { "--hidden", "--glob", "!.git/*" },
+        },
+      })
       return conf
     end,
   },
