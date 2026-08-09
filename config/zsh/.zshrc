@@ -189,19 +189,15 @@ alias 'mini'='~/.config/tmux/mini.sh'
 # Source local overrides (tokens, machine-specific config)
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
-# Replace ls with eza
-alias ls='eza --icons --color=always --group-directories-first'
-alias ll='eza -l --icons --git --color=always --group-directories-first'
-alias la='eza -la --icons --git --color=always --group-directories-first'
-alias lt='eza --tree --icons --color=always --group-directories-first'
-alias llt='eza -l --icons --git --color=always --sort=modified --time-style=relative'
+alias ls='eza --icons=auto --color=auto --group-directories-first'
+alias ll='eza -l --icons=auto --git --color=auto --group-directories-first'
+alias la='eza -la --icons=auto --git --color=auto --group-directories-first'
+alias lt='eza --tree --icons=auto --color=auto --group-directories-first'
+alias llt='eza -l --icons=auto --git --color=auto --sort=modified --time-style=relative'
 function lr() { eza -l --icons --color=always --sort=modified --time-style=relative "$@" | tail -n ${LR_COUNT:-20} }
 
-# Replace cd with eza preview (optional)
-# eza doesn't replace cd directly since it's a navigation command,
-# but you can add a function to auto-list after cd:
 function cd() {
-  builtin cd "$@" && eza --icons --color=always
+  builtin cd "$@" && eza --icons=auto --color=auto
 }
 
 # syntax highlighting
