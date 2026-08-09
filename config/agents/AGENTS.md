@@ -36,6 +36,8 @@
 - Native media tools (`ffmpeg`, `magick`) stall on their thread pools. Pin them
   to one thread, or do it in pure JS.
 - If a directory itself wedges, use its real path and move to a fresh one.
+- Scratch/temp files go in `./.tmp/` at the project root (create it, keep it
+  git-ignored), never in the global `/tmp`.
 
 ## Code Principles
 - Prefer the simplest thing that works. Keep it DRY.
