@@ -1,4 +1,4 @@
-local apps = { ["Preview"] = true, ["QuickTime Player"] = true }
+local apps = { ["Preview"] = true, ["QuickTime Player"] = true, ["IINA"] = true }
 
 local wf = hs.window.filter.new(function(w)
   local app = w:application()
