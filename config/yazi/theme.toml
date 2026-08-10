@@ -1,3 +1,12 @@
 [flavor]
 dark = "flexoki-dark"
 light = "flexoki-light"
+
+[mgr]
+hovered = { fg = "#CECDC3", bg = "#164F4A" }
+preview_hovered = { fg = "#CECDC3", bg = "#122F2C" }
+
+[indicator]
+current = { fg = "#CECDC3", bg = "#164F4A" }
+parent = { fg = "#CECDC3", bg = "#143F3C" }
+preview = { fg = "#CECDC3", bg = "#122F2C" }
