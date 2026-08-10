@@ -40,6 +40,7 @@ config_dirs=(
   git
   opencode
   vim
+  yazi
   zsh
 )
 
