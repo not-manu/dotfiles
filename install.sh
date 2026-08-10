@@ -56,6 +56,7 @@ link "$CONFIG_DIR/zsh/.zshrc"   "$HOME/.zshrc"
 link "$CONFIG_DIR/zsh/.zshenv"  "$HOME/.zshenv"
 link "$CONFIG_DIR/zsh/.profile" "$HOME/.profile"
 link "$CONFIG_DIR/vim/vimrc"    "$HOME/.vimrc"
+link "$DOTFILES_DIR/config/hammerspoon" "$HOME/.hammerspoon"
 
 # ---- Ghostty (macOS Application Support) ----
 echo ""
