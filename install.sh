@@ -26,7 +26,7 @@ link() {
 }
 
 # ---- ~/.config/ directories ----
-echo "[1/4] Linking config directories into ~/.config/ ..."
+echo "[1/6] Linking config directories into ~/.config/ ..."
 
 config_dirs=(
   ghostty
@@ -50,7 +50,7 @@ done
 
 # ---- Home directory symlinks (apps that don't support XDG) ----
 echo ""
-echo "[2/4] Linking shell dotfiles into ~/ ..."
+echo "[2/6] Linking shell dotfiles into ~/ ..."
 
 link "$CONFIG_DIR/zsh/.zshrc"   "$HOME/.zshrc"
 link "$CONFIG_DIR/zsh/.zshenv"  "$HOME/.zshenv"
@@ -60,7 +60,7 @@ link "$DOTFILES_DIR/config/hammerspoon" "$HOME/.hammerspoon"
 
 # ---- Ghostty (macOS Application Support) ----
 echo ""
-echo "[3/4] Linking Ghostty config into ~/Library/Application Support/ ..."
+echo "[3/6] Linking Ghostty config into ~/Library/Application Support/ ..."
 
 ghostty_dir="$HOME/Library/Application Support/com.mitchellh.ghostty"
 mkdir -p "$ghostty_dir"
@@ -73,7 +73,7 @@ link "$DOTFILES_DIR/config/karabiner/karabiner.json" "$CONFIG_DIR/karabiner/kara
 
 # ---- Claude (lives in ~/.<name>, not ~/.config/) ----
 echo ""
-echo "[4/5] Linking claude config ..."
+echo "[4/6] Linking claude config ..."
 
 mkdir -p "$HOME/.claude"
 link "$DOTFILES_DIR/config/claude/settings.json"  "$HOME/.claude/settings.json"
@@ -81,7 +81,7 @@ link "$DOTFILES_DIR/config/claude/hooks"          "$HOME/.claude/hooks"
 
 # ---- Global agent instructions (AGENTS.md → CLAUDE.md + OpenCode) ----
 echo ""
-echo "[5/5] Linking global agent instructions ..."
+echo "[5/6] Linking global agent instructions ..."
 
 link "$DOTFILES_DIR/config/agents/AGENTS.md"       "$HOME/.claude/CLAUDE.md"
 link "$DOTFILES_DIR/config/agents/AGENTS.md"       "$CONFIG_DIR/opencode/AGENTS.md"
@@ -102,6 +102,15 @@ EOF
   echo "Created template $zshrc_local_src (add your tokens here)"
 fi
 link "$zshrc_local_src" "$HOME/.zshrc.local"
+
+echo ""
+echo "[6/6] Setting default file handlers (duti) ..."
+if command -v duti >/dev/null 2>&1; then
+  duti "$DOTFILES_DIR/config/duti/handlers.duti"
+  echo "  Applied: config/duti/handlers.duti"
+else
+  echo "  Skipped: duti not installed (brew install duti)"
+fi
 
 echo ""
 echo "=== Install complete! ==="
