@@ -3,10 +3,10 @@ dark = "flexoki-dark"
 light = "flexoki-light"
 
 [mgr]
-hovered = { fg = "#CECDC3", bg = "#164F4A" }
-preview_hovered = { fg = "#CECDC3", bg = "#122F2C" }
+hovered = { fg = "#CECDC3", bg = "#403E3C" }
+preview_hovered = { fg = "#CECDC3", bg = "#282726" }
 
 [indicator]
-current = { fg = "#CECDC3", bg = "#164F4A" }
-parent = { fg = "#CECDC3", bg = "#143F3C" }
-preview = { fg = "#CECDC3", bg = "#122F2C" }
+current = { fg = "#CECDC3", bg = "#403E3C" }
+parent = { fg = "#CECDC3", bg = "#343331" }
+preview = { fg = "#CECDC3", bg = "#282726" }
