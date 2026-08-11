@@ -362,13 +362,27 @@ return {
     "github/copilot.vim",
     event = "InsertEnter",
     config = function()
-      -- Disable default Tab mapping
       vim.g.copilot_no_tab_map = true
-      -- Map Shift-Tab to accept suggestion
       vim.keymap.set("i", "<S-Tab>", 'copilot#Accept("<CR>")', {
         expr = true,
         replace_keycodes = false,
         desc = "Copilot accept",
+      })
+      local disabled_dirs = {
+        vim.fn.expand "~/Documents/Projects/not-manu/ideas",
+        vim.fn.expand "~/Documents/Projects/not-manu/vault",
+      }
+      vim.api.nvim_create_autocmd({ "BufEnter", "BufNewFile" }, {
+        group = vim.api.nvim_create_augroup("CopilotDisabledDirs", { clear = true }),
+        callback = function(ev)
+          local path = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(ev.buf), ":p")
+          for _, dir in ipairs(disabled_dirs) do
+            if path:sub(1, #dir + 1) == dir .. "/" then
+              vim.b[ev.buf].copilot_enabled = false
+              return
+            end
+          end
+        end,
       })
     end,
   },
