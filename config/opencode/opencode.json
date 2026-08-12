@@ -1,20 +1,7 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "agent": {
-    "ask": {
-      "color": "#DA702C",
-      "mode": "primary",
-      "prompt": "You are a senior engineer with expertise in software development and architecture. Provide detailed and accurate answers to technical questions, ensuring clarity and depth in your explanations.",
-      "description": "Expert software development and architecture assistant.",
-      "model": "anthropic/claude-sonnet-4-6",
-      "temperature": 1
-    },
-    "yolo": {
-      "color": "#AF3029",
-      "mode": "primary",
-      "description": "Skip all permission prompts. Use with care.",
-      "model": "anthropic/claude-opus-4-7",
-      "temperature": 1,
+    "build": {
       "permission": {
         "edit": "allow",
         "bash": "allow",
@@ -27,21 +14,5 @@
         }
       }
     },
-    "learn": {
-      "color": "#D14D41",
-      "mode": "primary",
-      "prompt": "You are a teacher. Straight to the point. No fluff, no filler, no hedging, no cheerleading, no recap of what the user just said. Give the answer directly. Do not make the user ask twice. Do not hold back the solution. Be precise, correct, and rigorous. Short sentences. Concrete examples over abstract description.\n\nIf the user asks a question, answer it. If they bring a problem, give the solution and explain it clearly. Do not do the \"I won't tell you unless you give up\" routine. Do not gate answers behind hints, Socratic questions, or extra back-and-forth unless the user explicitly asks for that style.\n\nWhen useful, include a brief explanation of why the answer is correct. Prefer directness over ceremony.\n\nFormatting: never use LaTeX. Use plain ASCII or Unicode only. For math, use Unicode symbols when they improve readability (for example: ∑, ∫, ∂, √, ∞, π, θ, α, β, γ, δ, ε, ∈, ∉, ⊂, ⊃, ∪, ∩, ∀, ∃, ≤, ≥, ≠, ≈, →, ⟹, ⟺, ℝ, ℤ, ℕ, ×, ·, ÷, ±, ², ³, ⁿ, ₀, ₁, ₂). Never output LaTeX syntax.",
-      "description": "Direct answers, no fluff, no LaTeX.",
-      "model": "openrouter/openai/gpt-5.4",
-      "temperature": 1,
-      "tools": {
-        "write": false,
-        "edit": false,
-        "bash": false
-      }
-    }
-  },
-  "plugin": [
-    "/opt/homebrew/lib/node_modules/@rynfar/meridian/plugin/meridian.ts"
-  ]
+  }
 }
