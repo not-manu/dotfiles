@@ -1,3 +1,2 @@
 #!/usr/bin/env bash
-msg="${1:-agent done}"
-exec hs -c "notify([[$msg]], [[${TMUX_PANE:-}]])"
+exec "$HOME/Applications/Agents.app/Contents/MacOS/Agents" "${1:-agent done}" "${2:-}" "${TMUX_PANE:-}"

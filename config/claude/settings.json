@@ -3,19 +3,6 @@
     "defaultMode": "auto"
   },
   "model": "claude-fable-5[1m]",
-  "hooks": {
-    "Notification": [
-      {
-        "matcher": "permission_prompt|idle_prompt",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$HOME/.claude/hooks/notify-done.sh"
-          }
-        ]
-      }
-    ]
-  },
   "enabledPlugins": {
     "pyright-lsp@claude-plugins-official": false
   },

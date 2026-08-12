@@ -40,9 +40,10 @@
   git-ignored), never in the global `/tmp`.
 
 ## Notifications
-- When you finish a task, run `notify "<short summary>"` (on PATH) — it sends a
-  clickable macOS notification that jumps to your tmux pane. Summarize what you
-  actually did in a few words ("refactored auth, tests pass"), not "done".
+- When you finish a task, run `notify "<short summary>" "<details>"` (on PATH) —
+  it sends a clickable macOS notification that jumps to your tmux pane. Summary
+  is a few words of what you actually did ("refactored auth"), not "done";
+  details (optional) is one sentence more.
 - Skip it for quick conversational replies; use it when I've likely walked away.
 
 ## Git
