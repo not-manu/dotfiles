@@ -39,6 +39,12 @@
 - Scratch/temp files go in `./.tmp/` at the project root (create it, keep it
   git-ignored), never in the global `/tmp`.
 
+## Notifications
+- When you finish a task, run `notify "<short summary>"` (on PATH) — it sends a
+  clickable macOS notification that jumps to your tmux pane. Summarize what you
+  actually did in a few words ("refactored auth, tests pass"), not "done".
+- Skip it for quick conversational replies; use it when I've likely walked away.
+
 ## Git
 - Never stage, commit, or push unless I explicitly ask. I stage and review my
   own changes — read-only git (`status`, `diff`, `log`) is fine, anything that

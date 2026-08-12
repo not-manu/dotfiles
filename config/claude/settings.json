@@ -4,16 +4,6 @@
   },
   "model": "claude-fable-5[1m]",
   "hooks": {
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$HOME/.claude/hooks/notify-done.sh"
-          }
-        ]
-      }
-    ],
     "Notification": [
       {
         "matcher": "permission_prompt|idle_prompt",

@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+msg="${1:-agent done}"
+exec hs -c "notify([[$msg]], [[${TMUX_PANE:-}]])"
