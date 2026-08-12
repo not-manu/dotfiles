@@ -1,0 +1,19 @@
+{
+  "theme": {
+    "name": "flexoki",
+    "mode": "dark"
+  },
+  "diffs": {
+    "wrap": "word"
+  },
+  "session": {
+    "sidebar": "hide",
+    "scrollbar": false,
+    "thinking": "show"
+  },
+  "animations": true,
+  "tabs": {
+    "layout": "vertical",
+    "enabled": false
+  }
+}

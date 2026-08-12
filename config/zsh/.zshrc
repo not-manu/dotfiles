@@ -114,6 +114,7 @@ ZLE_RPROMPT_INDENT=0  # remove padding from the right
 # opencode
 export PATH="$HOME/.opencode/bin:$PATH"
 alias 'ocd'='opencode --agent yolo'
+alias 'oc2'='opencode2'
 
 # `oc` wraps opencode so `oc patch` runs the smile-logo rebuild script
 function oc() {

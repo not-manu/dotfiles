@@ -10,6 +10,7 @@ Thumbs.db
 .npmrc
 .ssh/
 .mcp-auth/
+config/opencode/service.json
 
 # Plugin binaries and dependencies (installed by plugin managers)
 config/tmux/plugins/
