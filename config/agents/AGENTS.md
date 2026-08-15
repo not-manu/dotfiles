@@ -1,4 +1,6 @@
 - Be brief, unless explicitly asked to be more verbose.
+- A question is just a question ("why do we need X?", "is this used anywhere?",
+  "what does this do?"). Answer it. Don't change code until I ask for a change.
 - Python: `uv`, and always `uvx`. JS: `bun` (or `pnpm` if the project uses it),
   never `npm`. Search: `rg`, not `grep`.
 - IMPORTANT: Never hand-edit dependency manifests (`package.json`,
