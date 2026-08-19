@@ -22,6 +22,9 @@ config/nvim/lazy-lock.json
 
 # Editor state and caches
 config/btop/themes/
+config/karabiner/automatic_backups/
+config/karabiner/assets/
+config/karabiner/*.bak
 
 # Downloaded/generated files
 *.zwc

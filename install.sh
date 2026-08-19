@@ -67,9 +67,9 @@ mkdir -p "$ghostty_dir"
 link "$CONFIG_DIR/ghostty/config"  "$ghostty_dir/config"
 link "$CONFIG_DIR/ghostty/shaders" "$ghostty_dir/shaders"
 
-# ---- Karabiner (symlink just the json — Karabiner writes other state into the dir) ----
-mkdir -p "$CONFIG_DIR/karabiner"
-link "$DOTFILES_DIR/config/karabiner/karabiner.json" "$CONFIG_DIR/karabiner/karabiner.json"
+# ---- Karabiner (symlink the whole dir — GUI saves rename-over the json and
+# would destroy a file-level symlink; state subdirs are gitignored) ----
+link "$DOTFILES_DIR/config/karabiner" "$CONFIG_DIR/karabiner"
 
 # ---- Claude (lives in ~/.<name>, not ~/.config/) ----
 echo ""
