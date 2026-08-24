@@ -18,7 +18,7 @@ if [[ "${1:-}" == "--attach" ]]; then
     tmux set -t "$id" status on
     tmux set -t "$id" status-position bottom
     tmux set -t "$id" 'status-format[0]' \
-      "#[bg=#100f0f,align=right]#{?#{>:#{window_panes},1},#{P:#{?pane_active,#[fg=#878580]━━,#[fg=#403e3c]──}} ,}"
+      "#[bg=#100f0f,align=centre]#{?#{>:#{window_panes},1},#{P:#{?pane_active,#[fg=#878580]━━,#[fg=#403e3c]──}} ,}"
   fi
   exec tmux attach -t "=$name"
 fi
