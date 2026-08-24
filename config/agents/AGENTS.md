@@ -31,6 +31,7 @@
   background instead of sleeping in the foreground.
 - Assume a hang is a hidden prompt or a permission dialog before anything
   exotic.
+- Assume a dev server is already running; ask before starting one.
 - Never pattern-match processes by a string your own command contains. Kill by
   exact name or PID.
 - Parse machine-readable output, not pretty output — shell aliases add colour
@@ -40,6 +41,11 @@
 - If a directory itself wedges, use its real path and move to a fresh one.
 - Scratch/temp files go in `./.tmp/` at the project root (create it, keep it
   git-ignored), never in the global `/tmp`.
+
+## Reports & Deliverables
+- Don't publish Artifacts unless I explicitly ask. For reports, write-ups, and
+  visual deliverables, write a local self-contained `.html` file (inline
+  CSS/JS, no CDNs) next to the relevant project files and tell me the path.
 
 ## Notifications
 - When you finish a task, run `notify "<short summary>" "<details>"` (on PATH) —
