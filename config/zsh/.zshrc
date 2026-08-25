@@ -80,6 +80,18 @@ KEYTIMEOUT=1
 
 source $ZSH/oh-my-zsh.sh
 
+autoload -Uz select-quoted select-bracketed
+zle -N select-quoted
+zle -N select-bracketed
+for km in viopp visual; do
+  for c in {a,i}{\',\",\`}; do
+    bindkey -M $km -- $c select-quoted
+  done
+  for c in {a,i}${(s..)^:-'()[]{}<>bB'}; do
+    bindkey -M $km -- $c select-bracketed
+  done
+done
+
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
