@@ -1,0 +1,21 @@
+[[mgr.prepend_keymap]]
+on = "R"
+run = 'shell -- open -g -R "$0"'
+desc = "Reveal in Finder"
+
+[[mgr.prepend_keymap]]
+on = "F"
+run = 'shell -- open -g .'
+desc = "Open folder in Finder"
+
+[[mgr.prepend_keymap]]
+on = "<C-y>"
+run = '''shell -- case "${0##*.}" in
+  [Jj][Pp][Gg]|[Jj][Pp][Ee][Gg]) t="JPEG picture" ;;
+  [Pp][Nn][Gg]) t="«class PNGf»" ;;
+  [Gg][Ii][Ff]) t="GIF picture" ;;
+  [Tt][Ii][Ff]|[Tt][Ii][Ff][Ff]) t="TIFF picture" ;;
+  *) exit 1 ;;
+esac
+osascript -e "set the clipboard to (read (POSIX file \"$0\") as $t)"'''
+desc = "Copy image to clipboard"
