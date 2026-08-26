@@ -21,10 +21,10 @@
     }
   },
   "tui": "fullscreen",
+  "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
   "theme": "custom:flexoki",
   "editorMode": "vim",
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": false,
-  "autoMemoryEnabled": false
+  "voiceEnabled": false
 }
