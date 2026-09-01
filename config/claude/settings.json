@@ -2,7 +2,7 @@
   "permissions": {
     "defaultMode": "auto"
   },
-  "model": "claude-fable-5[1m]",
+  "model": "fable[1m]",
   "enabledPlugins": {
     "pyright-lsp@claude-plugins-official": false
   },
@@ -26,5 +26,8 @@
   "theme": "custom:flexoki",
   "editorMode": "vim",
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": false
+  "voiceEnabled": false,
+  "disableRemoteControl": true,
+  "remoteControlAtStartup": false,
+  "autoUploadSessions": false
 }
