@@ -1,9 +1,6 @@
 # Flexoki Dark theme (https://stephango.com/flexoki)
 os:
   editPreset: nvim
-  edit: "lg-edit {{filename}}"
-  editAtLine: "lg-edit {{filename}} {{line}}"
-  editInTerminal: false
 git:
   diffRenderers:
     - colorArg: always

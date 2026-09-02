@@ -36,17 +36,19 @@ if [[ "$sess" == _scratch_* ]]; then
   tmux has-session -t "=$parent" 2>/dev/null || exit 0
 
   tmux detach-client -t "$client" 2>/dev/null # closes the popup
-  for ((i = 0; i < 20; i++)); do
-    [[ -n $(tmux list-clients -f "#{==:#{client_name},$client}") ]] || break
-    sleep 0.05
-  done
   sess="$parent"
   target_client=$(tmux list-clients -t "=$parent" -F '#{client_name}' | head -1)
 fi
 
+# tmux refuses a popup while that client still has one open, so retry for a
+# moment while the scratchpad we just detached tears itself down.
 popup() {
+  local i
   [[ -n "$target_client" ]] || return 0
-  tmux display-popup -c "$target_client" "$@" || true
+  for ((i = 0; i < 20; i++)); do
+    tmux display-popup -c "$target_client" "$@" && return 0
+    sleep 0.05
+  done
 }
 
 case "$action" in
@@ -55,7 +57,7 @@ window)
   tmux select-window -t "=$sess:=$arg"
   ;;
 lazygit)
-  popup -e "LG_CLIENT=$target_client" -d "$arg" -w 85% -h 80% -S "fg=#282726" -E lazygit
+  popup -d "$arg" -w 85% -h 80% -S "fg=#282726" -E lazygit
   ;;
 todo)
   # q / ctrl-c (normal mode only) saves & closes, like a transient pager.

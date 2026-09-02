@@ -16,19 +16,6 @@ vim.api.nvim_create_autocmd("VimEnter", {
   end,
 })
 
-if vim.env.TMUX_PANE then
-  vim.api.nvim_create_autocmd("VimEnter", {
-    callback = function()
-      vim.system { "tmux", "set", "-p", "-t", vim.env.TMUX_PANE, "@nvim", vim.v.servername }
-    end,
-  })
-  vim.api.nvim_create_autocmd("VimLeavePre", {
-    callback = function()
-      vim.fn.system { "tmux", "set", "-pu", "-t", vim.env.TMUX_PANE, "@nvim" }
-    end,
-  })
-end
-
 -- MDX filetype detection
 vim.filetype.add {
   extension = {
