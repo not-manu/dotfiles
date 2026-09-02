@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -uo pipefail
+file=$(realpath "$1") line="${2:-}" client="${LG_CLIENT:?}"
+read -r here_sess here_win < <(tmux display -p -c "$client" '#{session_name} #{window_id}')
+
+pick=$(tmux list-panes -a -F '#{session_name} #{window_id} #{pane_id} #{@nvim}' |
+  awk -v s="$here_sess" -v w="$here_win" \
+    '$4 != "" && $1 !~ /^_scratch_/ { print ($2 == w ? 0 : $1 == s ? 1 : 2), $3, $4 }' |
+  sort -n | head -1)
+read -r _ pane sock <<<"$pick"
+
+if [[ -z ${sock:-} || ! -S $sock ]]; then
+  tmux new-window -c "$PWD" "nvim ${line:++$line} -- '$file'"
+else
+  f=${file//\'/\'\'}
+  nvim --server "$sock" --remote-expr \
+    "execute(['stopinsert', 'drop ' . fnameescape('$f')${line:+, '$line'}])" >/dev/null
+  tmux switch-client -c "$client" -t "$pane"
+fi
+tmux display-popup -C -c "$client"
