@@ -1,3 +1,10 @@
+[user]
+    name = not-manu
+    email = manu.anish@mail.utoronto.ca
+
+[include]
+    path = config.local
+
 [core]
     pager = delta
 	hooksPath = /Users/manu/.config/git/hooks
