@@ -1,4 +1,5 @@
 data.location=~/.local/share/task
+hooks.location=~/.config/task/hooks
 confirmation=off
 verbose=blank,header,footnote,label,new-id,affected,edit,special,project,sync,unwait
 weekstart=monday
