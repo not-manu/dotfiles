@@ -1,0 +1,178 @@
+#!/usr/bin/env -S uv run --script --quiet
+# /// script
+# requires-python = ">=3.11"
+# ///
+import os
+import plistlib
+import re
+import subprocess
+import sys
+import tomllib
+from datetime import datetime
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+JOBS = HERE / "jobs.toml"
+AGENTS = Path.home() / "Library/LaunchAgents"
+STATE = Path.home() / ".local/state/cron"
+PREFIX = "com.notmanu."
+DOMAIN = f"gui/{os.getuid()}"
+HOME = Path.home()
+PATH = ":".join(
+    str(p)
+    for p in [HOME / ".config/bin", HOME / ".local/bin", HOME / "go/bin", "/opt/homebrew/bin", "/usr/bin", "/bin"]
+)
+UNITS = {"s": 1, "m": 60, "h": 3600, "d": 86400}
+
+
+def die(msg):
+    print(f"cronctl: {msg}", file=sys.stderr)
+    sys.exit(1)
+
+
+def label(name):
+    return PREFIX + name
+
+
+def seconds(every):
+    parts = re.findall(r"(\d+)([smhd])", every)
+    if not parts or "".join(n + u for n, u in parts) != every:
+        die(f"bad interval {every!r} (use e.g. 30s, 5m, 1h30m, 1d)")
+    return sum(int(n) * UNITS[u] for n, u in parts)
+
+
+def calendar(at):
+    m = re.fullmatch(r"(\d{1,2}):(\d{2})", at)
+    if not m:
+        die(f"bad time {at!r} (use HH:MM)")
+    return {"Hour": int(m[1]), "Minute": int(m[2])}
+
+
+def load():
+    jobs = tomllib.loads(JOBS.read_text())
+    for name, job in jobs.items():
+        if ("every" in job) == ("at" in job):
+            die(f"{name}: need exactly one of every/at")
+        script = HERE / name
+        if not os.access(script, os.X_OK):
+            die(f"{name}: {script} is missing or not executable")
+    return jobs
+
+
+def plist_for(name, job):
+    log = STATE / f"{name}.log"
+    d = {
+        "Label": label(name),
+        "ProgramArguments": [str(HERE / name)],
+        "EnvironmentVariables": {"PATH": PATH},
+        "StandardOutPath": str(log),
+        "StandardErrorPath": str(log),
+    }
+    if "every" in job:
+        d["StartInterval"] = seconds(job["every"])
+        d["RunAtLoad"] = True
+    else:
+        d["StartCalendarInterval"] = calendar(job["at"])
+    return plistlib.dumps(d, sort_keys=True)
+
+
+def launchctl(*args, check=False):
+    return subprocess.run(["launchctl", *args], capture_output=True, text=True, check=check)
+
+
+def loaded():
+    out = launchctl("list").stdout
+    rows = {}
+    for line in out.splitlines()[1:]:
+        pid, status, lbl = line.split("\t")
+        if lbl.startswith(PREFIX):
+            rows[lbl] = (pid, status)
+    return rows
+
+
+def sync():
+    STATE.mkdir(parents=True, exist_ok=True)
+    AGENTS.mkdir(parents=True, exist_ok=True)
+    jobs = load()
+    wanted = {label(n) for n in jobs}
+    running = loaded()
+    for plist in AGENTS.glob(f"{PREFIX}*.plist"):
+        if plist.stem not in wanted:
+            launchctl("bootout", f"{DOMAIN}/{plist.stem}")
+            plist.unlink()
+            print(f"removed   {plist.stem.removeprefix(PREFIX)}")
+    for lbl in running:
+        if lbl not in wanted:
+            launchctl("bootout", f"{DOMAIN}/{lbl}")
+            print(f"removed   {lbl.removeprefix(PREFIX)}")
+    for name, job in jobs.items():
+        lbl = label(name)
+        path = AGENTS / f"{lbl}.plist"
+        data = plist_for(name, job)
+        schedule = job.get("every") or f"at {job['at']}"
+        if path.exists() and path.read_bytes() == data and lbl in running:
+            print(f"unchanged {name:<12} {schedule}")
+            continue
+        launchctl("bootout", f"{DOMAIN}/{lbl}")
+        path.write_bytes(data)
+        r = launchctl("bootstrap", DOMAIN, str(path))
+        if r.returncode:
+            die(f"{name}: bootstrap failed: {r.stderr.strip()}")
+        print(f"loaded    {name:<12} {schedule}")
+
+
+def last_log_line(name):
+    log = STATE / f"{name}.log"
+    if not log.exists():
+        return "", ""
+    lines = [l for l in log.read_text().splitlines() if l.strip()]
+    when = datetime.fromtimestamp(log.stat().st_mtime).strftime("%Y-%m-%d %H:%M")
+    return when, (lines[-1] if lines else "")
+
+
+def status():
+    jobs = load()
+    running = loaded()
+    rows = []
+    for name, job in jobs.items():
+        pid, exit_ = running.get(label(name), ("-", "-"))
+        state = "running" if pid != "-" else ("unloaded" if exit_ == "-" else f"exit {exit_}")
+        when, line = last_log_line(name)
+        rows.append((name, job.get("every") or f"at {job['at']}", state, when, job.get("what", ""), line))
+    header = ("job", "every", "state", "last log", "what", "last line")
+    widths = [max(len(str(r[i])) for r in [header, *rows]) for i in range(len(header))]
+    for r in [header, *rows]:
+        print("  ".join(str(c).ljust(w) for c, w in zip(r, widths)).rstrip())
+
+
+def run(name):
+    load()
+    r = launchctl("kickstart", "-k", f"{DOMAIN}/{label(name)}")
+    if r.returncode:
+        die(r.stderr.strip() or f"{name} is not loaded, run `cronctl sync`")
+    print(f"kicked {name}")
+
+
+def log(name, n="30"):
+    path = STATE / f"{name}.log"
+    if not path.exists():
+        die(f"no log yet: {path}")
+    os.execvp("tail", ["tail", "-n", n, str(path)])
+
+
+def main(argv):
+    cmd, *rest = argv or ["status"]
+    if cmd == "status":
+        status()
+    elif cmd == "sync":
+        sync()
+    elif cmd == "run" and len(rest) == 1:
+        run(rest[0])
+    elif cmd == "log" and rest:
+        log(*rest)
+    else:
+        print("usage: cronctl [status | sync | run <job> | log <job> [lines]]", file=sys.stderr)
+        sys.exit(2)
+
+
+main(sys.argv[1:])

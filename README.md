@@ -15,6 +15,7 @@
 - **vim** - 3 lines lol
 - **karabiner** - caps→esc, ctrl+j/k → ↓/↑
 - **task** - taskwarrior: `next` hides waiting/blocked, `waiting` + `blocked` reports, `who:` uda; data in `~/.local/share/task`
+- **cron** - scheduled jobs. `cron/jobs.toml` says what runs and how often (`every = "5m"` or `at = "07:30"`), `cron/<job>` is the script. `cronctl sync` turns it into launchd agents, `cronctl` (or `cronctl status`) shows state + last log line, `cronctl run <job>` / `cronctl log <job>`. logs in `~/.local/state/cron/`
 
 ### setup
 
