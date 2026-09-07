@@ -39,6 +39,7 @@ config_dirs=(
   btop
   git
   opencode
+  task
   vim
   yazi
   zsh

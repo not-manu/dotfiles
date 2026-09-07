@@ -14,6 +14,7 @@
 - **claude** - plugin settings
 - **vim** - 3 lines lol
 - **karabiner** - caps→esc, ctrl+j/k → ↓/↑
+- **task** - taskwarrior: `next` hides waiting/blocked, `waiting` + `blocked` reports, `who:` uda; data in `~/.local/share/task`
 
 ### setup
 
