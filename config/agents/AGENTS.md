@@ -42,6 +42,30 @@
 - Scratch/temp files go in `./.tmp/` at the project root (create it; it's
   already in the global gitignore), never in the global `/tmp`.
 
+## Tasks (taskwarrior)
+- `task` is the global task list; a per-project `TODO.md` is only for undated
+  project checklists. Anything with a date, a dependency, or a "waiting on
+  someone" goes in `task`, not in a markdown file.
+- Config: `~/.config/task/taskrc` (dotfiles). Data: `~/.local/share/task`. An
+  on-exit hook exports to `~/Documents/Projects/not-manu/taskwarrior/tasks.json`
+  and commits there on its own — never commit or push that repo yourself.
+- Always call it non-interactively: `task ... </dev/null`; `confirmation=off`
+  is set. Deleting a recurring task still prompts — pass
+  `rc.recurrence.confirmation=no`.
+- Conventions: `project:<short-name>` (recruit, janestreet, openai, …);
+  `due:` for real deadlines, with a time when one exists; `wait:<date>` to hide
+  until relevant; `depends:<id>` for "after X"; `+waiting who:<person-or-org>`
+  for anything blocked on someone else — never a `due:` on those.
+- IDs renumber whenever the pending set changes. Re-read them from the output
+  right before `task N done|modify|delete`; never reuse an id from earlier.
+- Reports: `task next` (actionable — hides waiting, blocked, and pre-`wait`),
+  `task waiting`, `task blocked`, `task calendar`, `task N` (info).
+- When we finish something together, `task N done` it. When we notice we're
+  waiting on a reply, add the `+waiting` task then. When a deadline shows up in
+  an email or doc, add it with `due:` — don't leave it in prose.
+- Recurring tasks are a parent template plus child instances; avoid them unless
+  asked (they clutter `next` and are awkward to delete).
+
 ## Reports & Deliverables
 - Don't publish Artifacts unless I explicitly ask. For reports, write-ups, and
   visual deliverables, write a local self-contained `.html` file (inline
