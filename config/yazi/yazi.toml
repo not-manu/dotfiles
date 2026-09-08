@@ -1,3 +1,13 @@
 [mgr]
 sort_by = "natural"
 sort_dir_first = true
+
+[[plugin.prepend_fetchers]]
+url = "*"
+run = "git"
+group = "git"
+
+[[plugin.prepend_fetchers]]
+url = "*/"
+run = "git"
+group = "git"
