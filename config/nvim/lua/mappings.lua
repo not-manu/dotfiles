@@ -185,12 +185,6 @@ map("n", "<leader>gH", "<cmd>DiffviewFileHistory<CR>", { desc = "Git history (wh
 map("n", "<leader>gd", "<cmd>DiffviewOpen<CR>", { desc = "Git diff (working tree)" })
 map("n", "<leader>gq", "<cmd>DiffviewClose<CR>", { desc = "Close diffview" })
 
--- Open URL under cursor in Zen browser
-map("n", "gz", function()
-  local url = vim.fn.expand "<cfile>"
-  vim.fn.system { "open", "-a", "Zen", url }
-end, { desc = "Open link in Zen browser" })
-
 -- vim-visual-multi keybindings (g prefix, Vim-style)
 vim.g.VM_maps = {
   ["Find Under"] = "gm", -- Start multi-cursor on word under cursor
