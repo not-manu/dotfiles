@@ -56,6 +56,10 @@
   `due:` for real deadlines, with a time when one exists; `wait:<date>` to hide
   until relevant; `depends:<id>` for "after X"; `+waiting who:<person-or-org>`
   for anything blocked on someone else — never a `due:` on those.
+- A task's working folder is an annotation (`task N annotate <path>`, `~`-prefixed),
+  never part of the description. Before working on a task, `task N` and use
+  the annotated path; when adding a task for a project with a folder, annotate
+  it the same way.
 - IDs renumber whenever the pending set changes. Re-read them from the output
   right before `task N done|modify|delete`; never reuse an id from earlier.
 - Reports: `task next` (actionable — hides waiting, blocked, and pre-`wait`),
