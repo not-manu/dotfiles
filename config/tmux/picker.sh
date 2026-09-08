@@ -34,6 +34,11 @@ cmd=$(awk '{for(i=1;i<=NF;i++) if($i ~ /^:/){print $i; exit}}' <<<"$result")
 case "$cmd" in
   :new)          tmux command-prompt -p "new session:" "new-session -d -s '%%' ; switch-client -t '%%'" ;;
   :rename)       tmux command-prompt -I "#S" -p "rename to:" "rename-session '%%'" ;;
+  :tag)
+    path=$(tmux display -p '#{pane_current_path}')
+    [[ -n "$path" ]] || path=$(tmux display -p '#{session_path}')
+    tmux command-prompt -I "$("$DIR/tags.sh" get "$path")" -p "tags:" "run-shell \"$DIR/tags.sh set '$path' %%\""
+    ;;
   :kill)         tmux confirm-before -p "kill session '#S'? (y/n)" kill-session ;;
   :detach)       tmux detach-client ;;
   :reload)       tmux source-file "$HOME/.config/tmux/tmux.conf" \; display "Config reloaded" ;;
