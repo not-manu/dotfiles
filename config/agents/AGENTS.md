@@ -95,3 +95,6 @@
   commented-out code. If a comment feels needed, the code is sloppy — rewrite it.
 - Sole exception: a one-line `TODO:` for work genuinely left undone.
 - Delete redundant comments in code you touch. Write one only if I ask.
+
+## Email
+- Sign emails with just my first name (Manu), never my full name.
