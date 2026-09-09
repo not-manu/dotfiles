@@ -75,6 +75,10 @@
   visual deliverables, write a local self-contained `.html` file (inline
   CSS/JS, no CDNs) next to the relevant project files and tell me the path.
 
+## Fonts
+- Sans: Geist. Serif: Source Serif 4. Mono: Berkeley Mono. Use these for
+  anything I'll look at (reports, UIs, slides); give each a sensible fallback.
+
 ## Notifications
 - When you finish a task, run `notify "<short summary>" "<details>"` (on PATH) —
   it sends a clickable macOS notification that jumps to your tmux pane. Summary
