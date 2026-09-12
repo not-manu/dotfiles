@@ -1,0 +1,16 @@
+%YAML 1.2
+---
+name: Astro
+file_extensions: [astro]
+scope: source.astro
+contexts:
+  main:
+    - match: '^\s*(---)\s*$'
+      captures:
+        1: punctuation.section.frontmatter.begin.astro
+      embed: scope:source.ts
+      embed_scope: meta.frontmatter.astro source.ts.embedded.astro
+      escape: '^\s*(---)\s*$'
+      escape_captures:
+        1: punctuation.section.frontmatter.end.astro
+    - include: scope:text.html.basic
