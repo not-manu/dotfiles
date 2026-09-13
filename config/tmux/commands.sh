@@ -5,7 +5,6 @@
 cat <<'EOF'
    :new           create new session
    :rename        rename current session
-   :tag           tag current session folder
    :kill          kill current session
    :detach        detach client
    :reload        reload tmux config
