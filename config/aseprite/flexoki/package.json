@@ -1,0 +1,21 @@
+{
+  "name": "flexoki-theme",
+  "displayName": "Flexoki Theme",
+  "description": "Flexoki light and dark recolors of the default Aseprite theme",
+  "version": "1.0",
+  "author": { "name": "not-manu" },
+  "contributors": [
+    { "name": "David Capello", "url": "https://davidcapello.com/" },
+    { "name": "Ilija Melentijevic", "url": "https://ilkke.net/" },
+    { "name": "Nicolas Desilets", "url": "https://twitter.com/MapleGecko" },
+    { "name": "Steph Ango", "url": "https://stephango.com/flexoki" }
+  ],
+  "license": "CC-BY-4.0",
+  "categories": ["Themes"],
+  "contributes": {
+    "themes": [
+      { "id": "flexoki-light", "path": "./light", "variant": "Light" },
+      { "id": "flexoki-dark", "path": "./dark", "variant": "Dark" }
+    ]
+  }
+}
