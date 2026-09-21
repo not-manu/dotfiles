@@ -32,6 +32,7 @@ return {
         "toml",
         "yaml",
         "python",
+        "latex",
         -- git + misc injections
         "gitcommit",
         "gitignore",
@@ -151,7 +152,6 @@ return {
         end, { buffer = bufnr, desc = "nvim-tree: Open in Obsidian" })
       end
       require("nvim-tree").setup(opts)
-      local api = require "nvim-tree.api"
       vim.api.nvim_create_autocmd("BufEnter", {
         pattern = "NvimTree_*",
         callback = function()
@@ -163,13 +163,6 @@ return {
               end
             end,
           })
-        end,
-      })
-      vim.api.nvim_create_autocmd({ "FocusGained", "TermLeave" }, {
-        callback = function()
-          if package.loaded["nvim-tree"] then
-            pcall(api.tree.reload)
-          end
         end,
       })
     end,
@@ -326,43 +319,6 @@ return {
     end,
   },
 
-  -- Treesitter with auto-install for web languages
-  {
-    "nvim-treesitter/nvim-treesitter",
-    opts = {
-      ensure_installed = {
-        -- Neovim
-        "vim",
-        "lua",
-        "vimdoc",
-        -- Web Development
-        "html",
-        "css",
-        "javascript",
-        "typescript",
-        "tsx",
-        "astro",
-        "json",
-        "markdown",
-        "markdown_inline",
-        -- Python
-        "python",
-        -- Rust
-        "rust",
-        "toml",
-        -- Go
-        "go",
-        "gomod",
-        "gosum",
-        -- LaTeX
-        "latex",
-        -- Additional useful parsers
-        "bash",
-        "gitignore",
-      },
-    },
-  },
-
   -- Multiple cursors (like VSCode Cmd+D / Cmd+Shift+L)
   {
     "mg979/vim-visual-multi",
@@ -514,7 +470,6 @@ return {
   -- Snippet engine for LaTeX snippets
   {
     "L3MON4D3/LuaSnip",
-    lazy = false,
     dependencies = { "rafamadriz/friendly-snippets" },
     config = function()
       local luasnip = require "luasnip"
