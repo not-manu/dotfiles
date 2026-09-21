@@ -98,6 +98,7 @@ return {
     opts = {
       view = {
         adaptive_size = true,
+        centralize_selection = true,
       },
       auto_reload_on_write = true,
       filesystem_watchers = {
