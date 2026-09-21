@@ -44,6 +44,14 @@ vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHo
   end,
 })
 
+vim.api.nvim_create_autocmd("FileType", {
+  callback = function(args)
+    if vim.b[args.buf].bigfile_detected == 1 then
+      pcall(vim.treesitter.stop, args.buf)
+    end
+  end,
+})
+
 vim.api.nvim_create_autocmd("FileChangedShellPost", {
   callback = function()
     vim.notify("File changed on disk — buffer reloaded", vim.log.levels.INFO)

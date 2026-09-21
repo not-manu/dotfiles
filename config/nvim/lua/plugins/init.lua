@@ -165,7 +165,7 @@ return {
           })
         end,
       })
-      vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "TermLeave" }, {
+      vim.api.nvim_create_autocmd({ "FocusGained", "TermLeave" }, {
         callback = function()
           if package.loaded["nvim-tree"] then
             pcall(api.tree.reload)
@@ -464,6 +464,20 @@ return {
     lazy = false,
     opts = {
       filesize = 0.5, -- 500KB in MiB
+      pattern = function(bufnr)
+        local file = io.open(vim.api.nvim_buf_get_name(bufnr), "rb")
+        if not file then
+          return false
+        end
+        local head = file:read(262144) or ""
+        file:close()
+        for text in head:gmatch "[^\n]+" do
+          if #text > 100000 then
+            return true
+          end
+        end
+        return false
+      end,
       features = {
         "indent_blankline",
         "illuminate",
