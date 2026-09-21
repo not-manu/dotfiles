@@ -98,7 +98,6 @@ return {
     opts = {
       view = {
         adaptive_size = true,
-        centralize_selection = true,
       },
       auto_reload_on_write = true,
       filesystem_watchers = {
@@ -153,6 +152,19 @@ return {
       end
       require("nvim-tree").setup(opts)
       local api = require "nvim-tree.api"
+      vim.api.nvim_create_autocmd("BufEnter", {
+        pattern = "NvimTree_*",
+        callback = function()
+          vim.api.nvim_create_autocmd("SafeState", {
+            once = true,
+            callback = function()
+              if vim.bo.filetype == "NvimTree" then
+                vim.cmd "normal! zz"
+              end
+            end,
+          })
+        end,
+      })
       vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "TermLeave" }, {
         callback = function()
           if package.loaded["nvim-tree"] then
