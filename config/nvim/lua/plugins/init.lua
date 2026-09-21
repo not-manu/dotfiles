@@ -114,7 +114,7 @@ return {
         vim.keymap.set("n", "s", function()
           local node = api.tree.get_node_under_cursor()
           if node and node.absolute_path and node.absolute_path:match "%.excalidraw$" then
-            vim.fn.jobstart({ "code", node.absolute_path }, { detach = true })
+            require("detached").start { "code", node.absolute_path }
           else
             api.node.run.system()
           end
@@ -128,7 +128,7 @@ return {
           local ext = node.absolute_path:match "%.([%w]+)$"
           local supported = { png = true, jpg = true, jpeg = true, gif = true, bmp = true, aseprite = true, ase = true }
           if ext and supported[ext:lower()] then
-            vim.fn.jobstart({ "open", "-a", "Aseprite", node.absolute_path }, { detach = true })
+            require("detached").start { "open", "-a", "Aseprite", node.absolute_path }
           else
             vim.notify("Not an Aseprite-openable file", vim.log.levels.WARN)
           end
@@ -136,7 +136,7 @@ return {
         vim.keymap.set("n", "gs", function()
           local node = api.tree.get_node_under_cursor()
           if node and node.absolute_path and node.absolute_path:lower():match "%.pdf$" then
-            vim.fn.jobstart({ vim.fn.expand "~/.config/bin/pdfpreview", node.absolute_path }, { detach = true })
+            require("detached").start { vim.fn.expand "~/.config/bin/pdfpreview", node.absolute_path }
           else
             vim.notify("Not a PDF", vim.log.levels.WARN)
           end
@@ -145,7 +145,7 @@ return {
           local node = api.tree.get_node_under_cursor()
           if node and node.absolute_path and node.absolute_path:lower():match "%.md$" then
             local uri = "obsidian://open?path=" .. vim.uri_encode(node.absolute_path, "rfc2396")
-            vim.fn.jobstart({ "open", uri }, { detach = true })
+            require("detached").start { "open", uri }
           else
             vim.notify("Not a markdown file", vim.log.levels.WARN)
           end

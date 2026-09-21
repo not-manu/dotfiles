@@ -50,6 +50,17 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+vim.api.nvim_create_autocmd("VimLeave", {
+  callback = function()
+    local keep = require("detached").pids
+    for _, pid in ipairs(vim.api.nvim_get_proc_children(vim.fn.getpid())) do
+      if not keep[pid] then
+        vim.uv.kill(pid, "sigkill")
+      end
+    end
+  end,
+})
+
 vim.api.nvim_create_autocmd("FileChangedShellPost", {
   callback = function()
     vim.notify("File changed on disk — buffer reloaded", vim.log.levels.INFO)
