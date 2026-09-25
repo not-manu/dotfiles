@@ -362,6 +362,11 @@ return {
     opts = function(_, conf)
       local actions = require "telescope.actions"
       conf.defaults = conf.defaults or {}
+      conf.defaults.path_display = { "truncate", filename_first = { reverse_directories = true } }
+      conf.defaults.layout_config = vim.tbl_deep_extend("force", conf.defaults.layout_config or {}, {
+        width = 0.95,
+        horizontal = { preview_width = 0.45 },
+      })
       conf.defaults.mappings = vim.tbl_deep_extend("force", conf.defaults.mappings or {}, {
         i = {
           ["<C-j>"] = actions.move_selection_next,
