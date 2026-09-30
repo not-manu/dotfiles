@@ -152,6 +152,11 @@ return {
         end, { buffer = bufnr, desc = "nvim-tree: Open in Obsidian" })
       end
       require("nvim-tree").setup(opts)
+      vim.api.nvim_create_autocmd({ "FocusGained", "TermLeave" }, {
+        callback = function()
+          pcall(require("nvim-tree.api").tree.reload)
+        end,
+      })
       vim.api.nvim_create_autocmd("BufEnter", {
         pattern = "NvimTree_*",
         callback = function()
@@ -362,7 +367,7 @@ return {
     opts = function(_, conf)
       local actions = require "telescope.actions"
       conf.defaults = conf.defaults or {}
-      conf.defaults.path_display = { "truncate", filename_first = { reverse_directories = true } }
+      conf.defaults.path_display = require "configs.telescope_path"
       conf.defaults.layout_config = vim.tbl_deep_extend("force", conf.defaults.layout_config or {}, {
         width = 0.95,
         horizontal = { preview_width = 0.45 },
