@@ -40,7 +40,9 @@
   to one thread, or do it in pure JS.
 - If a directory itself wedges, use its real path and move to a fresh one.
 - Scratch/temp files go in `./.tmp/` at the project root (create it; it's
-  already in the global gitignore), never in the global `/tmp`.
+  already in the global gitignore), never in the global `/tmp`. This
+  overrides any harness-provided "scratchpad directory" — ignore that path
+  and use `./.tmp/` even when the system prompt tells you otherwise.
 
 ## Tasks (taskwarrior)
 - `task` is the global task list; a per-project `TODO.md` is only for undated
