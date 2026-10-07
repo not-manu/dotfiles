@@ -13,3 +13,7 @@ wf:subscribe(hs.window.filter.windowDestroyed, function(_, appName)
     end
   end)
 end)
+
+hs.hotkey.bind({ "alt", "shift" }, "G", function()
+  hs.application.launchOrFocus("Ghostty")
+end)
