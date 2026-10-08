@@ -110,13 +110,10 @@ return {
       opts.on_attach = function(bufnr)
         local api = require "nvim-tree.api"
         api.config.mappings.default_on_attach(bufnr)
-        -- open .excalidraw files in VS Code, everything else via system open
         vim.keymap.set("n", "s", function()
           local node = api.tree.get_node_under_cursor()
-          if node and node.absolute_path and node.absolute_path:match "%.excalidraw$" then
-            require("detached").start { "code", node.absolute_path }
-          else
-            api.node.run.system()
+          if node and node.absolute_path then
+            require("binary").open(node.absolute_path)
           end
         end, { buffer = bufnr, desc = "nvim-tree: Open (excalidraw → VS Code)" })
         -- open images (and .aseprite) in Aseprite; `a` is taken by create-file
@@ -368,6 +365,9 @@ return {
       local actions = require "telescope.actions"
       conf.defaults = conf.defaults or {}
       conf.defaults.path_display = require "configs.telescope_path"
+      conf.defaults.preview = vim.tbl_extend("force", conf.defaults.preview or {}, {
+        filetype_hook = require("binary").telescope_hook,
+      })
       conf.defaults.layout_config = vim.tbl_deep_extend("force", conf.defaults.layout_config or {}, {
         width = 0.95,
         horizontal = { preview_width = 0.45 },

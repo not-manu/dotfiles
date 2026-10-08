@@ -1,4 +1,5 @@
 require "nvchad.autocmds"
+require("binary").setup()
 
 -- Per-project shada (search history, marks, etc.)
 vim.api.nvim_create_autocmd("VimEnter", {

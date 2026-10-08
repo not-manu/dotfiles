@@ -33,11 +33,13 @@ gui:
       - "#D14D41" # red
     defaultFgColor:
       - "#CECDC3" # base-200
-  authorColors:
-    "*": "#8B7EC8" # purple
-  branchColors:
-    main: "#D14D41" # red
-    master: "#D14D41"
+    authorColors:
+      "*": "#8B7EC8" # purple
+    branchColorPatterns:
+      ^main(/|$): "#D14D41" # red
+      ^master(/|$): "#D14D41"
+services:
+  github_not-manu: github:github.com
 customCommands:
   - key: "P"
     context: "global"
