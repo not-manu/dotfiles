@@ -44,33 +44,22 @@
   overrides any harness-provided "scratchpad directory" — ignore that path
   and use `./.tmp/` even when the system prompt tells you otherwise.
 
-## Tasks (taskwarrior)
-- `task` is the global task list; a per-project `TODO.md` is only for undated
-  project checklists. Anything with a date, a dependency, or a "waiting on
-  someone" goes in `task`, not in a markdown file.
-- Config: `~/.config/task/taskrc` (dotfiles). Data: `~/.local/share/task`. An
-  on-exit hook exports to `~/Documents/Projects/not-manu/taskwarrior/tasks.json`
-  and commits there on its own — never commit or push that repo yourself.
-- Always call it non-interactively: `task ... </dev/null`; `confirmation=off`
-  is set. Deleting a recurring task still prompts — pass
-  `rc.recurrence.confirmation=no`.
-- Conventions: `project:<short-name>` (recruit, janestreet, openai, …);
-  `due:` for real deadlines, with a time when one exists; `wait:<date>` to hide
-  until relevant; `depends:<id>` for "after X"; `+waiting who:<person-or-org>`
-  for anything blocked on someone else — never a `due:` on those.
-- A task's working folder is an annotation (`task N annotate <path>`, `~`-prefixed),
-  never part of the description. Before working on a task, `task N` and use
-  the annotated path; when adding a task for a project with a folder, annotate
-  it the same way.
-- IDs renumber whenever the pending set changes. Re-read them from the output
-  right before `task N done|modify|delete`; never reuse an id from earlier.
-- Reports: `task next` (actionable — hides waiting, blocked, and pre-`wait`),
-  `task waiting`, `task blocked`, `task calendar`, `task N` (info).
-- When we finish something together, `task N done` it. When we notice we're
-  waiting on a reply, add the `+waiting` task then. When a deadline shows up in
-  an email or doc, add it with `due:` — don't leave it in prose.
-- Recurring tasks are a parent template plus child instances; avoid them unless
-  asked (they clutter `next` and are awkward to delete).
+## Tasks & Reminders (Google Tasks)
+- Reminders, to-dos, and deadlines go in Google Tasks — the checkbox items
+  that show up on Google Calendar (circle when open, strikethrough when done).
+  They are NOT calendar events. Never create an event for a to-do; events are
+  only for things with a start/end time I attend (classes, calls, meetings).
+- The Google Calendar MCP tools only handle events. Use the `gws` CLI for
+  tasks: `gws tasks tasklists list`, then
+  `gws tasks tasks list|insert|patch|delete --params '{"tasklist":"<id>"}'`
+  with a `--json` body (`title`, `notes`, `due`, `status`).
+- Lists: `University` for coursework, `My Tasks` for everything else. Look up
+  ids with `tasklists list`; don't hardcode them.
+- `due` is RFC 3339 but Google Tasks keeps only the date — put a specific time
+  in the title (e.g. "(5pm)").
+- When we finish something together, mark it done (`status: "completed"`).
+  When a deadline shows up in an email or doc, add a task — don't leave it in
+  prose. A per-project `TODO.md` is only for undated project checklists.
 
 ## Reports & Deliverables
 - Don't publish Artifacts unless I explicitly ask. For reports, write-ups, and
