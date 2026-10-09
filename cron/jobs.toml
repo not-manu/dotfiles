@@ -1,3 +1,0 @@
-[tasksync]
-every = "5m"
-what = "commit tasks.json if changed, push with gbp"
