@@ -424,6 +424,45 @@ return {
     opts = {},
   },
 
+  {
+    "monaqa/dial.nvim",
+    keys = function()
+      local function dial(lhs, direction, mode)
+        return {
+          lhs,
+          function()
+            require("dial.map").manipulate(direction, mode)
+          end,
+          mode = mode:match "visual" and "x" or "n",
+          desc = "Dial " .. direction,
+        }
+      end
+      return {
+        dial("<C-a>", "increment", "normal"),
+        dial("<C-x>", "decrement", "normal"),
+        dial("g<C-a>", "increment", "gnormal"),
+        dial("g<C-x>", "decrement", "gnormal"),
+        dial("<C-a>", "increment", "visual"),
+        dial("<C-x>", "decrement", "visual"),
+        dial("g<C-a>", "increment", "gvisual"),
+        dial("g<C-x>", "decrement", "gvisual"),
+      }
+    end,
+    config = function()
+      local augend = require "dial.augend"
+      require("dial.config").augends:register_group {
+        default = {
+          augend.integer.alias.decimal_int,
+          augend.integer.alias.hex,
+          augend.constant.alias.bool,
+          augend.constant.new { elements = { "True", "False" } },
+          augend.date.alias["%Y-%m-%d"],
+          augend.semver.alias.semver,
+        },
+      }
+    end,
+  },
+
   -- Big file performance optimization
   {
     "LunarVim/bigfile.nvim",

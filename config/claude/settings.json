@@ -2,7 +2,7 @@
   "permissions": {
     "defaultMode": "auto"
   },
-  "model": "opus",
+  "model": "fable",
   "disableRemoteControl": true,
   "enabledPlugins": {
     "pyright-lsp@claude-plugins-official": false
