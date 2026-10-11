@@ -25,6 +25,7 @@
   },
   "tui": "fullscreen",
   "autoMemoryEnabled": false,
+  "idleCompaction": false,
   "skipDangerousModePermissionPrompt": true,
   "theme": "custom:flexoki",
   "editorMode": "vim",
