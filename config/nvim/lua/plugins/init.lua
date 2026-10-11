@@ -100,6 +100,9 @@ return {
       view = {
         adaptive_size = true,
       },
+      filters = {
+        enable = false,
+      },
       auto_reload_on_write = true,
       filesystem_watchers = {
         enable = true,
