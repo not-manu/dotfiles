@@ -100,9 +100,6 @@ return {
       view = {
         adaptive_size = true,
       },
-      filters = {
-        enable = false,
-      },
       auto_reload_on_write = true,
       filesystem_watchers = {
         enable = true,
@@ -113,6 +110,7 @@ return {
       opts.on_attach = function(bufnr)
         local api = require "nvim-tree.api"
         api.config.mappings.default_on_attach(bufnr)
+        vim.keymap.del("n", "f", { buffer = bufnr })
         vim.keymap.set("n", "s", function()
           local node = api.tree.get_node_under_cursor()
           if node and node.absolute_path then
