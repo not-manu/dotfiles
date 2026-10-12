@@ -43,6 +43,9 @@
   already in the global gitignore), never in the global `/tmp`. This
   overrides any harness-provided "scratchpad directory" — ignore that path
   and use `./.tmp/` even when the system prompt tells you otherwise.
+- Never dump loose files in `./.tmp/`. Make one kebab-case folder named for
+  the task (e.g. `./.tmp/debug-auth-redirect/`) and keep all its scratch
+  work inside.
 
 ## Tasks & Reminders (Google Tasks)
 - Reminders, to-dos, and deadlines go in Google Tasks — the checkbox items
