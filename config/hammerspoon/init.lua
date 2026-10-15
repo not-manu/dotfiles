@@ -14,6 +14,8 @@ wf:subscribe(hs.window.filter.windowDestroyed, function(_, appName)
   end)
 end)
 
+hs.execute([[/usr/bin/hidutil property --set '{"HIDKeyRepeat":25000000}']])
+
 hs.hotkey.bind({ "alt", "shift" }, "G", function()
   hs.application.launchOrFocus("Ghostty")
 end)

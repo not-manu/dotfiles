@@ -14,6 +14,7 @@
 - **claude** - plugin settings
 - **vim** - 3 lines lol
 - **karabiner** - caps→esc, ctrl+j/k → ↓/↑
+- **macos** - `defaults write` tweaks (fast key repeat, shorter delay; hammerspoon fine-tunes repeat to 25ms via `hidutil`), applied by `install.sh` or run `config/macos/defaults.sh`
 - **task** - taskwarrior: `next` hides waiting/blocked, `waiting` + `blocked` reports, `who:` uda; data in `~/.local/share/task`
 - **cron** - scheduled jobs. `cron/jobs.toml` says what runs and how often (`every = "5m"` or `at = "07:30"`), `cron/<job>` is the script. `cronctl sync` turns it into launchd agents, `cronctl` (or `cronctl status`) shows state + last log line, `cronctl run <job>` / `cronctl log <job>`. logs in `~/.local/state/cron/`
 
