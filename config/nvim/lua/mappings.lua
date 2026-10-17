@@ -178,13 +178,6 @@ map("n", "<leader>qd", function() require("persistence").stop() end, { desc = "D
 -- Lazygit
 map("n", "<leader>lg", "<cmd>LazyGit<CR>", { desc = "LazyGit" })
 
--- Diffview / git history
-map("n", "<leader>gh", "<cmd>DiffviewFileHistory %<CR>", { desc = "Git history (current file)" })
-map("v", "<leader>gh", ":DiffviewFileHistory<CR>", { desc = "Git history (selected range)" })
-map("n", "<leader>gH", "<cmd>DiffviewFileHistory<CR>", { desc = "Git history (whole repo)" })
-map("n", "<leader>gd", "<cmd>DiffviewOpen<CR>", { desc = "Git diff (working tree)" })
-map("n", "<leader>gq", "<cmd>DiffviewClose<CR>", { desc = "Close diffview" })
-
 -- vim-visual-multi keybindings (g prefix, Vim-style)
 vim.g.VM_maps = {
   ["Find Under"] = "gm", -- Start multi-cursor on word under cursor
