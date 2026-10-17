@@ -3,9 +3,11 @@
   "what does this do?"). Answer it. Don't change code until I ask for a change.
 - Python: `uv`, and always `uvx`. JS: `bun` (or `pnpm` if the project uses it),
   never `npm`. Search: `rg`, not `grep`.
-- IMPORTANT: Never hand-edit dependency manifests (`package.json`,
-  `pyproject.toml`, `Cargo.toml`, `go.mod`, `Gemfile`). Use the package manager
-  (`bun add`, `uv add`, `cargo add`, `go get`) so lockfiles stay consistent.
+- IMPORTANT: Never hand-edit dependencies — adding, removing, or changing a
+  version in `package.json`, `pyproject.toml`, `Cargo.toml`, `go.mod`, or
+  `Gemfile`. Use the package manager (`bun add`, `uv add`, `cargo add`,
+  `go get`) and let it write the manifest and lockfile. Other fields
+  (`scripts`, config) are fine to edit by hand.
 
 ## Where My Stuff Lives
 - Dotfiles: `~/.dotfiles`. `~/.claude/CLAUDE.md` symlinks to
