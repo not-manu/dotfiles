@@ -15,5 +15,8 @@
   "tabs": {
     "layout": "vertical",
     "enabled": false
-  }
+  },
+  "plugins": [
+    "opencode-vim@latest"
+  ]
 }
