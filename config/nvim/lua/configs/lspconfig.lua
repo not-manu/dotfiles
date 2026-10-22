@@ -37,16 +37,14 @@ vim.lsp.config("jsonls", {
   },
 })
 
--- Astro LSP configuration
 vim.lsp.config("astro", {
-  cmd = { "astro-ls", "--stdio" },
-  filetypes = { "astro" },
-  init_options = {
-    typescript = {
-      tsdk = "/Users/manu/.bun/install/global/node_modules/typescript/lib",
-    },
-  },
-  root_markers = { "package.json", "tsconfig.json", "jsconfig.json", ".git" },
+  before_init = function(_, config)
+    local tsdk = require("lspconfig.util").get_typescript_server_path(config.root_dir)
+    if tsdk == "" then
+      tsdk = vim.fn.expand "~/.bun/install/global/node_modules/typescript/lib"
+    end
+    config.init_options.typescript.tsdk = tsdk
+  end,
 })
 
 -- LaTeX LSP configuration
