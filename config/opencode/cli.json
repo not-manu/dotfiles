@@ -18,5 +18,8 @@
   },
   "plugins": [
     "opencode-vim@latest"
-  ]
+  ],
+  "prompt": {
+    "image_preview": true
+  }
 }
