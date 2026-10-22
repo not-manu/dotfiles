@@ -72,9 +72,89 @@
                                 ]
                             }
                         ]
+                    },
+                    {
+                        "description": "Mouse side buttons send F13/F16 in Minecraft",
+                        "manipulators": [
+                            {
+                                "type": "basic",
+                                "from": { "pointing_button": "button4", "modifiers": { "optional": ["any"] } },
+                                "to": [{ "key_code": "f13" }],
+                                "conditions": [{ "type": "frontmost_application_if", "file_paths": ["/bin/java$"] }]
+                            },
+                            {
+                                "type": "basic",
+                                "from": { "pointing_button": "button5", "modifiers": { "optional": ["any"] } },
+                                "to": [{ "key_code": "f16" }],
+                                "conditions": [{ "type": "frontmost_application_if", "file_paths": ["/bin/java$"] }]
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Cmd+Ctrl+Q quits Minecraft",
+                        "manipulators": [
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "q",
+                                    "modifiers": { "mandatory": ["command", "control"] }
+                                },
+                                "to": [{ "key_code": "q", "modifiers": ["left_command", "left_option", "left_control"] }],
+                                "conditions": [
+                                    {
+                                        "type": "frontmost_application_if",
+                                        "file_paths": ["/bin/java$"]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Fn+F1-F12 send standard F-keys outside Minecraft",
+                        "manipulators": [
+                            { "type": "basic", "from": { "key_code": "f1", "modifiers": { "mandatory": ["fn"], "optional": ["any"] } }, "to": [{ "key_code": "f1" }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] },
+                            { "type": "basic", "from": { "key_code": "f2", "modifiers": { "mandatory": ["fn"], "optional": ["any"] } }, "to": [{ "key_code": "f2" }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] },
+                            { "type": "basic", "from": { "key_code": "f3", "modifiers": { "mandatory": ["fn"], "optional": ["any"] } }, "to": [{ "key_code": "f3" }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] },
+                            { "type": "basic", "from": { "key_code": "f4", "modifiers": { "mandatory": ["fn"], "optional": ["any"] } }, "to": [{ "key_code": "f4" }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] },
+                            { "type": "basic", "from": { "key_code": "f5", "modifiers": { "mandatory": ["fn"], "optional": ["any"] } }, "to": [{ "key_code": "f5" }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] },
+                            { "type": "basic", "from": { "key_code": "f6", "modifiers": { "mandatory": ["fn"], "optional": ["any"] } }, "to": [{ "key_code": "f6" }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] },
+                            { "type": "basic", "from": { "key_code": "f7", "modifiers": { "mandatory": ["fn"], "optional": ["any"] } }, "to": [{ "key_code": "f7" }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] },
+                            { "type": "basic", "from": { "key_code": "f8", "modifiers": { "mandatory": ["fn"], "optional": ["any"] } }, "to": [{ "key_code": "f8" }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] },
+                            { "type": "basic", "from": { "key_code": "f9", "modifiers": { "mandatory": ["fn"], "optional": ["any"] } }, "to": [{ "key_code": "f9" }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] },
+                            { "type": "basic", "from": { "key_code": "f10", "modifiers": { "mandatory": ["fn"], "optional": ["any"] } }, "to": [{ "key_code": "f10" }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] },
+                            { "type": "basic", "from": { "key_code": "f11", "modifiers": { "mandatory": ["fn"], "optional": ["any"] } }, "to": [{ "key_code": "f11" }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] },
+                            { "type": "basic", "from": { "key_code": "f12", "modifiers": { "mandatory": ["fn"], "optional": ["any"] } }, "to": [{ "key_code": "f12" }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] }
+                        ]
+                    },
+                    {
+                        "description": "F1-F12 act as media keys outside Minecraft",
+                        "manipulators": [
+                            { "type": "basic", "from": { "key_code": "f1", "modifiers": { "optional": ["any"] } }, "to": [{ "key_code": "f1", "modifiers": ["fn"] }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] },
+                            { "type": "basic", "from": { "key_code": "f2", "modifiers": { "optional": ["any"] } }, "to": [{ "key_code": "f2", "modifiers": ["fn"] }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] },
+                            { "type": "basic", "from": { "key_code": "f3", "modifiers": { "optional": ["any"] } }, "to": [{ "key_code": "f3", "modifiers": ["fn"] }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] },
+                            { "type": "basic", "from": { "key_code": "f4", "modifiers": { "optional": ["any"] } }, "to": [{ "key_code": "f4", "modifiers": ["fn"] }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] },
+                            { "type": "basic", "from": { "key_code": "f5", "modifiers": { "optional": ["any"] } }, "to": [{ "key_code": "f5", "modifiers": ["fn"] }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] },
+                            { "type": "basic", "from": { "key_code": "f6", "modifiers": { "optional": ["any"] } }, "to": [{ "key_code": "f6", "modifiers": ["fn"] }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] },
+                            { "type": "basic", "from": { "key_code": "f7", "modifiers": { "optional": ["any"] } }, "to": [{ "key_code": "f7", "modifiers": ["fn"] }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] },
+                            { "type": "basic", "from": { "key_code": "f8", "modifiers": { "optional": ["any"] } }, "to": [{ "key_code": "f8", "modifiers": ["fn"] }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] },
+                            { "type": "basic", "from": { "key_code": "f9", "modifiers": { "optional": ["any"] } }, "to": [{ "key_code": "f9", "modifiers": ["fn"] }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] },
+                            { "type": "basic", "from": { "key_code": "f10", "modifiers": { "optional": ["any"] } }, "to": [{ "key_code": "f10", "modifiers": ["fn"] }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] },
+                            { "type": "basic", "from": { "key_code": "f11", "modifiers": { "optional": ["any"] } }, "to": [{ "key_code": "f11", "modifiers": ["fn"] }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] },
+                            { "type": "basic", "from": { "key_code": "f12", "modifiers": { "optional": ["any"] } }, "to": [{ "key_code": "f12", "modifiers": ["fn"] }], "conditions": [{ "type": "frontmost_application_unless", "file_paths": ["/bin/java$"], "bundle_identifiers": ["^com\\.slackow\\.SlackowWall$"] }] }
+                        ]
                     }
                 ]
             },
+            "devices": [
+                {
+                    "identifiers": {
+                        "is_pointing_device": true,
+                        "product_id": 163,
+                        "vendor_id": 5426
+                    },
+                    "ignore": false
+                }
+            ],
             "virtual_hid_keyboard": {
                 "keyboard_type_v2": "ansi"
             }
