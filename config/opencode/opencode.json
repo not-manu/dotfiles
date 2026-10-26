@@ -5,7 +5,7 @@
     "neo": {
       "description": "Neo — same base system prompt and permissions as Build, plus neo-prompt.md",
       "mode": "primary",
-      "system": "{file:./prompts/neo-base.md}\n\n{file:./prompts/neo-prompt.md}",
+      "system": "{file:~/.dotfiles/config/agents/prompts/opencode-system.md}\n\n{file:~/.dotfiles/config/agents/prompts/neo-prompt.md}",
       "permissions": [
         { "action": "question", "resource": "*", "effect": "allow" },
       ],

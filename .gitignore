@@ -18,6 +18,7 @@ config/opencode/node_modules/
 config/opencode/bun.lock
 config/opencode/package.json
 config/opencode/.gitignore
+config/agents/prompts/
 config/nvim/lazy-lock.json
 
 # Editor state and caches
