@@ -86,6 +86,10 @@
 - Never stage, commit, or push unless I explicitly ask. I stage and review my
   own changes — read-only git (`status`, `diff`, `log`) is fine, anything that
   touches the index or history is not.
+- Work on the default branch (`main`). Don't create, switch to, or commit on
+  other branches unless I ask or it clearly makes sense (e.g. a PR in
+  `Forks/`). If HEAD is on another branch when I ask you to commit, tell me
+  before committing.
 
 ## Code Principles
 - Prefer the simplest thing that works. Keep it DRY.
