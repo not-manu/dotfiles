@@ -33,5 +33,9 @@
   "autoUploadSessions": false,
   "skipAutoPermissionPrompt": true,
   "voiceEnabled": false,
-  "model": "opus"
+  "model": "opus",
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  }
 }
