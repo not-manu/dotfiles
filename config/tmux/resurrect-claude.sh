@@ -19,31 +19,59 @@ is_claude_cmd() {
   [[ "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
 }
 
+session_for_pane() {
+  local file json re='"sessionId":"([^"]+)"'
+  for file in "$HOME"/.claude/sessions/*.json; do
+    [[ -e "$file" ]] || continue
+    json=$(<"$file")
+    [[ "$json" == *"\"tmux\":\""*".$1\""* ]] || continue
+    kill -0 "$(basename "$file" .json)" 2>/dev/null || continue
+    [[ "$json" =~ $re ]] && echo "${BASH_REMATCH[1]}" && return 0
+  done
+  return 1
+}
+
 save() {
   : > "$SIDECAR"
-  while IFS=$'\t' read -r target cmd cwd; do
+  local napped=" " pane command target cwd cmd session
+  if command -v nap >/dev/null; then
+    while IFS=$'\t' read -r pane command; do
+      IFS=$'\t' read -r target cwd < <(tmux display -p -t "$pane" '#{session_name}:#{window_index}.#{pane_index}	#{pane_current_path}') || continue
+      printf '%s\t%s\t%s\n' "$target" "$cwd" "$command" >> "$SIDECAR"
+      napped+="$pane "
+    done < <(nap _relaunch)
+  fi
+  while IFS=$'\t' read -r pane target cmd cwd; do
+    [[ "$napped" == *" $pane "* ]] && continue
     if is_claude_cmd "$cmd"; then
-      printf '%s\t%s\n' "$target" "$cwd" >> "$SIDECAR"
+      if session=$(session_for_pane "$pane"); then
+        command="claude --resume $session"
+      else
+        command="claude --continue"
+      fi
+      printf '%s\t%s\t%s\n' "$target" "$cwd" "$command" >> "$SIDECAR"
     fi
-  done < <(tmux list-panes -a -F '#{session_name}:#{window_index}.#{pane_index}	#{pane_current_command}	#{pane_current_path}')
+  done < <(tmux list-panes -a -F '#{pane_id}	#{session_name}:#{window_index}.#{pane_index}	#{pane_current_command}	#{pane_current_path}')
 }
 
 restore() {
   [[ -f "$SIDECAR" ]] || exit 0
   # Give resurrect a moment to finish spawning shells before we send keys.
   sleep 1
-  while IFS=$'\t' read -r target cwd; do
+  while IFS=$'\t' read -r target cwd command; do
     [[ -z "$target" ]] && continue
     # Only act if the pane exists and is currently a shell (not already
     # running something). If the cwd differs, cd first so claude picks the
     # right per-project session.
-    if tmux list-panes -t "$target" >/dev/null 2>&1; then
-      current_cwd=$(tmux display -p -t "$target" '#{pane_current_path}' 2>/dev/null || echo "")
-      if [[ "$current_cwd" != "$cwd" ]]; then
-        tmux send-keys -t "$target" "cd ${cwd@Q}" Enter
-      fi
-      tmux send-keys -t "$target" "claude --continue" Enter
+    tmux list-panes -t "$target" >/dev/null 2>&1 || continue
+    current=$(tmux display -p -t "$target" '#{pane_current_command}' 2>/dev/null || echo "")
+    [[ "$current" =~ ^-?(zsh|bash|sh)$ ]] || continue
+    current_cwd=$(tmux display -p -t "$target" '#{pane_current_path}' 2>/dev/null || echo "")
+    if [[ "$current_cwd" != "$cwd" ]]; then
+      tmux send-keys -t "$target" "cd $(printf %q "$cwd")" Enter
     fi
+    tmux send-keys -t "$target" -l "${command:-claude --continue}"
+    tmux send-keys -t "$target" Enter
   done < "$SIDECAR"
 }
 

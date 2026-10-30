@@ -181,6 +181,8 @@ alias 'lg'='lazygit'
 alias 'lgup'='go -C ~/Documents/Projects/not-manu/Forks/lazygit install'
 
 # neovim
+(( $+commands[nap] )) || nap() { command "$@" }
+nvim() { nap nvim "$@" }
 alias 'n'='nvim'
 
 # nvim-lean — minimal scratch config (isolated config/data/state/cache)
@@ -236,7 +238,7 @@ CLAUDE_MODEL="claude-opus-5-5[1m]"
 # claude code
 claude() {
   mkdir -p "$PWD/.tmp"
-  CLAUDE_CODE_TMPDIR="$PWD/.tmp" command claude "$@"
+  CLAUDE_CODE_TMPDIR="$PWD/.tmp" nap claude "$@"
 }
 alias 'cc'='IS_DEMO=1 claude --chrome --model "$CLAUDE_MODEL" --system-prompt "$CLAUDE_SYSTEM_PROMPT"'
 alias 'ccd'='IS_DEMO=1 claude --chrome --model "$CLAUDE_MODEL" --dangerously-skip-permissions --system-prompt "$CLAUDE_SYSTEM_PROMPT"'
