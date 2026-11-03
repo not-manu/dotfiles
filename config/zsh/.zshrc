@@ -197,6 +197,8 @@ alias 'python'='python3'
 # yazi
 alias 'y'='yazi'
 
+alias 'pdf'='tpdf'
+
 # mini tmux — nested tmux (own server/socket) for swapping agent instances in a pane
 alias 'mini'='~/.config/tmux/mini.sh'
 
