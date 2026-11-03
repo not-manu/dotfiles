@@ -1,0 +1,208 @@
+#!/usr/bin/env -S uv run --quiet --script
+# /// script
+# requires-python = ">=3.12"
+# ///
+import ipaddress
+import json
+import re
+import socket
+import struct
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+PRESETS = {
+    "general": {"warp": "doh", "airdrop": True, "clear_exit_node": False},
+    "gaming": {"warp": "doh", "airdrop": False, "clear_exit_node": True},
+    "unblock": {"warp": "warp+doh", "airdrop": True, "clear_exit_node": False},
+}
+WARP_MODES = {"DnsOverHttps": "doh", "WarpWithDnsOverHttps": "warp+doh"}
+WARP_LABELS = {"doh": "DNS only", "warp+doh": "full tunnel"}
+TRACE_URL = "https://www.cloudflare.com/cdn-cgi/trace"
+RESOLVER_CHECK_HOST = "whoami.akamai.net"
+UOFT_DNS_RANGE = "107.161.13.128/27"
+CLOUDFLARE_RANGES = (
+    "173.245.48.0/20",
+    "103.21.244.0/22",
+    "103.22.200.0/22",
+    "103.31.4.0/22",
+    "141.101.64.0/18",
+    "108.162.192.0/18",
+    "190.93.240.0/20",
+    "188.114.96.0/20",
+    "197.234.240.0/22",
+    "198.41.128.0/17",
+    "162.158.0.0/15",
+    "104.16.0.0/13",
+    "104.24.0.0/14",
+    "172.64.0.0/13",
+    "131.0.72.0/22",
+)
+AIRDROP_MARKER = Path.home() / ".local/state/wifi/airdrop-off"
+HYPIXEL = ("mc.hypixel.net", 25565)
+PINGS = 5
+USAGE = "usage: wifi [status|general|gaming|unblock]"
+
+
+def output(*command):
+    try:
+        return subprocess.run(command, capture_output=True, text=True, stdin=subprocess.DEVNULL, timeout=15).stdout
+    except (OSError, subprocess.TimeoutExpired):
+        return ""
+
+
+def warp_mode():
+    found = re.search(r"Mode: (\S+)", output("warp-cli", "settings", "list"))
+    return WARP_MODES.get(found.group(1), found.group(1)) if found else None
+
+
+def warp_state():
+    found = re.search(r"Status update: (\w+)", output("warp-cli", "status"))
+    return found.group(1) if found else "unknown"
+
+
+def traffic_path():
+    found = re.search(r"^warp=(\w+)", output("curl", "-s", "-m", "4", TRACE_URL), re.MULTILINE)
+    if not found:
+        return "unknown"
+    return "direct" if found.group(1) == "off" else "through WARP"
+
+
+def airdrop_on():
+    return bool(re.search(r"<UP\b", output("ifconfig", "awdl0")))
+
+
+def tailscale_status():
+    try:
+        return json.loads(output("tailscale", "status", "--json"))
+    except json.JSONDecodeError:
+        return {}
+
+
+def tailscale_dns_on():
+    try:
+        return json.loads(output("tailscale", "debug", "prefs")).get("CorpDNS", False)
+    except json.JSONDecodeError:
+        return False
+
+
+def dns_path():
+    try:
+        address = ipaddress.ip_address(socket.gethostbyname(RESOLVER_CHECK_HOST))
+    except (OSError, ValueError):
+        return "no answer"
+    if any(address in ipaddress.ip_network(network) for network in CLOUDFLARE_RANGES):
+        return f"Cloudflare ({address})"
+    if address in ipaddress.ip_network(UOFT_DNS_RANGE):
+        return f"UofT's DNS ({address})"
+    return f"unknown resolver ({address})"
+
+
+def set_airdrop(state):
+    if subprocess.run(["sudo", "ifconfig", "awdl0", state]).returncode:
+        sys.exit(f"couldn't turn awdl0 {state}: run this from a terminal so sudo can ask")
+
+
+def apply(preset):
+    settings = PRESETS[preset]
+    if tailscale_dns_on():
+        output("tailscale", "set", "--accept-dns=false")
+    if warp_mode() != settings["warp"]:
+        output("warp-cli", "mode", settings["warp"])
+    if warp_state() == "Disconnected":
+        output("warp-cli", "connect")
+    if warp_mode() != settings["warp"]:
+        sys.exit(f"warp didn't switch to {settings['warp']}")
+    if settings["clear_exit_node"] and tailscale_status().get("ExitNodeStatus"):
+        output("tailscale", "set", "--exit-node=")
+    if settings["airdrop"]:
+        if AIRDROP_MARKER.exists():
+            set_airdrop("up")
+            AIRDROP_MARKER.unlink()
+    elif airdrop_on():
+        set_airdrop("down")
+        AIRDROP_MARKER.parent.mkdir(parents=True, exist_ok=True)
+        AIRDROP_MARKER.touch()
+
+
+def varint(value):
+    out = bytearray()
+    while True:
+        byte = value & 0x7F
+        value >>= 7
+        out.append(byte | (0x80 if value else 0))
+        if not value:
+            return bytes(out)
+
+
+def packet(body):
+    return varint(len(body)) + body
+
+
+def read_varint(stream):
+    value = shift = 0
+    while True:
+        byte = stream.read(1)[0]
+        value |= (byte & 0x7F) << shift
+        shift += 7
+        if not byte & 0x80:
+            return value
+
+
+def ping_hypixel():
+    host, port = HYPIXEL
+    name = host.encode()
+    handshake = b"\x00" + varint(47) + varint(len(name)) + name + struct.pack(">H", port) + varint(1)
+    with socket.create_connection(HYPIXEL, timeout=3) as sock:
+        sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        sock.settimeout(3)
+        sock.sendall(packet(handshake) + packet(b"\x00"))
+        stream = sock.makefile("rb")
+        read_varint(stream)
+        read_varint(stream)
+        stream.read(read_varint(stream))
+        start = time.perf_counter()
+        sock.sendall(packet(b"\x01" + struct.pack(">q", 1)))
+        stream.read(10)
+        return (time.perf_counter() - start) * 1000
+
+
+def hypixel_summary():
+    samples = []
+    for _ in range(PINGS):
+        try:
+            samples.append(ping_hypixel())
+        except (OSError, IndexError):
+            pass
+        time.sleep(0.2)
+    if not samples:
+        return "unreachable"
+    samples.sort()
+    return f"{samples[len(samples) // 2]:.0f} ms median, {samples[-1]:.0f} ms worst ({len(samples)}/{PINGS} pings)"
+
+
+def status():
+    mode = warp_mode()
+    tailscale = tailscale_status()
+    exit_node = "using an exit node" if tailscale.get("ExitNodeStatus") else "no exit node"
+    tailscale_dns = "DNS on" if tailscale_dns_on() else "DNS off"
+    print(f"warp       {WARP_LABELS.get(mode, mode)}, {warp_state().lower()}")
+    print(f"traffic    {traffic_path()}")
+    print(f"dns        {dns_path()}")
+    print(f"tailscale  {tailscale.get('BackendState', 'unknown')}, {exit_node}, {tailscale_dns}")
+    print(f"airdrop    {'on' if airdrop_on() else 'off'}")
+    print(f"hypixel    {hypixel_summary()}")
+
+
+def main():
+    command = sys.argv[1] if len(sys.argv) > 1 else "status"
+    if len(sys.argv) > 2 or (command != "status" and command not in PRESETS):
+        sys.exit(USAGE)
+    if command in PRESETS:
+        apply(command)
+    status()
+
+
+if __name__ == "__main__":
+    main()
