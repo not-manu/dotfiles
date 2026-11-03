@@ -12,6 +12,7 @@
 ## Where My Stuff Lives
 - Dotfiles: `~/.dotfiles`. `~/.claude/CLAUDE.md` symlinks to
   `~/.dotfiles/config/agents/AGENTS.md` — edit the source, not the symlink.
+- Personal commands: `~/.dotfiles/config/bin` (on PATH as `~/.config/bin`).
 - Code: `~/Documents/Projects/<scope>/<project>`. Scope `not-manu` is personal
   and the default; the other is a shared account.
 - `.../not-manu/Clones/` — upstream repos for reading only. Never commit or
@@ -48,6 +49,16 @@
 - Never dump loose files in `./.tmp/`. Make one kebab-case folder named for
   the task (e.g. `./.tmp/debug-auth-redirect/`) and keep all its scratch
   work inside.
+
+## Network
+- Run `wifi` to see network state. Presets: `wifi general` (default),
+  `wifi gaming`, `wifi unblock` (full WARP tunnel). Ask before switching.
+- Keep Tailscale DNS off on this Mac (`--accept-dns=false`). Turning it on jams
+  WARP's full tunnel and can send lookups through UofT's DNS. `.ts.net` names
+  don't resolve here, so use Tailscale IPs.
+- SSH to tailnet devices fails during `wifi unblock`; `wifi general` restores it.
+- Restart Tailscale with `tailscale up --accept-routes`. Plain `tailscale up` fails.
+- After testing network changes, put everything back and run `wifi` to confirm.
 
 ## Tasks & Reminders (Google Tasks)
 - Reminders, to-dos, and deadlines go in Google Tasks — the checkbox items
