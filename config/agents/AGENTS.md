@@ -82,6 +82,12 @@
   visual deliverables, write a local self-contained `.html` file (inline
   CSS/JS, no CDNs) next to the relevant project files and tell me the path.
 
+## Math
+- Write math in replies as LaTeX, never unicode or ASCII: `$$...$$` on its own
+  line for equations, `$...$` inside a sentence. The `texel` plugin draws these
+  as images in the terminal. Inline math is one row tall, so keep fractions,
+  sums, and integrals in `$$...$$`. Never wrap math in backticks; it stays raw.
+
 ## Fonts
 - Sans: Geist. Serif: Source Serif 4. Mono: Berkeley Mono. Use these for
   anything I'll look at (reports, UIs, slides); give each a sensible fallback.
