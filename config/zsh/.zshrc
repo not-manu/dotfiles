@@ -243,7 +243,7 @@ claude() {
   CLAUDE_CODE_TMPDIR="$PWD/.tmp" nap claude "$@"
 }
 alias 'cc'='IS_DEMO=1 claude --chrome --model "$CLAUDE_MODEL" --system-prompt "$CLAUDE_SYSTEM_PROMPT"'
-alias 'ccd'='IS_DEMO=1 claude --chrome --model "$CLAUDE_MODEL" --dangerously-skip-permissions --system-prompt "$CLAUDE_SYSTEM_PROMPT"'
+alias 'ccd'='claude-trust; IS_DEMO=1 claude --chrome --model "$CLAUDE_MODEL" --dangerously-skip-permissions --system-prompt "$CLAUDE_SYSTEM_PROMPT"'
 alias 'ccc'='IS_DEMO=1 CLAUDE_CODE_SIMPLE=1 claude --model "$CLAUDE_MODEL" --dangerously-skip-permissions'
 
 # bun

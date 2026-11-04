@@ -1,0 +1,32 @@
+#!/usr/bin/env bun
+import { realpathSync, renameSync, writeFileSync } from 'node:fs'
+import { homedir } from 'node:os'
+
+const HOME = homedir()
+const CONFIG = `${HOME}/.claude.json`
+const CLONES = `${HOME}/Documents/Projects/not-manu/Clones`
+
+const directory = realpathSync(process.argv[2] ?? '.')
+const git = Bun.spawnSync(
+  ['git', '-C', directory, 'rev-parse', '--show-toplevel'],
+  { stdin: 'ignore', stderr: 'ignore' },
+)
+const root = (git.exitCode === 0 ? git.stdout.toString().trim() : directory).normalize('NFC')
+
+if (root === '/' || root === HOME || root === CLONES || root.startsWith(`${CLONES}/`)) {
+  process.exit(0)
+}
+
+const config = await Bun.file(CONFIG).json()
+const project = config.projects?.[root]
+
+if (project?.hasTrustDialogAccepted) process.exit(0)
+
+config.projects = {
+  ...config.projects,
+  [root]: { ...project, hasTrustDialogAccepted: true },
+}
+
+const temporary = `${CONFIG}.${process.pid}.tmp`
+writeFileSync(temporary, JSON.stringify(config, null, 2), { mode: 0o600 })
+renameSync(temporary, CONFIG)
