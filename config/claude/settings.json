@@ -1,16 +1,28 @@
 {
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "permissions": {
     "defaultMode": "auto"
   },
+  "model": "opus",
   "disableRemoteControl": true,
   "enabledPlugins": {
-    "pyright-lsp@claude-plugins-official": false
+    "pyright-lsp@claude-plugins-official": false,
+    "texel@texel": true
   },
   "extraKnownMarketplaces": {
     "claude-code-plugins": {
       "source": {
         "source": "github",
         "repo": "anthropics/claude-code"
+      }
+    },
+    "texel": {
+      "source": {
+        "source": "directory",
+        "path": "/Users/manu/Documents/Projects/not-manu/texel"
       }
     }
   },
@@ -25,17 +37,12 @@
   },
   "tui": "fullscreen",
   "autoMemoryEnabled": false,
-  "idleCompaction": false,
   "skipDangerousModePermissionPrompt": true,
   "theme": "custom:flexoki",
   "editorMode": "vim",
+  "idleCompaction": false,
   "remoteControlAtStartup": false,
   "autoUploadSessions": false,
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": false,
-  "model": "opus",
-  "attribution": {
-    "commit": "",
-    "pr": ""
-  }
+  "voiceEnabled": false
 }

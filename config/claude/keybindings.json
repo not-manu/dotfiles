@@ -5,7 +5,8 @@
     {
       "context": "Chat",
       "bindings": {
-        "ctrl+x ctrl+u": "chat:undo"
+        "ctrl+x ctrl+u": "chat:undo",
+        "ctrl+u": "command:undo"
       }
     }
   ]
