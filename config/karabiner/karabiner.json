@@ -91,6 +91,23 @@
                         ]
                     },
                     {
+                        "description": "Lunar: Cmd+Q drops a stack, Cmd+Ctrl+Q quits",
+                        "manipulators": [
+                            {
+                                "type": "basic",
+                                "from": { "key_code": "q", "modifiers": { "mandatory": ["command", "control"] } },
+                                "to": [{ "key_code": "q", "modifiers": ["left_command"] }],
+                                "conditions": [{ "type": "frontmost_application_if", "file_paths": ["/\\.lunarclient/jre/"] }]
+                            },
+                            {
+                                "type": "basic",
+                                "from": { "key_code": "q", "modifiers": { "mandatory": ["command"] } },
+                                "to": [{ "key_code": "q", "modifiers": ["left_control"] }],
+                                "conditions": [{ "type": "frontmost_application_if", "file_paths": ["/\\.lunarclient/jre/"] }]
+                            }
+                        ]
+                    },
+                    {
                         "description": "Cmd+Ctrl+Q quits Minecraft",
                         "manipulators": [
                             {
