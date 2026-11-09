@@ -13,12 +13,8 @@ if [[ "${1:-}" == "--attach" ]]; then
     # popup is opened with -d <path>, so $PWD is the parent pane's path.
     # tmux 3.6 fails to resolve set/show -t by session *name*, so grab the
     # session id at creation and target that to configure the status bar.
-    # The bar is reduced to a single bottom line holding only the pane rail.
     id=$(tmux new-session -dPF '#{session_id}' -s "$name" -c "$PWD")
-    tmux set -t "$id" status on
-    tmux set -t "$id" status-position bottom
-    tmux set -t "$id" 'status-format[0]' \
-      "#[bg=#100f0f,align=centre]#{?#{>:#{window_panes},1},#{P:#{?pane_active,#[fg=#878580]━━,#[fg=#403e3c]──}} ,}"
+    tmux set -t "$id" status off
   fi
   exec tmux attach -t "=$name"
 fi
