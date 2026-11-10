@@ -6,7 +6,7 @@
   "permissions": {
     "defaultMode": "auto"
   },
-  "model": "claude-fable-5-2",
+  "model": "fable",
   "disableRemoteControl": true,
   "enabledPlugins": {
     "pyright-lsp@claude-plugins-official": false,
@@ -35,7 +35,7 @@
       "effortLevel": "xhigh"
     },
     "claude-fable-5-2": {
-      "effortLevel": "high"
+      "effortLevel": "xhigh"
     }
   },
   "tui": "fullscreen",
