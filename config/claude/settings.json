@@ -6,7 +6,7 @@
   "permissions": {
     "defaultMode": "auto"
   },
-  "model": "fable",
+  "model": "claude-fable-5-2",
   "disableRemoteControl": true,
   "enabledPlugins": {
     "pyright-lsp@claude-plugins-official": false,
