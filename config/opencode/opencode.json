@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "openrouter/~deepseek/deepseek-flash-latest",
+  "model": "opencode/deepseek-v4.1-flash-free",
   "agents": {
     "neo": {
       "description": "Neo — same base system prompt and permissions as Build, plus neo-prompt.md",
