@@ -69,6 +69,16 @@ vim.lsp.config("texlab", {
   },
 })
 
+vim.lsp.config("basedpyright", {
+  settings = {
+    basedpyright = {
+      analysis = {
+        typeCheckingMode = "standard",
+      },
+    },
+  },
+})
+
 -- MDX analyzer configuration
 vim.lsp.config("mdx_analyzer", {
   root_markers = { "package.json", "tsconfig.json", "jsconfig.json", ".git" },
