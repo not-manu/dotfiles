@@ -16,24 +16,6 @@ end)
 
 hs.execute([[/usr/bin/hidutil property --set '{"HIDKeyRepeat":25000000,"HIDInitialKeyRepeat":150000000}']])
 
-HeliumProfileTap = hs.eventtap
-  .new({ hs.eventtap.event.types.keyDown }, function(event)
-    if event:getKeyCode() ~= hs.keycodes.map.n or not event:getFlags():containExactly({ "cmd", "shift" }) then
-      return false
-    end
-    local app = hs.application.frontmostApplication()
-    if not app or app:bundleID() ~= "net.imput.helium" then
-      return false
-    end
-    local win = app:focusedWindow()
-    if not win or not win:title():match(" %- Manu$") then
-      return false
-    end
-    app:selectMenuItem({ "Profiles", "Personal" })
-    return true
-  end)
-  :start()
-
 hs.hotkey.bind({ "alt", "shift" }, "G", function()
   hs.application.launchOrFocus("Ghostty")
 end)
